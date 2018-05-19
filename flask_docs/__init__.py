@@ -1,0 +1,195 @@
+#!/usr/bin/env python
+# coding=utf8
+
+from flask import Blueprint, current_app, render_template, json, url_for
+import re
+
+ELEMENT_VERSION = '2.3.8'
+VUE_VERSION = '2.5.17-beta.0'
+MARKED_VERSION = '0.3.19'
+
+
+class CDN(object):
+    def get_resource_url(self, filename):
+        raise NotImplementedError
+
+
+class StaticCDN(object):
+    def __init__(self, static_endpoint='static', rev=False):
+        self.static_endpoint = static_endpoint
+        self.rev = rev
+
+    def get_resource_url(self, filename):
+        extra_args = {}
+
+        return url_for(self.static_endpoint, filename=filename, **extra_args)
+
+
+class WebCDN(object):
+    def __init__(self, baseurl):
+        self.baseurl = baseurl
+
+    def get_resource_url(self, filename):
+        return self.baseurl + filename
+
+
+class ConditionalCDN(object):
+    def __init__(self, confvar, primary, fallback):
+        self.confvar = confvar
+        self.primary = primary
+        self.fallback = fallback
+
+    def get_resource_url(self, filename):
+        if not current_app.config[self.confvar]:
+            return self.primary.get_resource_url(filename)
+        return self.fallback.get_resource_url(filename)
+
+
+def find_resource(filename, cdn, use_minified=True, local=True):
+    config = current_app.config
+
+    if use_minified:
+        filename = '%s.min.%s' % tuple(filename.rsplit('.', 1))
+
+    cdns = current_app.extensions['api_doc']['cdns']
+    resource_url = cdns[cdn].get_resource_url(filename)
+
+    if resource_url.startswith('//'):
+        resource_url = 'https:%s' % resource_url
+
+    return resource_url
+
+
+class ApiDoc(object):
+    def __init__(self, app=None):
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        app.config.setdefault('API_DOC_MEMBER', [])
+        app.config.setdefault('API_DOC_ENABLE', True)
+        app.config.setdefault('API_DOC_CDN', True)
+
+        with app.app_context():
+            if current_app.config['API_DOC_ENABLE']:
+                api_doc = Blueprint(
+                    'api_doc',
+                    __name__,
+                    template_folder='templates',
+                    static_folder='static',
+                    static_url_path=app.static_url_path + '/api_doc',
+                    url_prefix='/docs/api')
+
+                app.jinja_env.globals['find_resource'] =\
+                    find_resource
+                app.jinja_env.add_extension('jinja2.ext.do')
+
+                local = StaticCDN('api_doc.static', rev=True)
+                static = StaticCDN()
+
+                def lwrap(cdn, primary=static):
+                    return ConditionalCDN('API_DOC_CDN', primary, cdn)
+
+                elementJs = lwrap(
+                    WebCDN('//cdn.bootcss.com/element-ui/%s/' %
+                        ELEMENT_VERSION), local)
+
+                elementCss = lwrap(
+                    WebCDN('//cdn.bootcss.com/element-ui/%s/theme-chalk/' %
+                        ELEMENT_VERSION), local)
+
+                vue = lwrap(
+                    WebCDN('//cdn.bootcss.com/vue/%s/' %
+                        VUE_VERSION), local)
+
+                marked = lwrap(
+                    WebCDN('//cdn.bootcss.com/marked/%s/' %
+                        MARKED_VERSION), local)
+
+                app.extensions['api_doc'] = {
+                    'cdns': {
+                        'local': local,
+                        'static': static,
+                        'elementJs': elementJs,
+                        'elementCss': elementCss,
+                        'vue': vue,
+                        'marked': marked
+                    },
+                }
+
+                @api_doc.route('/', methods=['GET'])
+                def index():
+                    dataList = []
+                    for rule in app.url_map.iter_rules():
+                        for f in current_app.config['API_DOC_MEMBER']:
+                            if re.search(r'^/{}/.+'.format(f), str(rule)):
+
+                                api = {
+                                    'name': '',
+                                    'name_extra': '',
+                                    'url': '',
+                                    'method': [],
+                                    'doc': '',
+                                    'doc_md': ''
+                                }
+                                try:
+                                    func = app.view_functions[rule.endpoint]
+
+                                    api['name'] = self.get_api_name(func)
+                                    api['url'] = str(rule)
+
+                                    api['method'] = ' '.join([
+                                        r for r in rule.methods if r in
+                                        ['GET', 'POST', 'PUT', 'DELETE']
+                                    ])
+
+                                    doc = self.get_api_doc(func)
+                                    try:
+                                        api['doc'] = doc.split('@@@')[0]
+                                    except Exception as e:
+                                        api['doc'] = 'No doc found for this Api'
+
+                                    if api['doc'] != 'No doc found for this Api':
+                                        api['name_extra'] = api['doc'].split(
+                                            '\n\n')[0].split('\n')[0].strip(
+                                                ' ').strip('\n\n').strip(
+                                                    ' ').strip('\n').strip(' ')
+
+                                    api['doc'] = api['doc'].replace(
+                                        api['name_extra'], '',
+                                        1).rstrip(' ').strip('\n\n').rstrip(
+                                            ' ').strip('\n').rstrip(' ')
+
+                                    if api['doc'] == '':
+                                        api['doc'] = 'No doc found for this Api'
+
+                                    try:
+                                        api['doc_md'] = doc.split('@@@')[
+                                            1].strip(' ')
+                                    except Exception as e:
+                                        api['doc_md'] = ''
+                                    api['doc_md'] = re.sub(
+                                        ' +', ' ', api['doc_md'])
+
+                                except Exception as e:
+                                    pass
+                                else:
+                                    dataList.append(api)
+                    dataList.sort(key=lambda x: x['name'])
+                    dataDict = {'data': dataList}
+                    return render_template(
+                        'apidoc/api_doc.html', data=json.dumps(dataDict))
+
+                app.register_blueprint(api_doc)
+
+    def get_api_name(self, func):
+        """e.g. Convert 'do_work' to 'Do Work'"""
+        words = func.__name__.split('_')
+        words = [w.capitalize() for w in words]
+        return ' '.join(words)
+
+    def get_api_doc(self, func):
+        if func.__doc__:
+            return func.__doc__
+        else:
+            return 'No doc found for this Api'

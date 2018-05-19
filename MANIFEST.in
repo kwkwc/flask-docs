@@ -1,0 +1,4 @@
+recursive-include flask_docs/static *
+recursive-include flask_docs/templates *.html
+recursive-include flask_docs/assets *
+include README.md

@@ -1,12 +1,6 @@
-# Flask-Docs
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
 
-> Adds Docs support to Flask.
-
-Usage
------
-
-Here is an example:
-```
 from flask import Flask, render_template, jsonify, Blueprint
 from flask_docs import ApiDoc
 
@@ -64,14 +58,3 @@ app.register_blueprint(api, url_prefix='/api')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-```
-
-Run in /docs/api
------
-
-![sample_app](flask_docs/assets/sample_app.png)
-
-Reference
------
-
-[falsk_api_doc](https://github.com/tobyqin/flask_api_doc/)

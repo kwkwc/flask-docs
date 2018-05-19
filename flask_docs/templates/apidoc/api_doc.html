@@ -1,0 +1,97 @@
+{% extends "apidoc/base.html" %} 
+
+{% block title %}Api Doc{% endblock %}
+
+{% block content %}
+<div id="app">
+  <el-container>
+    <el-header>
+      <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
+        <el-menu-item index="1">Api Doc</el-menu-item>
+      </el-menu>
+    </el-header>
+    <el-main>
+      <el-row>
+        <el-col :span="8">
+          <el-input placeholder="Filter keyword" v-model="treeFilterText" style="padding-bottom:10px">
+          </el-input>
+          <div style="overflow-y:auto;max-height:670px;">
+            <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps" default-expand-all :filter-node-method="treeFilterNode"
+              ref="apiTree" @node-click="treeNodeClick">
+            </el-tree>
+          </div>
+        </el-col>
+        <el-col :span="16" style="padding-left:20px">
+          <div id="md"></div>
+        </el-col>
+      </el-row>
+    </el-main>
+  </el-container>
+</div>
+{% endblock %} 
+
+{% block scripts %}
+{{ super() }}
+<script>
+
+  new Vue({
+    delimiters: ['{[', ']}'],
+    el: '#app',
+    data: {
+      headerIndex: '1',
+      treeFilterText: '',
+      apiData: JSON.parse({{ data|tojson|safe }}),
+      treeData: JSON.parse({{ data|tojson|safe }}).data,
+      treeDefaultProps: {
+        label: 'full_name'
+      }
+    },
+    methods: {
+      treeFilterNode(value, data) {
+        if (!value) return true
+        let srcStr = data.full_name.toLowerCase()
+        let desStr = value.toLowerCase()
+        return srcStr.indexOf(desStr) !== -1
+      },
+      treeNodeClick(data) {
+        let md = ''
+        this.treeData.forEach((con, index) => {
+          if(con.name == data.name) {
+            md += '# ' + data.full_name + '\n\n'
+            md += '#### url' + '\n'
+            md += '- ' + con.url + '\n\n'
+            md += '#### method' + '\n'
+            md += '- ' + con.method + '\n\n'
+            md += '#### doc' + '\n'
+            md += '```\n' + con.doc + '\n```\n\n'
+            md += con.doc_md
+          }
+        })
+        document.getElementById('md').innerHTML = marked(md)
+      }
+    },
+    computed: {
+      treeDataNew() {
+        let treeDataNew = new Array()
+        this.treeData.forEach((con, index) => {
+          if(con.name_extra == '') {
+            treeDataNew.push({'full_name': con.name, 'name': con.name})
+          }
+          else {
+            treeDataNew.push({'full_name': con.name + '(' + con.name_extra + ')', 'name': con.name})
+          }
+        })
+        return treeDataNew
+      }
+    },
+    watch: {
+      treeFilterText(val) {
+        this.$refs.apiTree.filter(val)
+      }
+    }
+  })
+</script>
+<script>
+  document.getElementById('md').innerHTML = marked('# Api Doc')
+</script>
+{% endblock %}
