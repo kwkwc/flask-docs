@@ -5,33 +5,14 @@ from flask import Flask, render_template, jsonify, Blueprint
 from flask_docs import ApiDoc
 
 app = Flask(__name__)
-app.config['API_DOC_MEMBER'] = ['api']
-app.config['API_DOC_ENABLE'] = True
+app.config['API_DOC_MEMBER'] = ['api', 'platform']
+# app.config['API_DOC_ENABLE'] = False
 # app.config['API_DOC_CDN'] = False
 
 ApiDoc(app)
 
 api = Blueprint('api', __name__)
-
-
-@api.route('/get_data', methods=['GET'])
-def get_data():
-    """Get some data
-    
-    @@@
-    ### args
-
-    | args | nullable | type | remark |
-    |--------|--------|--------|--------|
-    |    title    |    false    |    string   |    blog title    |
-    |    name    |    true    |    string   |    person's name    |
-
-    ##### Returns：
-    - ##### json
-    > {"msg": "success", "code": 200}
-    @@@
-    """
-    return jsonify({'api': 'get data'})
+platform = Blueprint('platform', __name__)
 
 
 @api.route('/add_data', methods=['POST'])
@@ -49,12 +30,44 @@ def add_data():
     return jsonify({'api': 'add data'})
 
 
-@api.route('/del_data', methods=['GET', 'POST'])
+@api.route('/del_data', methods=['POST'])
 def del_data():
+    """Del some data
+
+    @@@
+    #### args
+
+    | args | nullable | type | remark |
+    |--------|--------|--------|--------|
+    |    title    |    false    |    string   |    blog title    |
+    |    name    |    true    |    string   |    person's name    |
+
+    #### return
+    - ##### json
+    > {"msg": "success", "code": 200}
+    @@@
+    """
     return jsonify({'api': 'del data'})
 
 
+@platform.route('/get_something', methods=['GET'])
+def get_something():
+    """
+    @@@
+    #### example
+        import requests
+        url='http://127.0.0.1:5000/api/get_something'
+        try:
+            print requests.get(url).text
+        except:
+            pass
+    @@@
+    """
+    return jsonify({'platform': 'get something'})
+
+
 app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(platform, url_prefix='/platform')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

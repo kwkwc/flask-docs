@@ -119,9 +119,11 @@ class ApiDoc(object):
 
                 @api_doc.route('/', methods=['GET'])
                 def index():
-                    dataList = []
-                    for rule in app.url_map.iter_rules():
-                        for f in current_app.config['API_DOC_MEMBER']:
+                    dataDict = {}
+                    for f in current_app.config['API_DOC_MEMBER']:
+                        dataList = []
+                        dataDict[f.capitalize()] = {'children': []}
+                        for rule in app.url_map.iter_rules():
                             if re.search(r'^/{}/.+'.format(f), str(rule)):
 
                                 api = {
@@ -130,7 +132,8 @@ class ApiDoc(object):
                                     'url': '',
                                     'method': [],
                                     'doc': '',
-                                    'doc_md': ''
+                                    'doc_md': '',
+                                    'router': f.capitalize()
                                 }
                                 try:
                                     func = app.view_functions[rule.endpoint]
@@ -166,17 +169,24 @@ class ApiDoc(object):
                                     try:
                                         api['doc_md'] = doc.split('@@@')[
                                             1].strip(' ')
+                                        try:
+                                            space_count = doc.split('@@@')[0].split('\n')[-1].count(' ')
+                                        except Exception as e:
+                                            space_count = 0
+                                        api['doc_md'] = '\n'.join(api['doc_md'].split('\n' + ' ' * space_count))
                                     except Exception as e:
                                         api['doc_md'] = ''
-                                    api['doc_md'] = re.sub(
-                                        ' +', ' ', api['doc_md'])
 
                                 except Exception as e:
                                     pass
                                 else:
                                     dataList.append(api)
-                    dataList.sort(key=lambda x: x['name'])
-                    dataDict = {'data': dataList}
+                        if dataList != []:
+                            dataList.sort(key=lambda x: x['name'])
+                            dataDict[f.capitalize()]['children'] = dataList
+                        else:
+                            dataDict.pop(f.capitalize())
+                    dataDict = {'data': dataDict}
                     return render_template(
                         'apidoc/api_doc.html', data=json.dumps(dataDict))
 
