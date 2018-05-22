@@ -21,7 +21,7 @@ ApiDoc(app)
 
 
 class TodoList(Resource):
-    """Get todolist"""
+    """Manage todolist"""
 
     def post(self):
         """Submission of data
@@ -52,7 +52,7 @@ class TodoList(Resource):
         return {'todos': 'get todolist'}
 
 
-restful_api.add_resource(TodoList, '/todos')
+restful_api.add_resource(TodoList, '/todolist')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
