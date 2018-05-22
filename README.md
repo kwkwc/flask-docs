@@ -113,7 +113,7 @@ Flask-RESTful Api and document pages
 from flask_restful import Resource, Api
 
 class TodoList(Resource):
-    """Get todolist"""
+    """Manage todolist"""
 
     def post(self):
         """Submission of data
@@ -144,7 +144,7 @@ class TodoList(Resource):
         return {'todos': 'get todolist'}
 
 
-restful_api.add_resource(TodoList, '/todos')
+restful_api.add_resource(TodoList, '/todolist')
 ```
 
 ![sample_app](flask_docs/assets/sample_app_restful_post.png)
