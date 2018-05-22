@@ -9,7 +9,7 @@ def read(fname):
 
 setup(
     name='Flask-Docs',
-    version='0.0.2',
+    version='0.0.3',
     url='https://github.com/kwkwc/flask-docs',
     license='MIT',
     author='kwkw',
@@ -23,9 +23,9 @@ setup(
     platforms='any',
     keywords=[
         'flask', 'api', 'apidoc', 'doc', 'docs', 'documentation', 'md',
-        'markdown'
+        'markdown', 'RESTful', 'auto'
     ],
-    install_requires=['Flask'],
+    install_requires=['Flask', 'Flask-RESTful'],
     classifiers=[
         'Environment :: Web Environment', 'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',

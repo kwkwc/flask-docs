@@ -5,9 +5,15 @@ from flask import Flask, render_template, jsonify, Blueprint
 from flask_docs import ApiDoc
 
 app = Flask(__name__)
-app.config['API_DOC_MEMBER'] = ['api', 'platform']
-# app.config['API_DOC_ENABLE'] = False
+
+# Local loading
 # app.config['API_DOC_CDN'] = False
+
+# Disable document pages
+# app.config['API_DOC_ENABLE'] = False
+
+# Api Document needs to be displayed
+app.config['API_DOC_MEMBER'] = ['api', 'platform']
 
 ApiDoc(app)
 

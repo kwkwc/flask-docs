@@ -2,6 +2,7 @@
 # coding=utf8
 
 from flask import Blueprint, current_app, render_template, json, url_for
+from flask_restful import Resource
 import re
 
 ELEMENT_VERSION = '2.3.8'
@@ -46,8 +47,6 @@ class ConditionalCDN(object):
 
 
 def find_resource(filename, cdn, use_minified=True, local=True):
-    config = current_app.config
-
     if use_minified:
         filename = '%s.min.%s' % tuple(filename.rsplit('.', 1))
 
@@ -60,6 +59,13 @@ def find_resource(filename, cdn, use_minified=True, local=True):
     return resource_url
 
 
+def get_all_subclasses(cls):
+    all_subclasses = []
+    for subclass in cls.__subclasses__():
+        all_subclasses.append(subclass)
+    return all_subclasses
+
+
 class ApiDoc(object):
     def __init__(self, app=None):
         if app is not None:
@@ -69,6 +75,7 @@ class ApiDoc(object):
         app.config.setdefault('API_DOC_MEMBER', [])
         app.config.setdefault('API_DOC_ENABLE', True)
         app.config.setdefault('API_DOC_CDN', True)
+        app.config.setdefault('RESTFUL_API_DOC_EXCLUDE', [])
 
         with app.app_context():
             if current_app.config['API_DOC_ENABLE']:
@@ -91,20 +98,20 @@ class ApiDoc(object):
                     return ConditionalCDN('API_DOC_CDN', primary, cdn)
 
                 elementJs = lwrap(
-                    WebCDN('//cdn.bootcss.com/element-ui/%s/' %
-                        ELEMENT_VERSION), local)
+                    WebCDN(
+                        '//cdn.bootcss.com/element-ui/%s/' % ELEMENT_VERSION),
+                    local)
 
                 elementCss = lwrap(
                     WebCDN('//cdn.bootcss.com/element-ui/%s/theme-chalk/' %
-                        ELEMENT_VERSION), local)
+                           ELEMENT_VERSION), local)
 
                 vue = lwrap(
-                    WebCDN('//cdn.bootcss.com/vue/%s/' %
-                        VUE_VERSION), local)
+                    WebCDN('//cdn.bootcss.com/vue/%s/' % VUE_VERSION), local)
 
                 marked = lwrap(
-                    WebCDN('//cdn.bootcss.com/marked/%s/' %
-                        MARKED_VERSION), local)
+                    WebCDN('//cdn.bootcss.com/marked/%s/' % MARKED_VERSION),
+                    local)
 
                 app.extensions['api_doc'] = {
                     'cdns': {
@@ -120,11 +127,117 @@ class ApiDoc(object):
                 @api_doc.route('/', methods=['GET'])
                 def index():
                     dataDict = {}
+
+                    url_map = app.url_map.iter_rules()
+                    restful_api_class = get_all_subclasses(Resource)
+
+                    for rule in url_map:
+                        dataList = []
+                        name = str(rule).split('/')[1].split('/')[0]
+                        if name not in current_app.config[
+                                'RESTFUL_API_DOC_EXCLUDE']:
+                            for c in restful_api_class:
+                                if str(rule.endpoint).split('.')[
+                                        0] == c.__name__.lower():
+
+                                    c_doc = self.get_api_doc(c)
+
+                                    try:
+                                        if c_doc != 'No doc found for this Api':
+                                            name = name.capitalize(
+                                            ) + '(' + c_doc.split(
+                                                '\n\n')[0].split('\n')[0].strip(
+                                                    ' ').strip('\n\n').strip(
+                                                        ' ').strip('\n').strip(
+                                                            ' ') + ')'
+                                    except Exception as e:
+                                        name = name.capitalize()
+
+                                    for m in c.methods:
+                                        if m in [
+                                                'GET', 'POST', 'PUT', 'DELETE'
+                                        ]:
+                                            api = {
+                                                'name': '',
+                                                'name_extra': '',
+                                                'url': '',
+                                                'doc': '',
+                                                'doc_md': '',
+                                                'router': name,
+                                                'api_type': 'restful_api'
+                                            }
+
+                                            try:
+                                                api['name'] = m
+
+                                                api['url'] = str(rule)
+
+                                                doc = eval(
+                                                    'c.{}.__doc__'.format(
+                                                        m.lower()))
+
+                                                doc = doc if doc else 'No doc found for this Api'
+
+                                                try:
+                                                    api['doc'] = doc.split(
+                                                        '@@@')[0]
+                                                except Exception as e:
+                                                    api['doc'] = 'No doc found for this Api'
+
+                                                if api['doc'] != 'No doc found for this Api':
+                                                    api['name_extra'] = api[
+                                                        'doc'].split(
+                                                            '\n\n'
+                                                        )[0].split(
+                                                            '\n'
+                                                        )[0].strip(' ').strip(
+                                                            '\n\n'
+                                                        ).strip(' ').strip(
+                                                            '\n').strip(' ')
+
+                                                api['doc'] = api[
+                                                    'doc'].replace(
+                                                        api['name_extra'], '',
+                                                        1).rstrip(' ').strip(
+                                                            '\n\n'
+                                                        ).rstrip(' ').strip(
+                                                            '\n').rstrip(' ')
+
+                                                if api['doc'] == '':
+                                                    api['doc'] = 'No doc found for this Api'
+
+                                                try:
+                                                    api['doc_md'] = doc.split(
+                                                        '@@@')[1].strip(' ')
+                                                    try:
+                                                        space_count = doc.split(
+                                                            '@@@'
+                                                        )[0].split('\n')[
+                                                            -1].count(' ')
+                                                    except Exception as e:
+                                                        space_count = 0
+                                                    api['doc_md'] = '\n'.join(
+                                                        api['doc_md'].split(
+                                                            '\n' +
+                                                            ' ' * space_count))
+                                                except Exception as e:
+                                                    api['doc_md'] = ''
+
+                                            except Exception as e:
+                                                pass
+                                            else:
+                                                dataList.append(api)
+                                    break
+                        if dataList != []:
+                            dataDict[name] = {'children': []}
+                            dataDict[name]['children'] = dataList
+
                     for f in current_app.config['API_DOC_MEMBER']:
                         dataList = []
                         dataDict[f.capitalize()] = {'children': []}
                         for rule in app.url_map.iter_rules():
-                            if re.search(r'^/{}/.+'.format(f), str(rule)):
+                            if re.search(r'^/{}/.+'.format(f),
+                                         str(rule) + '//'):
 
                                 api = {
                                     'name': '',
@@ -133,8 +246,10 @@ class ApiDoc(object):
                                     'method': [],
                                     'doc': '',
                                     'doc_md': '',
-                                    'router': f.capitalize()
+                                    'router': f.capitalize(),
+                                    'api_type': 'api'
                                 }
+
                                 try:
                                     func = app.view_functions[rule.endpoint]
 
@@ -170,10 +285,13 @@ class ApiDoc(object):
                                         api['doc_md'] = doc.split('@@@')[
                                             1].strip(' ')
                                         try:
-                                            space_count = doc.split('@@@')[0].split('\n')[-1].count(' ')
+                                            space_count = doc.split('@@@')[
+                                                0].split('\n')[-1].count(' ')
                                         except Exception as e:
                                             space_count = 0
-                                        api['doc_md'] = '\n'.join(api['doc_md'].split('\n' + ' ' * space_count))
+                                        api['doc_md'] = '\n'.join(
+                                            api['doc_md'].split(
+                                                '\n' + ' ' * space_count))
                                     except Exception as e:
                                         api['doc_md'] = ''
 
