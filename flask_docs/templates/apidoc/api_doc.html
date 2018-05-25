@@ -17,7 +17,7 @@
             <el-input placeholder="Filter keyword" v-model="treeFilterText" style="padding-bottom:10px">
             </el-input>
             <div style="overflow-y:auto;max-height:670px;">
-              <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps" default-expand-all :filter-node-method="treeFilterNode"
+              <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps" :filter-node-method="treeFilterNode"
                 ref="apiTree" @node-click="treeNodeClick">
               </el-tree>
             </div>

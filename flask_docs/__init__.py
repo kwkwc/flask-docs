@@ -63,6 +63,9 @@ def get_all_subclasses(cls):
     all_subclasses = []
     for subclass in cls.__subclasses__():
         all_subclasses.append(subclass)
+        tmp = get_all_subclasses(subclass)
+        all_subclasses.extend(tmp)
+
     return all_subclasses
 
 
@@ -129,17 +132,15 @@ class ApiDoc(object):
 
                     dataDict = {}
 
-                    url_map = app.url_map.iter_rules()
-                    restful_api_class = get_all_subclasses(Resource)
-
-                    for c in restful_api_class:
+                    for c in get_all_subclasses(Resource):
                         try:
                             dataList = []
                             name = c.__name__.capitalize()
                             if name not in current_app.config[
                                     'RESTFUL_API_DOC_EXCLUDE']:
-                                for rule in url_map:
-                                    if c.endpoint in str(rule.endpoint).split('.'):
+                                for rule in app.url_map.iter_rules():
+                                    if c.endpoint in str(
+                                            rule.endpoint).split('.'):
 
                                         c_doc = self.get_api_doc(c)
 
@@ -147,16 +148,18 @@ class ApiDoc(object):
                                             if c_doc != 'No doc found for this Api':
                                                 name = name.capitalize(
                                                 ) + '(' + c_doc.split(
-                                                    '\n\n')[0].split('\n')[0].strip(
-                                                        ' ').strip('\n\n').strip(
-                                                            ' ').strip('\n').strip(
-                                                                ' ') + ')'
+                                                    '\n\n'
+                                                )[0].split('\n')[0].strip(
+                                                    ' ').strip('\n\n').strip(
+                                                        ' ').strip('\n').strip(
+                                                            ' ') + ')'
                                         except Exception as e:
                                             name = name.capitalize()
 
                                         for m in c.methods:
                                             if m in [
-                                                    'GET', 'POST', 'PUT', 'DELETE'
+                                                    'GET', 'POST', 'PUT',
+                                                    'DELETE'
                                             ]:
                                                 api = {
                                                     'name': '',
@@ -191,25 +194,30 @@ class ApiDoc(object):
                                                                 '\n\n'
                                                             )[0].split(
                                                                 '\n'
-                                                            )[0].strip(' ').strip(
+                                                            )[0].strip(
+                                                                ' '
+                                                            ).strip(
                                                                 '\n\n'
                                                             ).strip(' ').strip(
-                                                                '\n').strip(' ')
+                                                                '\n').strip(
+                                                                    ' ')
 
                                                     api['doc'] = api[
                                                         'doc'].replace(
-                                                            api['name_extra'], '',
-                                                            1).rstrip(' ').strip(
-                                                                '\n\n'
-                                                            ).rstrip(' ').strip(
-                                                                '\n').rstrip(' ')
+                                                            api['name_extra'],
+                                                            '', 1
+                                                        ).rstrip(' ').strip(
+                                                            '\n\n'
+                                                        ).rstrip(' ').strip(
+                                                            '\n').rstrip(' ')
 
                                                     if api['doc'] == '':
                                                         api['doc'] = 'No doc found for this Api'
 
                                                     try:
                                                         api['doc_md'] = doc.split(
-                                                            '@@@')[1].strip(' ')
+                                                            '@@@')[1].strip(
+                                                                ' ')
                                                         try:
                                                             space_count = doc.split(
                                                                 '@@@'
@@ -218,9 +226,10 @@ class ApiDoc(object):
                                                         except Exception as e:
                                                             space_count = 0
                                                         api['doc_md'] = '\n'.join(
-                                                            api['doc_md'].split(
-                                                                '\n' +
-                                                                ' ' * space_count))
+                                                            api['doc_md']
+                                                            .split(
+                                                                '\n' + ' ' *
+                                                                space_count))
                                                     except Exception as e:
                                                         api['doc_md'] = ''
 
@@ -229,6 +238,7 @@ class ApiDoc(object):
                                                 else:
                                                     dataList.append(api)
                             if dataList != []:
+                                dataList.sort(key=lambda x: x['name'])
                                 dataDict[name] = {'children': []}
                                 dataDict[name]['children'] = dataList
                         except Exception as e:
