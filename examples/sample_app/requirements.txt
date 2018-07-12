@@ -1,6 +1,6 @@
 click==6.7
 Flask==1.0.2
-Flask-Docs==0.0.5
+Flask-Docs==0.0.7
 Flask-UIkit==0.0.3
 itsdangerous==0.24
 Jinja2==2.10

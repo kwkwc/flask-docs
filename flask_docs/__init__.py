@@ -8,6 +8,7 @@ import re
 ELEMENT_VERSION = '2.3.8'
 VUE_VERSION = '2.5.17-beta.0'
 MARKED_VERSION = '0.3.19'
+FILE_SAVER_VERSION = '2014-11-29'
 
 
 class CDN(object):
@@ -116,6 +117,10 @@ class ApiDoc(object):
                     WebCDN('//cdn.bootcss.com/marked/%s/' % MARKED_VERSION),
                     local)
 
+                fileSaver = lwrap(
+                    WebCDN('//cdn.bootcss.com/FileSaver.js/%s/' %
+                           FILE_SAVER_VERSION), local)
+
                 app.extensions['api_doc'] = {
                     'cdns': {
                         'local': local,
@@ -123,7 +128,8 @@ class ApiDoc(object):
                         'elementJs': elementJs,
                         'elementCss': elementCss,
                         'vue': vue,
-                        'marked': marked
+                        'marked': marked,
+                        'fileSaver': fileSaver
                     },
                 }
 

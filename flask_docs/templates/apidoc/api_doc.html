@@ -9,6 +9,7 @@
       <el-header>
         <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
           <el-menu-item index="1">Api Doc</i></el-menu-item>
+          <el-button class="download" type="text" icon="el-icon-download" @click="download"></el-button>
         </el-menu>
       </el-header>
       <el-main>
@@ -35,14 +36,12 @@
 {% block scripts %}
 {{ super() }}
 <script>
-
   new Vue({
     delimiters: ['{[', ']}'],
     el: '#app',
     data: {
       headerIndex: '1',
       treeFilterText: '',
-      apiData: JSON.parse({{ data|tojson|safe }}),
       treeData: JSON.parse({{ data|tojson|safe }}).data,
       treeDefaultProps: {
         label: 'full_name',
@@ -79,6 +78,35 @@
           })
           document.getElementById('md').innerHTML = marked(md)
         }
+      },
+      download() {
+        let md = ''
+        this.treeDataNew.forEach((t, index) => {
+          md += '# ' + t.full_name + '\n\n'
+          this.treeData[t.full_name]['children'].forEach((con, index) => {
+            if(con.name_extra == '') {
+              md += '## ' + con.name + '\n\n'
+            }
+            else {
+              md += '## ' + con.name + '(' + con.name_extra + ')' + '\n\n'
+            }
+            md += '#### url' + '\n'
+            md += '- ' + con.url + '\n\n'
+            if(con.api_type === 'api') {
+              md += '#### method' + '\n'
+              md += '- ' + con.method + '\n\n'
+            }
+            if(con.doc == 'No doc found for this Api' && con.doc_md != '') {
+            }
+            else {
+              md += '#### doc' + '\n'
+              md += '```\n' + con.doc + '\n```\n\n'
+            }
+            md += con.doc_md + '\n'
+          })
+          md += '\n'
+        })
+        saveAs(new Blob([md], { type: 'text/markdown;charset=utf-8' }), 'ApiDoc.md')
       }
     },
     computed: {
@@ -109,4 +137,16 @@
 <script>
   document.getElementById('md').innerHTML = marked('# Api Doc')
 </script>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+  .download {
+    padding-top: 25px;
+    padding-right: 20px;
+    font-size: 20px;
+    float: right;
+  }
+</style>
 {% endblock %}

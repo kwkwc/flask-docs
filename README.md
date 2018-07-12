@@ -7,6 +7,7 @@ Features
 
 - Automatic generation of markdown documents
 - Support Flask-RESTful
+- Support for generating offline documents
 
 Usage
 -----
