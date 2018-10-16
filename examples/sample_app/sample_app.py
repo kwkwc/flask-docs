@@ -6,8 +6,8 @@ from flask_docs import ApiDoc
 
 app = Flask(__name__)
 
-# Local loading
-# app.config['API_DOC_CDN'] = False
+# Using CDN
+# app.config['API_DOC_CDN'] = True
 
 # Disable document pages
 # app.config['API_DOC_ENABLE'] = False

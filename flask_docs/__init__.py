@@ -5,6 +5,7 @@ from flask import Blueprint, current_app, render_template, json, url_for
 from flask_restful import Resource
 import re
 
+CDN_HOST = 'cdn.staticfile.org'
 ELEMENT_VERSION = '2.3.8'
 VUE_VERSION = '2.5.17-beta.0'
 MARKED_VERSION = '0.3.19'
@@ -78,7 +79,7 @@ class ApiDoc(object):
     def init_app(self, app):
         app.config.setdefault('API_DOC_MEMBER', [])
         app.config.setdefault('API_DOC_ENABLE', True)
-        app.config.setdefault('API_DOC_CDN', True)
+        app.config.setdefault('API_DOC_CDN', False)
         app.config.setdefault('RESTFUL_API_DOC_EXCLUDE', [])
 
         with app.app_context():
@@ -102,24 +103,23 @@ class ApiDoc(object):
                     return ConditionalCDN('API_DOC_CDN', primary, cdn)
 
                 elementJs = lwrap(
-                    WebCDN(
-                        '//cdn.bootcss.com/element-ui/%s/' % ELEMENT_VERSION),
-                    local)
+                    WebCDN('//%s/element-ui/%s/' % (CDN_HOST,
+                                                    ELEMENT_VERSION)), local)
 
                 elementCss = lwrap(
-                    WebCDN('//cdn.bootcss.com/element-ui/%s/theme-chalk/' %
-                           ELEMENT_VERSION), local)
+                    WebCDN('//%s/element-ui/%s/theme-chalk/' %
+                           (CDN_HOST, ELEMENT_VERSION)), local)
 
                 vue = lwrap(
-                    WebCDN('//cdn.bootcss.com/vue/%s/' % VUE_VERSION), local)
+                    WebCDN('//%s/vue/%s/' % (CDN_HOST, VUE_VERSION)), local)
 
                 marked = lwrap(
-                    WebCDN('//cdn.bootcss.com/marked/%s/' % MARKED_VERSION),
+                    WebCDN('//%s/marked/%s/' % (CDN_HOST, MARKED_VERSION)),
                     local)
 
                 fileSaver = lwrap(
-                    WebCDN('//cdn.bootcss.com/FileSaver.js/%s/' %
-                           FILE_SAVER_VERSION), local)
+                    WebCDN('//%s/FileSaver.js/%s/' %
+                           (CDN_HOST, FILE_SAVER_VERSION)), local)
 
                 app.extensions['api_doc'] = {
                     'cdns': {
