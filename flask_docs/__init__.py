@@ -11,6 +11,8 @@ VUE_VERSION = '2.5.17-beta.0'
 MARKED_VERSION = '0.3.19'
 FILE_SAVER_VERSION = '2014-11-29'
 
+NO_DOC = 'No doc found for this Api'
+
 
 class CDN(object):
     def get_resource_url(self, filename):
@@ -151,7 +153,7 @@ class ApiDoc(object):
                                         c_doc = self.get_api_doc(c)
 
                                         try:
-                                            if c_doc != 'No doc found for this Api':
+                                            if c_doc != NO_DOC:
                                                 name = name.capitalize(
                                                 ) + '(' + c_doc.split(
                                                     '\n\n'
@@ -186,15 +188,15 @@ class ApiDoc(object):
                                                         'c.{}.__doc__'.format(
                                                             m.lower()))
 
-                                                    doc = doc if doc else 'No doc found for this Api'
+                                                    doc = doc if doc else NO_DOC
 
                                                     try:
                                                         api['doc'] = doc.split(
                                                             '@@@')[0]
                                                     except Exception as e:
-                                                        api['doc'] = 'No doc found for this Api'
+                                                        api['doc'] = NO_DOC
 
-                                                    if api['doc'] != 'No doc found for this Api':
+                                                    if api['doc'] != NO_DOC:
                                                         api['name_extra'] = api[
                                                             'doc'].split(
                                                                 '\n\n'
@@ -218,7 +220,7 @@ class ApiDoc(object):
                                                             '\n').rstrip(' ')
 
                                                     if api['doc'] == '':
-                                                        api['doc'] = 'No doc found for this Api'
+                                                        api['doc'] = NO_DOC
 
                                                     try:
                                                         api['doc_md'] = doc.split(
@@ -283,9 +285,9 @@ class ApiDoc(object):
                                     try:
                                         api['doc'] = doc.split('@@@')[0]
                                     except Exception as e:
-                                        api['doc'] = 'No doc found for this Api'
+                                        api['doc'] = NO_DOC
 
-                                    if api['doc'] != 'No doc found for this Api':
+                                    if api['doc'] != NO_DOC:
                                         api['name_extra'] = api['doc'].split(
                                             '\n\n')[0].split('\n')[0].strip(
                                                 ' ').strip('\n\n').strip(
@@ -297,7 +299,7 @@ class ApiDoc(object):
                                             ' ').strip('\n').rstrip(' ')
 
                                     if api['doc'] == '':
-                                        api['doc'] = 'No doc found for this Api'
+                                        api['doc'] = NO_DOC
 
                                     try:
                                         api['doc_md'] = doc.split('@@@')[
@@ -336,6 +338,6 @@ class ApiDoc(object):
 
     def get_api_doc(self, func):
         if func.__doc__:
-            return func.__doc__
+            return func.__doc__.replace('\t', '    ')
         else:
-            return 'No doc found for this Api'
+            return NO_DOC
