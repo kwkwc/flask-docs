@@ -88,22 +88,24 @@ def del_data():
 
 ![sample_app](flask_docs/assets/sample_app_del.png)
 
-```python
+````python
 @platform.route('/get_something', methods=['GET'])
 def get_something():
     """
     @@@
     #### example
-        import requests
-        url='http://127.0.0.1:5000/api/get_something'
-        try:
-            print requests.get(url).text
-        except:
-            pass
+    ```
+    import requests
+    url='http://127.0.0.1:5000/api/get_something'
+    try:
+        print requests.get(url).text
+    except:
+        pass
+    ```
     @@@
     """
     return jsonify({'platform': 'get something'})
-```
+````
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
 
