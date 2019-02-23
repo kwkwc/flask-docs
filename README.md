@@ -14,7 +14,7 @@ Usage
 
 Here is an example:
 
-```
+```python
 from flask import Flask
 from flask_docs import ApiDoc
 
@@ -47,7 +47,7 @@ How to add markdown documents to the code:
 Api and document pages
 -----
 
-```
+```python
 @api.route('/add_data', methods=['POST'])
 def add_data():
     """Add some data
@@ -65,7 +65,7 @@ def add_data():
 
 ![sample_app](flask_docs/assets/sample_app_add.png)
 
-```
+```python
 @api.route('/del_data', methods=['POST'])
 def del_data():
     """Del some data
@@ -88,7 +88,7 @@ def del_data():
 
 ![sample_app](flask_docs/assets/sample_app_del.png)
 
-```
+```python
 @platform.route('/get_something', methods=['GET'])
 def get_something():
     """
@@ -110,7 +110,7 @@ def get_something():
 Flask-RESTful Api and document pages
 -----
 
-```
+```python
 from flask_restful import Resource, Api
 
 class TodoList(Resource):
