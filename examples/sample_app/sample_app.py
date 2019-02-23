@@ -61,12 +61,14 @@ def get_something():
     """
     @@@
     #### example
-        import requests
-        url='http://127.0.0.1:5000/api/get_something'
-        try:
-            print requests.get(url).text
-        except:
-            pass
+    ```
+    import requests
+    url='http://127.0.0.1:5000/api/get_something'
+    try:
+        print requests.get(url).text
+    except:
+        pass
+    ```
     @@@
     """
     return jsonify({'platform': 'get something'})
