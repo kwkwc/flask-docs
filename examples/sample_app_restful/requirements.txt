@@ -1,7 +1,7 @@
 aniso8601==3.0.0
 click==6.7
 Flask==1.0.2
-Flask-Docs==0.1.0
+Flask-Docs==0.1.1
 Flask-RESTful==0.3.6
 itsdangerous==0.24
 Jinja2==2.10

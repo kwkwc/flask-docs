@@ -186,7 +186,8 @@ class ApiDoc(object):
 
                                                     doc = eval(
                                                         'c.{}.__doc__'.format(
-                                                            m.lower()))
+                                                            m.lower())
+                                                    ).replace('\t', '    ')
 
                                                     doc = doc if doc else NO_DOC
 
