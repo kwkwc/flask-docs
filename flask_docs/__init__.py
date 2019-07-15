@@ -3,6 +3,7 @@
 
 from flask import Blueprint, current_app, render_template, json, url_for
 from flask_restful import Resource
+from flask.views import MethodView
 import re
 
 CDN_HOST = 'cdn.staticfile.org'
@@ -63,11 +64,15 @@ def find_resource(filename, cdn, use_minified=True, local=True):
     return resource_url
 
 
-def get_all_subclasses(cls):
+def get_all_subclasses(cls, clsmv=None):
+    if clsmv is None:
+        clsmv = []
+    else:
+        clsmv = clsmv.__subclasses__()[1:]
     all_subclasses = []
-    for subclass in cls.__subclasses__():
+    for subclass in cls.__subclasses__() + clsmv:
         all_subclasses.append(subclass)
-        tmp = get_all_subclasses(subclass)
+        tmp = get_all_subclasses(subclass, None)
         all_subclasses.extend(tmp)
 
     return all_subclasses
@@ -140,15 +145,22 @@ class ApiDoc(object):
 
                     dataDict = {}
 
-                    for c in get_all_subclasses(Resource):
+                    for c in get_all_subclasses(Resource, MethodView):
                         try:
                             dataList = []
                             name = c.__name__.capitalize()
                             if name not in current_app.config[
                                     'RESTFUL_API_DOC_EXCLUDE']:
                                 for rule in app.url_map.iter_rules():
-                                    if c.endpoint in str(
-                                            rule.endpoint).split('.'):
+                                    flag = False
+                                    if hasattr(c, 'endpoint'):
+                                        if c.endpoint in str(
+                                                rule.endpoint).split('.'):
+                                            flag = True
+                                    else:
+                                        if name.lower() in str(rule).lower():
+                                            flag = True
+                                    if flag:
 
                                         c_doc = self.get_api_doc(c)
 

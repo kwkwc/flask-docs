@@ -8,6 +8,7 @@ Features
 - Automatic generation of markdown documents
 - Support Flask-RESTful
 - Support for generating offline documents
+- Support flask.views.MethodView
 
 Usage
 -----
@@ -153,6 +154,30 @@ restful_api.add_resource(TodoList, '/todolist')
 ![sample_app](flask_docs/assets/sample_app_restful_post.png)
 
 ![sample_app](flask_docs/assets/sample_app_restful_get.png)
+
+flask.views.MethodView Api
+-----
+> ***For the time being, only url_rule with the same class name are supported***
+
+```python
+from flask.views import MethodView
+
+class TodoList(MethodView):
+    """Manage todolist"""
+
+    def put(self):
+        """Change the data
+        """
+        return jsonify({'todos': 'put todolist'})
+
+    def delete(self):
+        """Delete the data
+        """
+        return jsonify({'todos': 'delete todolist'})
+
+
+app.add_url_rule('/todolist/', view_func=TodoList.as_view('todolist'))
+```
 
 Examples
 -----
