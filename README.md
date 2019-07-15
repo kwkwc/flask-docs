@@ -167,6 +167,7 @@ Installation
 Reference
 -----
 
-[falsk_api_doc](https://github.com/tobyqin/flask_api_doc/)
+[flask_api_doc](https://github.com/tobyqin/flask_api_doc/)
+[Flask-Bootstrap](https://github.com/mbr/flask-bootstrap/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples
