@@ -1,6 +1,18 @@
 #!/usr/bin/env python
 # coding=utf8
 
+'''
+Program:
+    Flask-Docs
+Version:
+    0.1.3
+History:
+    Created on 2018/05/20
+    Last modified on 2019/11/06
+Author:
+    kwkw
+'''
+
 from flask import Blueprint, current_app, render_template, json, url_for
 from flask_restful import Resource
 from flask.views import MethodView
@@ -96,7 +108,6 @@ class ApiDoc(object):
                     __name__,
                     template_folder='templates',
                     static_folder='static',
-                    static_url_path='/static/api_doc',
                     url_prefix='/docs/api')
 
                 app.jinja_env.globals['find_resource'] =\
@@ -213,13 +224,13 @@ class ApiDoc(object):
                                                         api['name_extra'] = api[
                                                             'doc'].split(
                                                                 '\n\n'
-                                                            )[0].split(
+                                                        )[0].split(
                                                                 '\n'
-                                                            )[0].strip(
+                                                        )[0].strip(
                                                                 ' '
-                                                            ).strip(
+                                                        ).strip(
                                                                 '\n\n'
-                                                            ).strip(' ').strip(
+                                                        ).strip(' ').strip(
                                                                 '\n').strip(
                                                                     ' ')
 
@@ -227,9 +238,9 @@ class ApiDoc(object):
                                                         'doc'].replace(
                                                             api['name_extra'],
                                                             '', 1
-                                                        ).rstrip(' ').strip(
+                                                    ).rstrip(' ').strip(
                                                             '\n\n'
-                                                        ).rstrip(' ').strip(
+                                                    ).rstrip(' ').strip(
                                                             '\n').rstrip(' ')
 
                                                     if api['doc'] == '':

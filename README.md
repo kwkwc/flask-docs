@@ -1,4 +1,4 @@
-# Flask-Docs
+# Flask-Docs v0.1.3
 
 > Adds Docs support to Flask.
 
@@ -193,6 +193,7 @@ Reference
 -----
 
 [flask_api_doc](https://github.com/tobyqin/flask_api_doc/)
+
 [Flask-Bootstrap](https://github.com/mbr/flask-bootstrap/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples
