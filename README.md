@@ -2,6 +2,8 @@
 
 > Adds Docs support to Flask.
 
+[简体中文](README.zh-CN.md)
+
 Features
 -----
 
@@ -187,7 +189,7 @@ Examples
 Installation
 -----
 
-`pip install Flask-Docs`
+`pip3 install Flask-Docs`
 
 Reference
 -----
