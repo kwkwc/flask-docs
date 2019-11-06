@@ -96,7 +96,7 @@ class ApiDoc(object):
                     __name__,
                     template_folder='templates',
                     static_folder='static',
-                    static_url_path=app.static_url_path + '/api_doc',
+                    static_url_path='/static/api_doc',
                     url_prefix='/docs/api')
 
                 app.jinja_env.globals['find_resource'] =\
