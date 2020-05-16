@@ -15,7 +15,7 @@ app = Flask(__name__)
 # Api Document needs to be displayed
 app.config['API_DOC_MEMBER'] = ['api', 'platform']
 
-ApiDoc(app)
+ApiDoc(app, title='Sample App', version='0.1.4')
 
 api = Blueprint('api', __name__)
 platform = Blueprint('platform', __name__)

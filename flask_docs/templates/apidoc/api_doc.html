@@ -1,6 +1,6 @@
 {% extends "apidoc/base.html" %} 
 
-{% block title %}Api Doc{% endblock %}
+{% block title %}{{ title }} ({{ version }}){% endblock %}
 
 {% block content %}
 <div id="app">
@@ -8,7 +8,7 @@
     <el-container>
       <el-header>
         <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
-          <el-menu-item index="1">Api Doc</i></el-menu-item>
+          <el-menu-item index="1">{{ title }} ({{ version }})</i></el-menu-item>
           <el-button class="download" type="text" icon="el-icon-download" @click="download"></el-button>
         </el-menu>
       </el-header>
@@ -135,7 +135,7 @@
   })
 </script>
 <script>
-  document.getElementById('md').innerHTML = marked('# Api Doc')
+  document.getElementById('md').innerHTML = marked('# {{ title }} ({{ version }})')
 </script>
 {% endblock %}
 
