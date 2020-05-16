@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.1.3
+    0.1.4
 History:
     Created on 2018/05/20
-    Last modified on 2019/11/06
+    Last modified on 2020/05/16
 Author:
     kwkw
 '''
@@ -25,6 +25,7 @@ MARKED_VERSION = '0.3.19'
 FILE_SAVER_VERSION = '2014-11-29'
 
 NO_DOC = 'No doc found for this Api'
+METHODS_LIST = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 
 
 class CDN(object):
@@ -188,10 +189,7 @@ class ApiDoc(object):
                                             name = name.capitalize()
 
                                         for m in c.methods:
-                                            if m in [
-                                                    'GET', 'POST', 'PUT',
-                                                    'DELETE'
-                                            ]:
+                                            if m in METHODS_LIST:
                                                 api = {
                                                     'name': '',
                                                     'name_extra': '',
@@ -301,8 +299,7 @@ class ApiDoc(object):
                                     api['url'] = str(rule)
 
                                     api['method'] = ' '.join([
-                                        r for r in rule.methods if r in
-                                        ['GET', 'POST', 'PUT', 'DELETE']
+                                        r for r in rule.methods if r in METHODS_LIST
                                     ])
 
                                     doc = self.get_api_doc(func)
