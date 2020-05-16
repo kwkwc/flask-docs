@@ -1,4 +1,4 @@
-# Flask-Docs v0.1.3
+# Flask-Docs v0.1.4
 
 > Adds Docs support to Flask.
 

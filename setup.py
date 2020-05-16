@@ -9,7 +9,7 @@ def read(fname):
 
 setup(
     name='Flask-Docs',
-    version='0.1.3',
+    version='0.1.4',
     url='https://github.com/kwkwc/flask-docs',
     license='MIT',
     author='kwkw',

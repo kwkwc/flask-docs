@@ -62,7 +62,12 @@
             if(con.name == data.name) {
               md += '# ' + data.full_name + '\n\n'
               md += '#### url' + '\n'
-              md += '- ' + con.url + '\n\n'
+              var urls= new Array()
+              urls = con.url.split(" ")
+              for (i=0; i<urls.length; i++)
+              {
+                md += '- ' + urls[i] + '\n\n'
+              }
               if(con.api_type === 'api') {
                 md += '#### method' + '\n'
                 md += '- ' + con.method + '\n\n'
@@ -91,7 +96,12 @@
               md += '## ' + con.name + '(' + con.name_extra + ')' + '\n\n'
             }
             md += '#### url' + '\n'
-            md += '- ' + con.url + '\n\n'
+            var urls= new Array()
+            urls = con.url.split(" ")
+            for (i=0; i<urls.length; i++)
+            {
+              md += '- ' + urls[i] + '\n\n'
+            }
             if(con.api_type === 'api') {
               md += '#### method' + '\n'
               md += '- ' + con.method + '\n\n'

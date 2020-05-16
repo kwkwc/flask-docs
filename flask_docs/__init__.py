@@ -163,6 +163,7 @@ class ApiDoc(object):
                             name = c.__name__.capitalize()
                             if name not in current_app.config[
                                     'RESTFUL_API_DOC_EXCLUDE']:
+                                flag_rule = 0
                                 for rule in app.url_map.iter_rules():
                                     flag = False
                                     if hasattr(c, 'endpoint'):
@@ -176,17 +177,19 @@ class ApiDoc(object):
 
                                         c_doc = self.get_api_doc(c)
 
-                                        try:
-                                            if c_doc != NO_DOC:
-                                                name = name.capitalize(
-                                                ) + '(' + c_doc.split(
-                                                    '\n\n'
-                                                )[0].split('\n')[0].strip(
-                                                    ' ').strip('\n\n').strip(
-                                                        ' ').strip('\n').strip(
-                                                            ' ') + ')'
-                                        except Exception as e:
-                                            name = name.capitalize()
+                                        if flag_rule == 0:
+                                            try:
+                                                if c_doc != NO_DOC:
+                                                    name = name.capitalize(
+                                                    ) + '(' + c_doc.split(
+                                                        '\n\n'
+                                                    )[0].split('\n')[0].strip(
+                                                        ' ').strip('\n\n').strip(
+                                                            ' ').strip('\n').strip(
+                                                                ' ') + ')'
+                                            except Exception as e:
+                                                name = name.capitalize()
+                                            flag_rule = 1
 
                                         for m in c.methods:
                                             if m in METHODS_LIST:
@@ -201,9 +204,20 @@ class ApiDoc(object):
                                                 }
 
                                                 try:
-                                                    api['name'] = m
+                                                    name_m = m
+                                                    url = str(rule)
 
-                                                    api['url'] = str(rule)
+                                                    result = filter(
+                                                        lambda x: x['name'] == name_m, dataList)
+                                                    result_list = list(result)
+                                                    if len(result_list) > 0:
+                                                        result_list[0]['url'] = result_list[0]['url'] + ' ' + url
+                                                        result_list[0]['url'] = ' '.join(
+                                                            list(set(result_list[0]['url'].split(' '))))
+                                                        raise
+
+                                                    api['name'] = name_m
+                                                    api['url'] = url
 
                                                     doc = eval(
                                                         'c.{}.__doc__'.format(
@@ -285,7 +299,7 @@ class ApiDoc(object):
                                     'name': '',
                                     'name_extra': '',
                                     'url': '',
-                                    'method': [],
+                                    'method': '',
                                     'doc': '',
                                     'doc_md': '',
                                     'router': f.capitalize(),
@@ -295,12 +309,28 @@ class ApiDoc(object):
                                 try:
                                     func = app.view_functions[rule.endpoint]
 
-                                    api['name'] = self.get_api_name(func)
-                                    api['url'] = str(rule)
-
-                                    api['method'] = ' '.join([
+                                    name = self.get_api_name(func)
+                                    url = str(rule)
+                                    method = ' '.join([
                                         r for r in rule.methods if r in METHODS_LIST
                                     ])
+
+                                    result = filter(
+                                        lambda x: x['name'] == name, dataList)
+                                    result_list = list(result)
+                                    if len(result_list) > 0:
+                                        result_list[0]['url'] = result_list[0]['url'] + ' ' + url
+                                        result_list[0]['url'] = ' '.join(
+                                            list(set(result_list[0]['url'].split(' '))))
+                                        result_list[0]['method'] = result_list[0]['method'] + \
+                                            ' ' + method
+                                        result_list[0]['method'] = ' '.join(
+                                            list(set(result_list[0]['method'].split(' '))))
+                                        raise
+
+                                    api['name'] = name
+                                    api['url'] = url
+                                    api['method'] = method
 
                                     doc = self.get_api_doc(func)
                                     try:
