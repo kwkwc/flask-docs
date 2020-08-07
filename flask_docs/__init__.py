@@ -92,11 +92,11 @@ def get_all_subclasses(cls, clsmv=None):
 
 
 class ApiDoc(object):
-    def __init__(self, app=None, title='Api Doc', version='1.0.0'):
+    def __init__(self, app=None, title='Api Doc', version='1.0.0',desc = 'cooler desc'):
         if app is not None:
-            self.init_app(app, title, version)
+            self.init_app(app, title, version,desc)
 
-    def init_app(self, app, title, version):
+    def init_app(self, app, title, version,desc):
         app.config.setdefault('API_DOC_MEMBER', [])
         app.config.setdefault('API_DOC_ENABLE', True)
         app.config.setdefault('API_DOC_CDN', False)
@@ -377,7 +377,7 @@ class ApiDoc(object):
                             dataDict.pop(f.capitalize())
                     dataDict = {'data': dataDict}
                     return render_template(
-                        'apidoc/api_doc.html', data=json.dumps(dataDict), title=title, version=version)
+                        'apidoc/api_doc.html', data=json.dumps(dataDict), title=title, version=version,desc=desc)
 
                 app.register_blueprint(api_doc)
 
