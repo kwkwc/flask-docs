@@ -145,7 +145,7 @@
   })
 </script>
 <script>
-  document.getElementById('md').innerHTML = marked('# {{ title }} ({{ version }})<hr/>{{ desc }}')
+  document.getElementById('md').innerHTML = marked('# {{ title }} ({{ version }})<hr/>{% for d in desc %}<p><h5>{{ d }}</h5></p>{% endfor %}')
 </script>
 {% endblock %}
 
