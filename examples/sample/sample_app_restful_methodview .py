@@ -16,7 +16,7 @@ app = Flask(__name__)
 # RESTful Api documents to be excluded
 app.config['RESTFUL_API_DOC_EXCLUDE'] = []
 
-ApiDoc(app, title='Sample App Restful Methodview', version='0.1.4')
+ApiDoc(app, title='Sample App Restful Methodview', version='0.1.5')
 
 
 class TodoList(MethodView):

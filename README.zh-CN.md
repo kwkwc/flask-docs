@@ -1,4 +1,4 @@
-# Flask-Docs v0.1.4
+# Flask-Docs v0.1.5
 
 > Flask Api 文档自动生成插件
 

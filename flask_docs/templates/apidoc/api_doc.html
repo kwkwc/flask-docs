@@ -46,7 +46,10 @@
       treeDefaultProps: {
         label: 'full_name',
         children: 'children'
-      }
+      },
+      title: '{{ title }}',
+      version: '{{ version }}',
+      noDocText: '{{ noDocText }}'
     },
     methods: {
       treeFilterNode(value, data) {
@@ -72,7 +75,7 @@
                 md += '#### method' + '\n'
                 md += '- ' + con.method + '\n\n'
               }
-              if(con.doc == 'No doc found for this Api' && con.doc_md != '') {
+              if(con.doc == this.noDocText && con.doc_md != '') {
               }
               else {
                 md += '#### doc' + '\n'
@@ -106,7 +109,7 @@
               md += '#### method' + '\n'
               md += '- ' + con.method + '\n\n'
             }
-            if(con.doc == 'No doc found for this Api' && con.doc_md != '') {
+            if(con.doc == this.noDocText && con.doc_md != '') {
             }
             else {
               md += '#### doc' + '\n'
@@ -116,7 +119,7 @@
           })
           md += '\n'
         })
-        saveAs(new Blob([md], { type: 'text/markdown;charset=utf-8' }), 'ApiDoc.md')
+        saveAs(new Blob([md], { type: 'text/markdown;charset=utf-8' }), this.title + ' (' + this.version + ')' + '.md')
       }
     },
     computed: {
