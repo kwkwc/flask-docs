@@ -10,6 +10,7 @@
         <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
           <el-menu-item index="1">{{ title }} ({{ version }})</i></el-menu-item>
           <el-button class="download" type="text" icon="el-icon-download" @click="download"></el-button>
+          <el-button class="download" type="text" @click="set_header">Set Header</el-button>
         </el-menu>
       </el-header>
       <el-main>
@@ -24,17 +25,68 @@
             </div>
           </el-col>
           <el-col :span="16" style="padding-left:20px">
+            <el-button style="float: right; font-size: 18px;" type="text" @click="test">Click For Test</el-button>
             <div id="md"></div>
           </el-col>
         </el-row>
       </el-main>
     </el-container>
   </el-card>
+  <!-- 动态添加 -->
+  <el-dialog title="Test" :visible.sync="showTest" v-loading="loading" top="1vh">
+    <el-form :model="FormInput" ref="FormInput" label-width="100px" class="demo-dynamic">
+      <el-form-item>
+        <h2>Request Param</h2>
+      </el-form-item>
+      <el-form-item
+      v-for="(domain) in FormInput.domains"
+      :key="domain.label"
+      >
+      <label><span v-html="domain.label" :style="widthSpan">&nbsp;&nbsp;</span><el-input v-model="domain.value" :style="widthInput"></el-input></label>
+      </el-form-item>
+      
+      <el-form-item>
+        <el-button type="primary" @click="submitFormData('FormInput')">Submit</el-button>
+      </el-form-item>
+      <el-form-item>
+        <h2>Response</h2>
+        <div id="response_data">
+
+        </div>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
+  <!-- key-value -->
+  <el-dialog title="SetHeader" :visible.sync="showSetHeader" v-loading="loading" top="1vh">
+    <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
+      <el-form-item
+        v-for="(domain, index) in dynamicValidateForm.domains"
+        :key="domain.label"
+        :prop="'domains.' + index + '.key'"
+        :rules="{
+          required: true, message: '不能为空', trigger: 'blur'
+        }"
+      >
+        <label>key&nbsp;&nbsp;<el-input v-model="domain.key"></el-input></label>
+        <label style="margin-left:20px;">value&nbsp;&nbsp;<el-input v-model="domain.value"></el-input></label>
+        <el-button @click="addDomain" v-if="domain.show==1?displayShow.display=='block':displayShow.display=='none'">Add</el-button>
+        <el-button @click.prevent="removeDomain(domain)" v-if="domain.show==1?displayDel.display=='none':displayDel.display=='block'">Del</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('dynamicValidateForm')">Submit</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
 </div>
+
+
+
 {% endblock %} 
 
 {% block scripts %}
 {{ super() }}
+<script>
+</script>
 <script>
   new Vue({
     delimiters: ['{[', ']}'],
@@ -42,11 +94,38 @@
     data: {
       headerIndex: '1',
       treeFilterText: '',
+      showTest: false,
+      showSetHeader: false,
+      loading: false,
+      // showDialog1: false,
       treeData: JSON.parse({{ data|tojson|safe }}).data,
       treeDefaultProps: {
         label: 'full_name',
         children: 'children'
-      }
+      },
+      displayShow:{
+        "display": "block"
+      },
+      widthSpan:{
+        "display": "inline-block",
+        "width": "30%",
+      },
+      widthInput:{
+        "width": "60%",
+      },
+      displayDel:{
+        "display": "block"
+      },
+      dynamicValidateForm: {
+        domains: [{
+            key: '',
+            value: '',
+            show: 1,
+        }]
+      },
+      FormInput:{
+        domains: []
+      },
     },
     methods: {
       treeFilterNode(value, data) {
@@ -83,6 +162,98 @@
           })
           document.getElementById('md').innerHTML = marked(md)
         }
+      },
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            arr = this.dynamicValidateForm.domains
+            headers = {}
+            for (var i = 0; i < arr.length; i++) {
+              obj = arr[i]
+              headers[obj.key] = obj.value
+            }
+            window.localStorage.setItem("headers", JSON.stringify(headers))
+            this.showSetHeader = false
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      removeDomain(item) {
+        var index = this.dynamicValidateForm.domains.indexOf(item)
+        if (index !== -1) {
+          this.dynamicValidateForm.domains.splice(index, 1)
+        }
+      },
+      addDomain() {
+        this.dynamicValidateForm.domains.push({
+          value: '',
+          key: ''
+        });
+      },
+      set_header() {
+        this.showSetHeader = true
+      },
+      submitFormData(formName) {
+        that = this
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            arr = this.FormInput.domains
+            data = {}
+            for (var i = 0; i < arr.length; i++) {
+              obj = arr[i]
+              data[obj.label] = obj.value
+            }
+            // 发送请求
+            console.log(data)
+            headers = {}
+            header_str = window.localStorage.getItem("headers")
+            if (headers != null && headers != "") {
+              headers = JSON.parse(header_str)
+            }
+            base_url = window.location.protocol + "//" + window.location.host
+            url = $("#url").next("ul").find("li").html()
+            method = $("#method").next("ul").find("li").html()
+            console.log(base_url)
+            console.log(url)
+            console.log(method)
+            $.ajax({
+              url: base_url + url,
+              headers: headers,
+              type: method,
+              data: data,
+              async: false,
+              success: function(data) {
+                console.log(this)
+                $("#response_data").JSONView(data, {collapsed: true, nl2br: true})
+                console.log(data)
+                // 返回内容，json展示
+              }
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      test() {
+        
+        args = []
+        trs = $("#args").next("table").find("tbody").find("tr")
+        $(trs).each(function() {
+          arg = $($(this).find("td")).html()
+          obj = {
+            "label": arg,
+            "value": ""
+          }
+          args.push(obj)
+        })
+        console.log(args)
+        $("#response_data").html("")
+        this.FormInput.domains = args
+        this.showTest = true
+
       },
       download() {
         let md = ''
@@ -156,7 +327,12 @@
     padding-top: 25px;
     padding-right: 20px;
     font-size: 20px;
+  
     float: right;
+  }
+
+  .demo-dynamic .el-input {
+    width:initial;
   }
 </style>
 {% endblock %}
