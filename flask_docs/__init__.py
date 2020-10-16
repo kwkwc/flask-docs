@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.1.5
+    0.1.6
 History:
     Created on 2018/05/20
-    Last modified on 2020/09/12
+    Last modified on 2020/10/17
 Author:
     kwkw
 '''
@@ -23,6 +23,7 @@ ELEMENT_VERSION = '2.3.8'
 VUE_VERSION = '2.5.17-beta.0'
 MARKED_VERSION = '0.3.19'
 FILE_SAVER_VERSION = '2014-11-29'
+HIGHLIGHT_VERSION = '10.2.1'
 
 
 class CDN(object):
@@ -122,6 +123,12 @@ class ApiDoc(object):
                 fileSaver = lwrap(WebCDN('//%s/FileSaver.js/%s/' %
                                          (CDN_HOST, FILE_SAVER_VERSION)), local)
 
+                highlightJs = lwrap(WebCDN('//%s/highlight.js/%s/' %
+                                         (CDN_HOST, HIGHLIGHT_VERSION)), local)
+
+                highlightCss = lwrap(WebCDN('//%s/highlight.js/%s/styles/' %
+                                         (CDN_HOST, HIGHLIGHT_VERSION)), local)
+
                 app.extensions['api_doc'] = {
                     'cdns': {
                         'local': local,
@@ -130,7 +137,9 @@ class ApiDoc(object):
                         'elementCss': elementCss,
                         'vue': vue,
                         'marked': marked,
-                        'fileSaver': fileSaver
+                        'fileSaver': fileSaver,
+                        'highlightJs': highlightJs,
+                        'highlightCss': highlightCss
                     },
                 }
 

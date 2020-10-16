@@ -1,4 +1,4 @@
-# Flask-Docs v0.1.5
+# Flask-Docs v0.1.6
 
 > Flask Api 文档自动生成插件
 
@@ -79,15 +79,15 @@ def del_data():
     """Del some data
 
     @@@
-    #### args
+    ### args
 
     | args | nullable | type | remark |
     |--------|--------|--------|--------|
     |    title    |    false    |    string   |    blog title    |
     |    name    |    true    |    string   |    person's name    |
 
-    #### return
-    - ##### json
+    ### return
+    - #### json
     > {"msg": "success", "code": 200}
     @@@
     """
@@ -101,7 +101,7 @@ def del_data():
 def get_something():
     """
     @@@
-    #### example
+    ### example
     ```
     import requests
     url='http://127.0.0.1:5000/api/get_something'
@@ -141,15 +141,15 @@ class TodoList(Resource):
     def get(self):
         """
         @@@
-        #### args
+        ### args
 
         | args | nullable | type | remark |
         |--------|--------|--------|--------|
         |    id    |    false    |    int   |    todo id    |
 
-        #### return
-        - ##### json
-        > {...}
+        ### return
+        - #### json
+        > {......}
         @@@
         """
         return {'todos': 'get todolist'}
@@ -202,5 +202,7 @@ app.add_url_rule('/todolist/', view_func=TodoList.as_view('todolist'))
 [flask_api_doc](https://github.com/tobyqin/flask_api_doc/)
 
 [Flask-Bootstrap](https://github.com/mbr/flask-bootstrap/)
+
+[github-markdown-css](https://github.com/sindresorhus/github-markdown-css/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples

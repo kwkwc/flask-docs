@@ -15,7 +15,7 @@ app = Flask(__name__)
 # Api Document needs to be displayed
 app.config['API_DOC_MEMBER'] = ['api', 'platform']
 
-ApiDoc(app, title='Sample App', version='0.1.5')
+ApiDoc(app, title='Sample App', version='0.1.6')
 
 api = Blueprint('api', __name__)
 platform = Blueprint('platform', __name__)
@@ -41,15 +41,15 @@ def del_data():
     """Del some data
 
     @@@
-    #### args
+    ### args
 
     | args | nullable | type | remark |
     |--------|--------|--------|--------|
     |    title    |    false    |    string   |    blog title    |
     |    name    |    true    |    string   |    person's name    |
 
-    #### return
-    - ##### json
+    ### return
+    - #### json
     > {"msg": "success", "code": 200}
     @@@
     """
@@ -60,7 +60,7 @@ def del_data():
 def get_something():
     """
     @@@
-    #### example
+    ### example
     ```
     import requests
     url='http://127.0.0.1:5000/api/get_something'

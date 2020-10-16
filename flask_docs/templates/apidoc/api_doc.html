@@ -24,7 +24,7 @@
             </div>
           </el-col>
           <el-col :span="16" style="padding-left:20px">
-            <div id="md"></div>
+            <article class="markdown-body"><div id="md"></div></article>
           </el-col>
         </el-row>
       </el-main>
@@ -64,7 +64,7 @@
           this.treeData[data.router]['children'].forEach((con, index) => {
             if(con.name == data.name) {
               md += '# ' + data.full_name + '\n\n'
-              md += '#### url' + '\n'
+              md += '### url' + '\n'
               var urls= new Array()
               urls = con.url.split(" ")
               for (i=0; i<urls.length; i++)
@@ -72,19 +72,22 @@
                 md += '- ' + urls[i] + '\n\n'
               }
               if(con.api_type === 'api') {
-                md += '#### method' + '\n'
+                md += '### method' + '\n'
                 md += '- ' + con.method + '\n\n'
               }
               if(con.doc == this.noDocText && con.doc_md != '') {
               }
               else {
-                md += '#### doc' + '\n'
-                md += '```\n' + con.doc + '\n```\n\n'
+                md += '### doc' + '\n'
+                md += '```doc\n' + con.doc + '\n```\n\n'
               }
               md += con.doc_md
             }
           })
           document.getElementById('md').innerHTML = marked(md)
+          document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightBlock(block)
+          })
         }
       },
       download() {
@@ -98,7 +101,7 @@
             else {
               md += '## ' + con.name + '(' + con.name_extra + ')' + '\n\n'
             }
-            md += '#### url' + '\n'
+            md += '### url' + '\n'
             var urls= new Array()
             urls = con.url.split(" ")
             for (i=0; i<urls.length; i++)
@@ -106,14 +109,14 @@
               md += '- ' + urls[i] + '\n\n'
             }
             if(con.api_type === 'api') {
-              md += '#### method' + '\n'
+              md += '### method' + '\n'
               md += '- ' + con.method + '\n\n'
             }
             if(con.doc == this.noDocText && con.doc_md != '') {
             }
             else {
-              md += '#### doc' + '\n'
-              md += '```\n' + con.doc + '\n```\n\n'
+              md += '### doc' + '\n'
+              md += '```doc\n' + con.doc + '\n```\n\n'
             }
             md += con.doc_md + '\n'
           })

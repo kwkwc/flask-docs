@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.config['RESTFUL_API_DOC_EXCLUDE'] = []
 
 restful_api = Api(app)
-ApiDoc(app, title='Sample App Restful', version='0.1.5')
+ApiDoc(app, title='Sample App Restful', version='0.1.6')
 
 
 class TodoList(Resource):
@@ -38,15 +38,15 @@ class TodoList(Resource):
     def get(self):
         """
         @@@
-        #### args
+        ### args
 
         | args | nullable | type | remark |
         |--------|--------|--------|--------|
         |    id    |    false    |    int   |    todo id    |
 
-        #### return
-        - ##### json
-        > {...}
+        ### return
+        - #### json
+        > {......}
         @@@
         """
         return {'todos': 'get todolist'}
