@@ -6,7 +6,7 @@ install:
 - pip install -r tests/requirements.txt
 - pip install coveralls
 script:
-- coverage run tests/test_accept.py
+- coverage run tests/test_case.py
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel

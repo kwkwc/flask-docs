@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.1.7
+    0.1.8
 History:
     Created on 2018/05/20
     Last modified on 2020/10/18
