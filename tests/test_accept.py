@@ -14,6 +14,9 @@ Author:
 '''
 
 
+import sys
+sys.path.append('.')
+
 import unittest
 from flask import Flask
 from flask_docs import ApiDoc

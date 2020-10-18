@@ -9,14 +9,14 @@ def read(fname):
 
 setup(
     name='Flask-Docs',
-    version='0.1.6',
+    version='0.1.7',
     url='https://github.com/kwkwc/flask-docs',
     license='MIT',
     author='kwkw',
     author_email='wei497896143@yeah.net',
     description='Adds Docs support to Flask.',
-    long_description=read('README.md'),
-    long_description_content_type="text/markdown",
+    # long_description=read('README.md'),
+    # long_description_content_type="text/markdown",
     packages=['flask_docs'],
     zip_safe=False,
     include_package_data=True,
