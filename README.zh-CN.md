@@ -1,4 +1,8 @@
-# Flask-Docs v0.1.6
+# Flask-Docs
+
+[![Build Status](https://travis-ci.org/kwkwc/flask-docs.svg?branch=master)](https://travis-ci.org/kwkwc/flask-docs)
+[![Coverage Status](https://coveralls.io/repos/github/kwkwc/flask-docs/badge.svg?branch=master)](https://coveralls.io/github/kwkwc/flask-docs?branch=master)
+[![PyPI](https://img.shields.io/pypi/v/Flask-Docs)](https://pypi.org/project/Flask-Docs/)
 
 > Flask Api 文档自动生成插件
 
