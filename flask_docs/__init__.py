@@ -83,7 +83,7 @@ class ApiDoc(object):
         if app is not None:
             self.init_app(app, title, version)
 
-    def init_app(self, app, title, version):
+    def init_app(self, app, title='Api Doc', version='1.0.0'):
         app.config.setdefault('API_DOC_MEMBER', [])
         app.config.setdefault('API_DOC_ENABLE', True)
         app.config.setdefault('API_DOC_CDN', False)
