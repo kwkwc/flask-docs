@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.0.2
+    0.0.3
 History:
     Created on 2020/10/18
-    Last modified on 2020/10/18
+    Last modified on 2020/10/29
 Author:
     kwkw
 '''
@@ -37,6 +37,13 @@ class AcceptTestCase(unittest.TestCase):
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, 'text/html; charset=utf-8')
 
+    def test_accept_docs_api_data(self):
+
+        with app.test_client() as client:
+            res = client.get('/docs/api/data')
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.content_type, 'application/json')
+
 
 class RestfulApiTestRoute(Resource):
     pass
@@ -58,6 +65,10 @@ class TodoList(RestfulApiTestRoute):
         pass
 
 
+class TodoListNone(RestfulApiTestRoute):
+    pass
+
+
 class CoverageTestCase(unittest.TestCase):
 
     def test_api_route_coverage(self):
@@ -65,26 +76,27 @@ class CoverageTestCase(unittest.TestCase):
         api = Blueprint('api', __name__)
 
         @api.route('/add_data', methods=['POST'])
-        @api.route('/data', methods=['POST', 'GET'])
+        @api.route('/post_data', methods=['POST', 'PUT'])
         def add_data():
             pass
 
         app.register_blueprint(api, url_prefix='/api')
 
         with app.test_client() as client:
-            res = client.get('/docs/api/')
+            res = client.get('/docs/api/data')
             self.assertEqual(res.status_code, 200)
-            self.assertEqual(res.content_type, 'text/html; charset=utf-8')
+            self.assertEqual(res.content_type, 'application/json')
 
     def test_restful_api_route_coverage(self):
 
         restful_api = Api(app)
         restful_api.add_resource(TodoList, '/todolist', '/todo')
+        restful_api.add_resource(TodoListNone, '/todolist_none')
 
         with app.test_client() as client:
-            res = client.get('/docs/api/')
+            res = client.get('/docs/api/data')
             self.assertEqual(res.status_code, 200)
-            self.assertEqual(res.content_type, 'text/html; charset=utf-8')
+            self.assertEqual(res.content_type, 'application/json')
 
 
 if __name__ == '__main__':

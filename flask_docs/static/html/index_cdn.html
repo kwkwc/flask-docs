@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge，chrome=1">
+
+    <link rel="stylesheet" href="static/css/github-markdown.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/element-ui/2.3.8/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.2.1/styles/github-gist.min.css">
+
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+    </style>
+
+    <title>Documentation</title>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <el-card class="box-card">
+            <el-container>
+                <el-header>
+                    <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
+                        <el-menu-item index="1">{{ titleVersion }}</el-menu-item>
+                        <el-button class="download" type="text" icon="el-icon-download" @click="download"></el-button>
+                    </el-menu>
+                </el-header>
+                <el-main v-loading="loading">
+                    <el-row>
+                        <el-col :span="8">
+                            <el-input placeholder="Filter keyword" v-model="treeFilterText" style="padding-bottom:10px">
+                            </el-input>
+                            <div style="overflow-y:auto;max-height:670px;">
+                                <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps"
+                                    :filter-node-method="treeFilterNode" ref="apiTree" @node-click="treeNodeClick">
+                                </el-tree>
+                            </div>
+                        </el-col>
+                        <el-col :span="16" style="padding-left:20px">
+                            <article class="markdown-body">
+                                <div id="md"></div>
+                            </article>
+                        </el-col>
+                    </el-row>
+                </el-main>
+            </el-container>
+        </el-card>
+    </div>
+</body>
+
+<script src="https://cdn.staticfile.org/vue/2.5.17-beta.0/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/element-ui/2.3.8/index.js"></script>
+<script src="https://cdn.staticfile.org/marked/0.3.19/marked.min.js"></script>
+<script src="https://cdn.staticfile.org/axios/0.21.0/axios.min.js"></script>
+<script src="https://cdn.staticfile.org/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+<script src="https://cdn.staticfile.org/highlight.js/10.2.1/highlight.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            loading: false,
+            headerIndex: '1',
+            treeFilterText: '',
+            treeData: {},
+            treeDefaultProps: {
+                label: 'full_name',
+                children: 'children'
+            },
+            title: 'Documentation',
+            version: '1.0.0',
+            titleVersion: 'Documentation',
+            noDocText: 'No doc found for this Api'
+        },
+        created: function () {
+            document.title = this.title
+            document.getElementById('md').innerHTML = marked('# ' + this.title)
+        },
+        mounted: function () {
+            this.loading = true
+            axios.get('/docs/api/data').then(res => {
+                this.treeData = res.data.data
+                this.title = res.data.title
+                this.version = res.data.version
+                this.titleVersion = this.title + ' (' + this.version + ')'
+                this.noDocText = res.data.noDocText
+                document.title = this.titleVersion
+                document.getElementById('md').innerHTML = marked('# ' + this.titleVersion)
+                this.loading = false
+            },
+                err => {
+                    this.$message.error('Error');
+                    this.loading = false
+                }
+            )
+        },
+        methods: {
+            treeFilterNode(value, data) {
+                if (!value) return true
+                let srcStr = data.full_name.toLowerCase()
+                let desStr = value.toLowerCase()
+                return srcStr.indexOf(desStr) !== -1
+            },
+            treeNodeClick(data) {
+                if (data.router != null) {
+                    let md = ''
+                    this.treeData[data.router]['children'].forEach((con, index) => {
+                        if (con.name == data.name) {
+                            md += '# ' + data.full_name + '\n\n'
+                            md += '### url' + '\n'
+                            var urls = new Array()
+                            urls = con.url.split(" ")
+                            for (i = 0; i < urls.length; i++) {
+                                md += '- ' + urls[i] + '\n\n'
+                            }
+                            if (con.api_type === 'api') {
+                                md += '### method' + '\n'
+                                md += '- ' + con.method + '\n\n'
+                            }
+                            if (con.doc == this.noDocText && con.doc_md != '') {
+                            }
+                            else {
+                                md += '### doc' + '\n'
+                                md += '```doc\n' + con.doc + '\n```\n\n'
+                            }
+                            md += con.doc_md
+                        }
+                    })
+                    document.getElementById('md').innerHTML = marked(md)
+                    document.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightBlock(block)
+                    })
+                }
+            },
+            download() {
+                let md = ''
+                this.treeDataNew.forEach((t, index) => {
+                    md += '# ' + t.full_name + '\n\n'
+                    this.treeData[t.full_name]['children'].forEach((con, index) => {
+                        if (con.name_extra == '') {
+                            md += '## ' + con.name + '\n\n'
+                        }
+                        else {
+                            md += '## ' + con.name + '(' + con.name_extra + ')' + '\n\n'
+                        }
+                        md += '### url' + '\n'
+                        var urls = new Array()
+                        urls = con.url.split(" ")
+                        for (i = 0; i < urls.length; i++) {
+                            md += '- ' + urls[i] + '\n\n'
+                        }
+                        if (con.api_type === 'api') {
+                            md += '### method' + '\n'
+                            md += '- ' + con.method + '\n\n'
+                        }
+                        if (con.doc == this.noDocText && con.doc_md != '') {
+                        }
+                        else {
+                            md += '### doc' + '\n'
+                            md += '```doc\n' + con.doc + '\n```\n\n'
+                        }
+                        md += con.doc_md + '\n'
+                    })
+                    md += '\n'
+                })
+                saveAs(new Blob([md], { type: 'text/markdown;charset=utf-8' }), this.title + ' (' + this.version + ')' + '.md')
+            }
+        },
+        computed: {
+            treeDataNew() {
+                let treeDataNew = new Array()
+                for (key in this.treeData) {
+                    let childrenData = new Array()
+                    this.treeData[key]['children'].forEach((con, index) => {
+                        if (con.name_extra == '') {
+                            childrenData.push({ 'full_name': con.name, 'name': con.name, 'router': con.router })
+                        }
+                        else {
+                            childrenData.push({ 'full_name': con.name + '(' + con.name_extra + ')', 'name': con.name, 'router': con.router })
+                        }
+                    })
+                    treeDataNew.push({ 'full_name': key, 'children': childrenData })
+                }
+                return treeDataNew
+            }
+        },
+        watch: {
+            treeFilterText(val) {
+                this.$refs.apiTree.filter(val)
+            }
+        }
+    })
+</script>
+
+<style>
+    @media screen and (min-width: 914px) {
+        body {
+            width: 96%;
+            margin: 10px auto;
+        }
+    }
+
+    .download {
+        padding-top: 25px;
+        padding-right: 20px;
+        font-size: 20px;
+        float: right;
+    }
+</style>
+
+</html>

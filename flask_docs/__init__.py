@@ -5,74 +5,17 @@
 Program:
     Flask-Docs
 Version:
-    0.1.8
+    0.1.9
 History:
     Created on 2018/05/20
-    Last modified on 2020/10/18
+    Last modified on 2020/10/29
 Author:
     kwkw
 '''
 
-from flask import Blueprint, current_app, render_template, json, url_for
+from flask import Blueprint, current_app, jsonify
 from flask_restful import Resource
 from flask.views import MethodView
-import re
-
-CDN_HOST = 'cdn.staticfile.org'
-ELEMENT_VERSION = '2.3.8'
-VUE_VERSION = '2.5.17-beta.0'
-MARKED_VERSION = '0.3.19'
-FILE_SAVER_VERSION = '2014-11-29'
-HIGHLIGHT_VERSION = '10.2.1'
-
-
-class CDN(object):
-    def get_resource_url(self, filename):
-        raise NotImplementedError
-
-
-class StaticCDN(object):
-    def __init__(self, static_endpoint='static', rev=False):
-        self.static_endpoint = static_endpoint
-        self.rev = rev
-
-    def get_resource_url(self, filename):
-        extra_args = {}
-
-        return url_for(self.static_endpoint, filename=filename, **extra_args)
-
-
-class WebCDN(object):
-    def __init__(self, baseurl):
-        self.baseurl = baseurl
-
-    def get_resource_url(self, filename):
-        return self.baseurl + filename
-
-
-class ConditionalCDN(object):
-    def __init__(self, confvar, primary, fallback):
-        self.confvar = confvar
-        self.primary = primary
-        self.fallback = fallback
-
-    def get_resource_url(self, filename):
-        if not current_app.config[self.confvar]:
-            return self.primary.get_resource_url(filename)
-        return self.fallback.get_resource_url(filename)
-
-
-def find_resource(filename, cdn, use_minified=True, local=True):
-    if use_minified:
-        filename = '%s.min.%s' % tuple(filename.rsplit('.', 1))
-
-    cdns = current_app.extensions['api_doc']['cdns']
-    resource_url = cdns[cdn].get_resource_url(filename)
-
-    if resource_url.startswith('//'):
-        resource_url = 'https:%s' % resource_url
-
-    return resource_url
 
 
 class ApiDoc(object):
@@ -90,197 +33,171 @@ class ApiDoc(object):
         app.config.setdefault('RESTFUL_API_DOC_EXCLUDE', [])
 
         with app.app_context():
-            if current_app.config['API_DOC_ENABLE']:
-                api_doc = Blueprint(
-                    'api_doc',
-                    __name__,
-                    template_folder='templates',
-                    static_folder='static',
-                    url_prefix='/docs/api')
+            if not current_app.config['API_DOC_ENABLE']:
+                return
 
-                app.jinja_env.globals['find_resource'] =\
-                    find_resource
-                app.jinja_env.add_extension('jinja2.ext.do')
+            api_doc = Blueprint(
+                'api_doc',
+                __name__,
+                static_folder='static',
+                url_prefix='/docs/api')
 
-                local = StaticCDN('api_doc.static', rev=True)
-                static = StaticCDN()
+            @api_doc.route('/', methods=['GET'])
+            def index():
+                if current_app.config['API_DOC_CDN']:
+                    return api_doc.send_static_file('html/index_cdn.html')
+                else:
+                    return api_doc.send_static_file('html/index.html')
 
-                def lwrap(cdn, primary=static):
-                    return ConditionalCDN('API_DOC_CDN', primary, cdn)
+            @api_doc.route('/data', methods=['GET'])
+            def data():
 
-                elementJs = lwrap(WebCDN('//%s/element-ui/%s/' %
-                                         (CDN_HOST, ELEMENT_VERSION)), local)
+                dataDict = {}
 
-                elementCss = lwrap(
-                    WebCDN('//%s/element-ui/%s/theme-chalk/' % (CDN_HOST, ELEMENT_VERSION)), local)
+                # Restful Api and MethodView Api
+                c_dict = {c.__name__.lower(): c for c in self.get_all_subclasses(
+                    Resource, MethodView)}
+                for rule in app.url_map.iter_rules():
+                    func = app.view_functions[rule.endpoint]
+                    if func.__name__ not in c_dict:
+                        continue
 
-                vue = lwrap(WebCDN('//%s/vue/%s/' %
-                                   (CDN_HOST, VUE_VERSION)), local)
+                    name = func.__name__
+                    if name in current_app.config['RESTFUL_API_DOC_EXCLUDE']:
+                        continue
 
-                marked = lwrap(WebCDN('//%s/marked/%s/' %
-                                      (CDN_HOST, MARKED_VERSION)), local)
+                    c_doc = self.get_api_doc(func)
 
-                fileSaver = lwrap(WebCDN('//%s/FileSaver.js/%s/' %
-                                         (CDN_HOST, FILE_SAVER_VERSION)), local)
-
-                highlightJs = lwrap(WebCDN('//%s/highlight.js/%s/' %
-                                         (CDN_HOST, HIGHLIGHT_VERSION)), local)
-
-                highlightCss = lwrap(WebCDN('//%s/highlight.js/%s/styles/' %
-                                         (CDN_HOST, HIGHLIGHT_VERSION)), local)
-
-                app.extensions['api_doc'] = {
-                    'cdns': {
-                        'local': local,
-                        'static': static,
-                        'elementJs': elementJs,
-                        'elementCss': elementCss,
-                        'vue': vue,
-                        'marked': marked,
-                        'fileSaver': fileSaver,
-                        'highlightJs': highlightJs,
-                        'highlightCss': highlightCss
-                    },
-                }
-
-                @api_doc.route('/', methods=['GET'])
-                def index():
-
-                    dataDict = {}
-
-                    # Restful Api and MethodView Api
-                    for c in self.get_all_subclasses(Resource, MethodView):
+                    flag_rule = True
+                    if flag_rule:
+                        # e.g. Repeat "Todolist(manage todolist)(Manage todolist)"
                         try:
-                            dataList = []
-                            name = c.__name__.capitalize()
-                            if name not in current_app.config['RESTFUL_API_DOC_EXCLUDE']:
-                                flag_rule = True
-                                for rule in app.url_map.iter_rules():
-                                    if (hasattr(c, 'endpoint') and c.endpoint in str(rule.endpoint).split('.')) or (name.lower() in str(rule).lower()):
+                            if c_doc != ApiDoc.NO_DOC:
+                                name = name.capitalize() + '(' + c_doc.split('\n\n')[0].split(
+                                    '\n')[0].strip(' ').strip('\n\n').strip(' ').strip('\n').strip(' ') + ')'
+                        except Exception as e:
+                            name = name.capitalize()
+                        flag_rule = False
 
-                                        c_doc = self.get_api_doc(c)
+                    if func.methods is None:
+                        continue
 
-                                        if flag_rule:
-                                            try:
-                                                if c_doc != ApiDoc.NO_DOC:
-                                                    name = name.capitalize() + '(' + c_doc.split('\n\n')[0].split(
-                                                        '\n')[0].strip(' ').strip('\n\n').strip(' ').strip('\n').strip(' ') + ')'
-                                            except Exception as e:
-                                                name = name.capitalize()
-                                            flag_rule = False
+                    if name not in dataDict:
+                        dataDict[name] = {'children': []}
 
-                                        for m in c.methods:
-                                            if m in ApiDoc.METHODS_LIST:
-                                                api = {
-                                                    'name': '',
-                                                    'name_extra': '',
-                                                    'url': '',
-                                                    'doc': '',
-                                                    'doc_md': '',
-                                                    'router': name,
-                                                    'api_type': 'restful_api'
-                                                }
+                    for m in func.methods:
+                        if m not in ApiDoc.METHODS_LIST:
+                            continue
 
-                                                try:
-                                                    name_m = m
-                                                    url = str(rule)
+                        api = {
+                            'name': '',
+                            'name_extra': '',
+                            'url': '',
+                            'doc': '',
+                            'doc_md': '',
+                            'router': name,
+                            'api_type': 'restful_api'
+                        }
 
-                                                    result = filter(
-                                                        lambda x: x['name'] == name_m, dataList)
-                                                    result_list = list(result)
-                                                    if len(result_list) > 0:
-                                                        result_list[0]['url'] = result_list[0]['url'] + ' ' + url
-                                                        result_list[0]['url'] = ' '.join(
-                                                            list(set(result_list[0]['url'].split(' '))))
-                                                        raise
+                        try:
+                            name_m = m
+                            url = str(rule)
 
-                                                    api['name'] = name_m
-                                                    api['url'] = url
+                            result = filter(
+                                lambda x: x['name'] == name_m, dataDict[name]['children'])
+                            result_list = list(result)
+                            if len(result_list) > 0:
+                                result_list[0]['url'] = result_list[0]['url'] + ' ' + url
+                                result_list[0]['url'] = ' '.join(
+                                    list(set(result_list[0]['url'].split(' '))))
+                                raise
 
-                                                    doc = eval('c.{}.__doc__'.format(
-                                                        m.lower())).replace('\t', '    ')
+                            api['name'] = name_m
+                            api['url'] = url
 
-                                                    doc = doc if doc else ApiDoc.NO_DOC
+                            doc = eval('c_dict[func.__name__].{}.__doc__'.format(
+                                m.lower())).replace('\t', '    ')
 
-                                                    api['doc'], api['name_extra'], api['doc_md'] = self.get_doc_name_extra_doc_md(
-                                                        doc)
+                            doc = doc if doc else ApiDoc.NO_DOC
 
-                                                except Exception as e:
-                                                    pass
-                                                else:
-                                                    dataList.append(api)
+                            api['doc'], api['name_extra'], api['doc_md'] = self.get_doc_name_extra_doc_md(
+                                doc)
 
-                            if dataList != []:
-                                dataList.sort(key=lambda x: x['name'])
-                                dataDict[name] = {'children': []}
-                                dataDict[name]['children'] = dataList
                         except Exception as e:
                             pass
-
-                    # Api
-                    for f in current_app.config['API_DOC_MEMBER']:
-                        dataList = []
-                        dataDict[f.capitalize()] = {'children': []}
-                        for rule in app.url_map.iter_rules():
-                            if re.search(r'^/{}/.+'.format(f), str(rule) + '//'):
-
-                                api = {
-                                    'name': '',
-                                    'name_extra': '',
-                                    'url': '',
-                                    'method': '',
-                                    'doc': '',
-                                    'doc_md': '',
-                                    'router': f.capitalize(),
-                                    'api_type': 'api'
-                                }
-
-                                try:
-                                    func = app.view_functions[rule.endpoint]
-
-                                    name = self.get_api_name(func)
-                                    url = str(rule)
-                                    method = ' '.join(
-                                        [r for r in rule.methods if r in ApiDoc.METHODS_LIST])
-
-                                    result = filter(
-                                        lambda x: x['name'] == name, dataList)
-                                    result_list = list(result)
-                                    if len(result_list) > 0:
-                                        result_list[0]['url'] = result_list[0]['url'] + ' ' + url
-                                        result_list[0]['url'] = ' '.join(
-                                            list(set(result_list[0]['url'].split(' '))))
-                                        result_list[0]['method'] = result_list[0]['method'] + \
-                                            ' ' + method
-                                        result_list[0]['method'] = ' '.join(
-                                            list(set(result_list[0]['method'].split(' '))))
-                                        raise
-
-                                    api['name'] = name
-                                    api['url'] = url
-                                    api['method'] = method
-
-                                    doc = self.get_api_doc(func)
-
-                                    api['doc'], api['name_extra'], api['doc_md'] = self.get_doc_name_extra_doc_md(
-                                        doc)
-
-                                except Exception as e:
-                                    pass
-                                else:
-                                    dataList.append(api)
-                                    
-                        if dataList != []:
-                            dataList.sort(key=lambda x: x['name'])
-                            dataDict[f.capitalize()]['children'] = dataList
                         else:
-                            dataDict.pop(f.capitalize())
+                            dataDict[name]['children'].append(api)
 
-                    dataDict = {'data': dataDict}
-                    return render_template(
-                        'apidoc/api_doc.html', data=json.dumps(dataDict), title=title, version=version, noDocText=ApiDoc.NO_DOC)
+                    if dataDict[name]['children'] == []:
+                        dataDict.pop(name)
+                    else:
+                        dataDict[name]['children'].sort(
+                            key=lambda x: x['name'])
 
-                app.register_blueprint(api_doc)
+                # Api
+                for rule in app.url_map.iter_rules():
+                    r = str(rule).split('/')[1]
+                    if r not in current_app.config['API_DOC_MEMBER']:
+                        continue
+
+                    if r.capitalize() not in dataDict:
+                        dataDict[r.capitalize()] = {'children': []}
+
+                    api = {
+                        'name': '',
+                        'name_extra': '',
+                        'url': '',
+                        'method': '',
+                        'doc': '',
+                        'doc_md': '',
+                        'router': r.capitalize(),
+                        'api_type': 'api'
+                    }
+
+                    try:
+                        func = app.view_functions[rule.endpoint]
+
+                        name = self.get_api_name(func)
+                        url = str(rule)
+                        method = ' '.join(
+                            [r for r in rule.methods if r in ApiDoc.METHODS_LIST])
+
+                        result = filter(
+                            lambda x: x['name'] == name, dataDict[r.capitalize()]['children'])
+                        result_list = list(result)
+                        if len(result_list) > 0:
+                            result_list[0]['url'] = result_list[0]['url'] + ' ' + url
+                            result_list[0]['url'] = ' '.join(
+                                list(set(result_list[0]['url'].split(' '))))
+                            result_list[0]['method'] = result_list[0]['method'] + \
+                                ' ' + method
+                            result_list[0]['method'] = ' '.join(
+                                list(set(result_list[0]['method'].split(' '))))
+                            raise
+
+                        api['name'] = name
+                        api['url'] = url
+                        api['method'] = method
+
+                        doc = self.get_api_doc(func)
+
+                        api['doc'], api['name_extra'], api['doc_md'] = self.get_doc_name_extra_doc_md(
+                            doc)
+
+                    except Exception as e:
+                        pass
+                    else:
+                        dataDict[r.capitalize()]['children'].append(api)
+
+                    if dataDict[r.capitalize()]['children'] == []:
+                        dataDict.pop(r.capitalize())
+                    else:
+                        dataDict[r.capitalize()]['children'].sort(
+                            key=lambda x: x['name'])
+
+                return jsonify({'data': dataDict, 'title': title, 'version': version, 'noDocText': ApiDoc.NO_DOC})
+
+            app.register_blueprint(api_doc)
 
     def get_api_name(self, func):
         """e.g. Convert 'do_work' to 'Do Work'"""
