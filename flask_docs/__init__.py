@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.1.9
+    0.2.0
 History:
     Created on 2018/05/20
-    Last modified on 2020/10/29
+    Last modified on 2020/10/30
 Author:
     kwkw
 '''
@@ -136,12 +136,12 @@ class ApiDoc(object):
 
                 # Api
                 for rule in app.url_map.iter_rules():
-                    r = str(rule).split('/')[1]
-                    if r not in current_app.config['API_DOC_MEMBER']:
+                    f = str(rule).split('/')[1]
+                    if f not in current_app.config['API_DOC_MEMBER']:
                         continue
 
-                    if r.capitalize() not in dataDict:
-                        dataDict[r.capitalize()] = {'children': []}
+                    if f.capitalize() not in dataDict:
+                        dataDict[f.capitalize()] = {'children': []}
 
                     api = {
                         'name': '',
@@ -150,7 +150,7 @@ class ApiDoc(object):
                         'method': '',
                         'doc': '',
                         'doc_md': '',
-                        'router': r.capitalize(),
+                        'router': f.capitalize(),
                         'api_type': 'api'
                     }
 
@@ -163,7 +163,7 @@ class ApiDoc(object):
                             [r for r in rule.methods if r in ApiDoc.METHODS_LIST])
 
                         result = filter(
-                            lambda x: x['name'] == name, dataDict[r.capitalize()]['children'])
+                            lambda x: x['name'] == name, dataDict[f.capitalize()]['children'])
                         result_list = list(result)
                         if len(result_list) > 0:
                             result_list[0]['url'] = result_list[0]['url'] + ' ' + url
@@ -187,12 +187,12 @@ class ApiDoc(object):
                     except Exception as e:
                         pass
                     else:
-                        dataDict[r.capitalize()]['children'].append(api)
+                        dataDict[f.capitalize()]['children'].append(api)
 
-                    if dataDict[r.capitalize()]['children'] == []:
-                        dataDict.pop(r.capitalize())
+                    if dataDict[f.capitalize()]['children'] == []:
+                        dataDict.pop(f.capitalize())
                     else:
-                        dataDict[r.capitalize()]['children'].sort(
+                        dataDict[f.capitalize()]['children'].sort(
                             key=lambda x: x['name'])
 
                 return jsonify({'data': dataDict, 'title': title, 'version': version, 'noDocText': ApiDoc.NO_DOC})

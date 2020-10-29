@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.config['RESTFUL_API_DOC_EXCLUDE'] = []
 
 restful_api = Api(app)
-ApiDoc(app, title='Sample App Restful', version='0.1.9')
+ApiDoc(app, title='Sample App Restful', version='0.2.0')
 
 
 class TodoList(Resource):
