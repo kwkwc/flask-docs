@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.2.0
+    0.2.1
 History:
     Created on 2018/05/20
     Last modified on 2020/10/30
@@ -13,12 +13,27 @@ Author:
     kwkw
 '''
 
+import os
 from flask import Blueprint, current_app, jsonify
 from flask_restful import Resource
 from flask.views import MethodView
 
 
 class ApiDoc(object):
+    APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+    APP_TEMPLATES = os.path.join(APP_ROOT, 'templates')
+
+    with open(os.path.join(APP_TEMPLATES, 'index.html'), 'r') as h:
+        INDEX_HTML = h.read()
+    with open(os.path.join(APP_TEMPLATES, 'css_template_cdn.html'), 'r') as h:
+        CSS_TEMPLATE_CDN = h.read()
+    with open(os.path.join(APP_TEMPLATES, 'css_template_local.html'), 'r') as h:
+        CSS_TEMPLATE_LOCAL = h.read()
+    with open(os.path.join(APP_TEMPLATES, 'js_template_cdn.html'), 'r') as h:
+        JS_TEMPLATE_CDN = h.read()
+    with open(os.path.join(APP_TEMPLATES, 'js_template_local.html'), 'r') as h:
+        JS_TEMPLATE_LOCAL = h.read()
+
     NO_DOC = 'No doc found for this Api'
     METHODS_LIST = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 
@@ -45,9 +60,11 @@ class ApiDoc(object):
             @api_doc.route('/', methods=['GET'])
             def index():
                 if current_app.config['API_DOC_CDN']:
-                    return api_doc.send_static_file('html/index_cdn.html')
+                    return ApiDoc.INDEX_HTML.replace('<!-- ___CSS_TEMPLATE___ -->',
+                                                     ApiDoc.CSS_TEMPLATE_CDN).replace('<!-- ___JS_TEMPLATE___ -->', ApiDoc.JS_TEMPLATE_CDN)
                 else:
-                    return api_doc.send_static_file('html/index.html')
+                    return ApiDoc.INDEX_HTML.replace('<!-- ___CSS_TEMPLATE___ -->',
+                                                     ApiDoc.CSS_TEMPLATE_LOCAL).replace('<!-- ___JS_TEMPLATE___ -->', ApiDoc.JS_TEMPLATE_LOCAL)
 
             @api_doc.route('/data', methods=['GET'])
             def data():
