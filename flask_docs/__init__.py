@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.2.2
+    0.2.3
 History:
     Created on 2018/05/20
-    Last modified on 2020/10/31
+    Last modified on 2021/02/24
 Author:
     kwkw
 '''

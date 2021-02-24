@@ -74,7 +74,7 @@
         },
         mounted: function () {
             this.loading = true
-            axios.get('/docs/api/data').then(res => {
+            axios.get('data').then(res => {
                 this.treeData = res.data.data
                 this.title = res.data.title
                 this.version = res.data.version
