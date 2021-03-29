@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.2.3
+    0.2.4
 History:
     Created on 2018/05/20
-    Last modified on 2021/02/24
+    Last modified on 2021/03/29
 Author:
     kwkw
 '''
@@ -72,8 +72,11 @@ class ApiDoc(object):
                 dataDict = {}
 
                 # Restful Api and MethodView Api
-                c_dict = {c.__name__.lower(): c for c in self.get_all_subclasses(
-                    Resource, MethodView)}
+                c_dict = {}
+                class_name_dict = {}
+                for c in self.get_all_subclasses(Resource, MethodView):
+                    c_dict[c.__name__.lower()] = c
+                    class_name_dict[c.__name__.lower()] = c.__name__
                 for rule in app.url_map.iter_rules():
                     func = app.view_functions[rule.endpoint]
                     if func.__name__ not in c_dict:
@@ -90,7 +93,7 @@ class ApiDoc(object):
                         # e.g. Repeat "Todolist(manage todolist)(Manage todolist)"
                         try:
                             if c_doc != ApiDoc.NO_DOC:
-                                name = name.capitalize() + '(' + c_doc.split('\n\n')[0].split(
+                                name = class_name_dict[name] + '(' + c_doc.split('\n\n')[0].split(
                                     '\n')[0].strip(' ').strip('\n\n').strip(' ').strip('\n').strip(' ') + ')'
                         except Exception as e:
                             name = name.capitalize()
