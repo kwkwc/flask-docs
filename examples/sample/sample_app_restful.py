@@ -9,16 +9,16 @@ from flask_docs import ApiDoc
 app = Flask(__name__)
 
 # Using CDN
-# app.config['API_DOC_CDN'] = True
+# app.config["API_DOC_CDN"] = True
 
 # Disable document pages
-# app.config['API_DOC_ENABLE'] = False
+# app.config["API_DOC_ENABLE"] = False
 
 # RESTful Api documents to be excluded
-app.config['RESTFUL_API_DOC_EXCLUDE'] = []
+app.config["RESTFUL_API_DOC_EXCLUDE"] = []
 
 restful_api = Api(app)
-ApiDoc(app, title='Sample App Restful', version='1.0.0')
+ApiDoc(app, title="Sample App Restful", version="1.0.0")
 
 
 class TodoList(Resource):
@@ -29,12 +29,12 @@ class TodoList(Resource):
 
         Args:
             pass
-    
+
         Returns:
             pass
 
         """
-        return {'todos': 'post todolist'}
+        return {"todos": "post todolist"}
 
     def get(self):
         """
@@ -50,10 +50,10 @@ class TodoList(Resource):
         > {......}
         @@@
         """
-        return {'todos': 'get todolist'}
+        return {"todos": "get todolist"}
 
 
-restful_api.add_resource(TodoList, '/todolist')
+restful_api.add_resource(TodoList, "/todolist")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)

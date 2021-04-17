@@ -8,21 +8,21 @@ from flask_docs import ApiDoc
 app = Flask(__name__)
 
 # Using CDN
-# app.config['API_DOC_CDN'] = True
+# app.config["API_DOC_CDN"] = True
 
 # Disable document pages
-# app.config['API_DOC_ENABLE'] = False
+# app.config["API_DOC_ENABLE"] = False
 
 # Api Document needs to be displayed
-app.config['API_DOC_MEMBER'] = ['api', 'platform']
+app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
-ApiDoc(app, title='Sample App', version='1.0.0')
+ApiDoc(app, title="Sample App", version="1.0.0")
 
-api = Blueprint('api', __name__)
-platform = Blueprint('platform', __name__)
+api = Blueprint("api", __name__)
+platform = Blueprint("platform", __name__)
 
 
-@api.route('/add_data', methods=['POST'])
+@api.route("/add_data", methods=["POST"])
 def add_data():
     """Add some data
 
@@ -30,14 +30,14 @@ def add_data():
 
     Args:
         pass
- 
+
     Returns:
         pass
     """
-    return jsonify({'api': 'add data'})
+    return jsonify({"api": "add data"})
 
 
-@api.route('/del_data', methods=['POST'])
+@api.route("/del_data", methods=["POST"])
 def del_data():
     """Del some data
 
@@ -54,10 +54,10 @@ def del_data():
     > {"msg": "success", "code": 200}
     @@@
     """
-    return jsonify({'api': 'del data'})
+    return jsonify({"api": "del data"})
 
 
-@platform.route('/get_something', methods=['GET'])
+@platform.route("/get_something", methods=["GET"])
 def get_something():
     """
     @@@
@@ -72,11 +72,11 @@ def get_something():
     ```
     @@@
     """
-    return jsonify({'platform': 'get something'})
+    return jsonify({"platform": "get something"})
 
 
-app.register_blueprint(api, url_prefix='/api')
-app.register_blueprint(platform, url_prefix='/platform')
+app.register_blueprint(api, url_prefix="/api")
+app.register_blueprint(platform, url_prefix="/platform")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
