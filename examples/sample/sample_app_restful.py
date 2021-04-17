@@ -1,6 +1,18 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+"""
+Program:
+    Sample app restful
+Version:
+    0.2.5
+History:
+    Created on 2018/05/20
+    Last modified on 2021/04/17
+Author:
+    kwkw
+"""
+
 from flask import Flask
 from flask_restful import Api, Resource
 
