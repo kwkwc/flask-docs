@@ -2,7 +2,8 @@
 # -*- coding:utf-8 -*-
 
 from flask import Flask
-from flask_restful import Resource, Api
+from flask_restful import Api, Resource
+
 from flask_docs import ApiDoc
 
 app = Flask(__name__)

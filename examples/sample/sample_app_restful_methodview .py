@@ -3,6 +3,7 @@
 
 from flask import Flask, jsonify
 from flask.views import MethodView
+
 from flask_docs import ApiDoc
 
 app = Flask(__name__)

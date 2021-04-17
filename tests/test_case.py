@@ -1,27 +1,29 @@
 #!/usr/bin/env python
-# coding=utf8
+# -*- coding:utf-8 -*-
 
 '''
 Program:
     Test case
 Version:
-    0.0.3
+    0.0.4
 History:
     Created on 2020/10/18
-    Last modified on 2020/10/29
+    Last modified on 2021/04/17
 Author:
     kwkw
 '''
 
 
 import sys
+
 sys.path.append('.')
 
 import unittest
-from flask import Flask, Blueprint
-from flask_restful import Resource, Api
-from flask_docs import ApiDoc
 
+from flask import Blueprint, Flask
+from flask_restful import Api, Resource
+
+from flask_docs import ApiDoc
 
 app = Flask(__name__)
 app.config['API_DOC_MEMBER'] = ['api']

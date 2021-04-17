@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from flask import Flask, render_template, jsonify, Blueprint
+from flask import Blueprint, Flask, jsonify, render_template
+
 from flask_docs import ApiDoc
 
 app = Flask(__name__)

@@ -1,22 +1,24 @@
 #!/usr/bin/env python
-# coding=utf8
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
 
 '''
 Program:
     Flask-Docs
 Version:
-    0.2.4
+    0.2.5
 History:
     Created on 2018/05/20
-    Last modified on 2021/03/29
+    Last modified on 2021/04/17
 Author:
     kwkw
 '''
 
 import os
+
 from flask import Blueprint, current_app, jsonify
-from flask_restful import Resource
 from flask.views import MethodView
+from flask_restful import Resource
 
 
 class ApiDoc(object):
