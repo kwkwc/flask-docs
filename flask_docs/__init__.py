@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.2.5
+    0.2.6
 History:
     Created on 2018/05/20
     Last modified on 2021/04/17
@@ -35,14 +35,28 @@ class ApiDoc(object):
     with open(os.path.join(APP_TEMPLATES, "js_template_local.html"), "r") as h:
         JS_TEMPLATE_LOCAL = h.read()
 
-    NO_DOC = "No doc found for this Api"
     METHODS_LIST = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
-    def __init__(self, app=None, title="Api Doc", version="1.0.0"):
+    def __init__(
+        self,
+        app=None,
+        title="Api Doc",
+        version="1.0.0",
+        no_doc_text="No doc found for this Api",
+    ):
         if app is not None:
-            self.init_app(app, title, version)
+            self.init_app(app, title, version, no_doc_text)
 
-    def init_app(self, app, title="Api Doc", version="1.0.0"):
+    def init_app(
+        self,
+        app,
+        title="Api Doc",
+        version="1.0.0",
+        no_doc_text="No doc found for this Api",
+    ):
+
+        self.no_doc_text = no_doc_text
+
         app.config.setdefault("API_DOC_MEMBER", [])
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
@@ -93,7 +107,7 @@ class ApiDoc(object):
                     if flag_rule:
                         # e.g. Repeat "Todolist(manage todolist)(Manage todolist)"
                         try:
-                            if c_doc != ApiDoc.NO_DOC:
+                            if c_doc != self.no_doc_text:
                                 name = (
                                     class_name_dict[name]
                                     + "("
@@ -155,7 +169,7 @@ class ApiDoc(object):
                                 "c_dict[func.__name__].{}.__doc__".format(m.lower())
                             ).replace("\t", "    ")
 
-                            doc = doc if doc else ApiDoc.NO_DOC
+                            doc = doc if doc else self.no_doc_text
 
                             (
                                 api["doc"],
@@ -249,7 +263,7 @@ class ApiDoc(object):
                         "data": dataDict,
                         "title": title,
                         "version": version,
-                        "noDocText": ApiDoc.NO_DOC,
+                        "noDocText": self.no_doc_text,
                     }
                 )
 
@@ -267,15 +281,15 @@ class ApiDoc(object):
         if func.__doc__:
             return func.__doc__.replace("\t", "    ")
         else:
-            return ApiDoc.NO_DOC
+            return self.no_doc_text
 
     def get_doc_name_extra_doc_md(self, doc_src):
         try:
             doc = doc_src.split("@@@")[0]
         except Exception as e:
-            doc = ApiDoc.NO_DOC
+            doc = self.no_doc_text
 
-        if doc != ApiDoc.NO_DOC:
+        if doc != self.no_doc_text:
             name_extra = (
                 doc.split("\n\n")[0]
                 .split("\n")[0]
@@ -298,7 +312,7 @@ class ApiDoc(object):
         )
 
         if doc == "":
-            doc = ApiDoc.NO_DOC
+            doc = self.no_doc_text
 
         try:
             doc_md = doc_src.split("@@@")[1].strip(" ")
