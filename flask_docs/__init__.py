@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.2.6
+    0.2.7
 History:
     Created on 2018/05/20
     Last modified on 2021/04/17
@@ -35,8 +35,6 @@ class ApiDoc(object):
     with open(os.path.join(APP_TEMPLATES, "js_template_local.html"), "r") as h:
         JS_TEMPLATE_LOCAL = h.read()
 
-    METHODS_LIST = ["GET", "POST", "PUT", "DELETE", "PATCH"]
-
     def __init__(
         self,
         app=None,
@@ -61,6 +59,7 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
         app.config.setdefault("RESTFUL_API_DOC_EXCLUDE", [])
+        app.config.setdefault("METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"])
 
         with app.app_context():
             if not current_app.config["API_DOC_ENABLE"]:
@@ -131,7 +130,7 @@ class ApiDoc(object):
                         dataDict[name] = {"children": []}
 
                     for m in func.methods:
-                        if m not in ApiDoc.METHODS_LIST:
+                        if m not in current_app.config["METHODS_LIST"]:
                             continue
 
                         api = {
@@ -213,7 +212,11 @@ class ApiDoc(object):
                         name = self.get_api_name(func)
                         url = str(rule)
                         method = " ".join(
-                            [r for r in rule.methods if r in ApiDoc.METHODS_LIST]
+                            [
+                                r
+                                for r in rule.methods
+                                if r in current_app.config["METHODS_LIST"]
+                            ]
                         )
 
                         result = filter(
