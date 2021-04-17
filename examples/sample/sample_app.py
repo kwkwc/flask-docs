@@ -5,7 +5,7 @@
 Program:
     Sample app
 Version:
-    0.2.5
+    0.2.6
 History:
     Created on 2018/05/20
     Last modified on 2021/04/17
@@ -38,52 +38,75 @@ platform = Blueprint("platform", __name__)
 def add_data():
     """Add some data
 
-    Add some data in this routing
+    @@@
+    ### args
+    |  args | nullable | request type | type |  remarks |
+    |-------|----------|--------------|------|----------|
+    | title |  false   |    body      | str  | blog title    |
+    | name  |  false   |    body      | str  | person's name |
 
-    Args:
-        pass
+    ### request
+    ```json
+    {"title": "xxx", "name": "xxx"}
+    ```
 
-    Returns:
-        pass
+    ### return
+    ```json
+    {"code": xxxx, "msg": "xxx", "data": null}
+    ```
+    @@@
     """
     return jsonify({"api": "add data"})
 
 
-@api.route("/del_data", methods=["POST"])
-def del_data():
-    """Del some data
+@api.route("/delete_data", methods=["GET"])
+def delete_data():
+    """Delete some data
 
     @@@
     ### args
+    |  args  | nullable | request type | type |  remarks     |
+    |--------|----------|--------------|------|--------------|
+    |  id    |  true    |    query     |  str | blog id    |
+    |  name  |  false   |    query     |  str | person's name |
 
-    | args | nullable | type | remark |
-    |--------|--------|--------|--------|
-    |    title    |    false    |    string   |    blog title    |
-    |    name    |    true    |    string   |    person's name    |
+    ### request
+    ```bash
+    http://127.0.0.1:5000/api/delete_data?name=xxx
+    ```
 
     ### return
-    - #### json
-    > {"msg": "success", "code": 200}
+    ```json
+    {"code": xxxx, "msg": "xxx", "data": null}
+    ```
     @@@
     """
+
     return jsonify({"api": "del data"})
 
 
 @platform.route("/get_something", methods=["GET"])
 def get_something():
-    """
+    """Get some data
+
     @@@
-    ### example
-    ```
+    ### request example
+    ```python
     import requests
-    url='http://127.0.0.1:5000/api/get_something'
+    url="http://127.0.0.1:5000/platform/get_something"
     try:
-        print requests.get(url).text
+        print(requests.get(url).text)
     except:
         pass
     ```
+
+    ### return
+    ```json
+    {"code": xxxx, "msg": "xxx", "data": null}
+    ```
     @@@
     """
+
     return jsonify({"platform": "get something"})
 
 

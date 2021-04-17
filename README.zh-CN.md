@@ -12,8 +12,8 @@
 -----
 
 - 根据代码注释自动生成文档
-- 支持 Flask-RESTful
 - 支持离线 markdown 文档下载
+- 支持 Flask-RESTful
 - 支持 flask.views.MethodView
 
 使用
@@ -59,64 +59,87 @@ http://127.0.0.1/docs/api
 Api demo
 -----
 
-```python
+````python
 @api.route('/add_data', methods=['POST'])
 def add_data():
     """Add some data
 
-    Add some data in this routing
+    @@@
+    ### args
+    |  args | nullable | request type | type |  remarks |
+    |-------|----------|--------------|------|----------|
+    | title |  false   |    body      | str  | blog title    |
+    | name  |  false   |    body      | str  | person's name |
 
-    Args:
-        pass
+    ### request
+    ```json
+    {"title": "xxx", "name": "xxx"}
+    ```
 
-    Returns:
-        pass
+    ### return
+    ```json
+    {"code": xxxx, "msg": "xxx", "data": null}
+    ```
+    @@@
     """
-    return jsonify({'api': 'add data'})
-```
+    return jsonify({"api": "add data"})
+````
 
 ![sample_app](flask_docs/assets/sample_app_add.png)
 
-```python
-@api.route('/del_data', methods=['POST'])
-def del_data():
-    """Del some data
+````python
+@api.route('/delete_data', methods=['GET'])
+def delete_data():
+    """Delete some data
 
     @@@
     ### args
+    |  args  | nullable | request type | type |  remarks     |
+    |--------|----------|--------------|------|--------------|
+    |  id    |  true    |    query     |  str | blog id    |
+    |  name  |  false   |    query     |  str | person's name |
 
-    | args | nullable | type | remark |
-    |--------|--------|--------|--------|
-    |    title    |    false    |    string   |    blog title    |
-    |    name    |    true    |    string   |    person's name    |
+    ### request
+    ```bash
+    http://127.0.0.1:5000/api/delete_data?name=xxx
+    ```
 
     ### return
-    - #### json
-    > {"msg": "success", "code": 200}
+    ```json
+    {"code": xxxx, "msg": "xxx", "data": null}
+    ```
     @@@
     """
-    return jsonify({'api': 'del data'})
-```
 
-![sample_app](flask_docs/assets/sample_app_del.png)
+    return jsonify({"api": "del data"})
+````
+
+![sample_app](flask_docs/assets/sample_app_delete.png)
 
 ````python
 @platform.route('/get_something', methods=['GET'])
 def get_something():
-    """
+    """Get some data
+
     @@@
-    ### example
-    ```
+    ### request example
+    ```python
     import requests
-    url='http://127.0.0.1:5000/api/get_something'
+    url="http://127.0.0.1:5000/platform/get_something"
     try:
-        print requests.get(url).text
+        print(requests.get(url).text)
     except:
         pass
     ```
+
+    ### return
+    ```json
+    {"code": xxxx, "msg": "xxx", "data": null}
+    ```
     @@@
     """
-    return jsonify({'platform': 'get something'})
+
+    return jsonify({"platform": "get something"})
 ````
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
@@ -124,43 +147,69 @@ def get_something():
 Flask-RESTful Api demo
 -----
 
-```python
+````python
 from flask_restful import Resource, Api
 
-class TodoList(Resource):
-    """Manage todolist"""
+class Todo(Resource):
+    """Manage todo"""
 
     def post(self):
-        """Submission of data
+        """Add todo
 
-        Args:
-            pass
-
-        Returns:
-            pass
-
-        """
-        return {'todos': 'post todolist'}
-
-    def get(self):
-        """
         @@@
-        ### args
+        ### description
+        > Add todo
 
-        | args | nullable | type | remark |
-        |--------|--------|--------|--------|
-        |    id    |    false    |    int   |    todo id    |
+        ### args
+        |  args | nullable | request type | type |  remarks |
+        |-------|----------|--------------|------|----------|
+        |  name |  false   |    body      | str  | todo name |
+        |  type |  false   |    body      | str  | todo type |
+
+        ### request
+        ```json
+        {"name": "xx", "type": "code"}
+        ```
 
         ### return
-        - #### json
-        > {......}
+        ```json
+        {"code": xxxx, "msg": "xxx", "data": null}
+        ```
         @@@
         """
-        return {'todos': 'get todolist'}
+
+        return {"todo": "post todo"}
+
+    def get(self):
+        """Get todo
+
+        @@@
+        ### description
+        > Get todo
+
+        ### args
+        |  args | nullable | request type | type |  remarks |
+        |-------|----------|--------------|------|----------|
+        |  name |  false   |    query     | str  | todo name |
+        |  type |  true    |    query     | str  | todo type |
+
+        ### request
+        ```bash
+        http://127.0.0.1:5000/todo?name=xxx&type=code
+        ```
+
+        ### return
+        ```json
+        {"code": xxxx, "msg": "xxx", "data": null}
+        ```
+        @@@
+        """
+
+        return {"todo": "get todo"}
 
 
-restful_api.add_resource(TodoList, '/todolist')
-```
+restful_api.add_resource(Todo, "/todo")
+````
 
 ![sample_app](flask_docs/assets/sample_app_restful_post.png)
 

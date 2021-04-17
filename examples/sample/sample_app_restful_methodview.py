@@ -5,7 +5,7 @@
 Program:
     Sample app restful methodview
 Version:
-    0.2.5
+    0.2.6
 History:
     Created on 2018/05/20
     Last modified on 2021/04/17
@@ -37,10 +37,12 @@ class TodoList(MethodView):
 
     def put(self):
         """Change the data"""
+
         return jsonify({"todos": "put todolist"})
 
     def delete(self):
         """Delete the data"""
+
         return jsonify({"todos": "delete todolist"})
 
 

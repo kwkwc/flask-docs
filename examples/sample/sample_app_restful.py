@@ -5,7 +5,7 @@
 Program:
     Sample app restful
 Version:
-    0.2.5
+    0.2.6
 History:
     Created on 2018/05/20
     Last modified on 2021/04/17
@@ -33,39 +33,65 @@ restful_api = Api(app)
 ApiDoc(app, title="Sample App Restful", version="1.0.0")
 
 
-class TodoList(Resource):
-    """Manage todolist"""
+class Todo(Resource):
+    """Manage todo"""
 
     def post(self):
-        """Submission of data
+        """Add todo
 
-        Args:
-            pass
-
-        Returns:
-            pass
-
-        """
-        return {"todos": "post todolist"}
-
-    def get(self):
-        """
         @@@
-        ### args
+        ### description
+        > Add todo
 
-        | args | nullable | type | remark |
-        |--------|--------|--------|--------|
-        |    id    |    false    |    int   |    todo id    |
+        ### args
+        |  args | nullable | request type | type |  remarks |
+        |-------|----------|--------------|------|----------|
+        |  name |  false   |    body      | str  | todo name |
+        |  type |  false   |    body      | str  | todo type |
+
+        ### request
+        ```json
+        {"name": "xx", "type": "code"}
+        ```
 
         ### return
-        - #### json
-        > {......}
+        ```json
+        {"code": xxxx, "msg": "xxx", "data": null}
+        ```
         @@@
         """
-        return {"todos": "get todolist"}
+
+        return {"todo": "post todo"}
+
+    def get(self):
+        """Get todo
+
+        @@@
+        ### description
+        > Get todo
+
+        ### args
+        |  args | nullable | request type | type |  remarks |
+        |-------|----------|--------------|------|----------|
+        |  name |  false   |    query     | str  | todo name |
+        |  type |  true    |    query     | str  | todo type |
+
+        ### request
+        ```bash
+        http://127.0.0.1:5000/todo?name=xxx&type=code
+        ```
+
+        ### return
+        ```json
+        {"code": xxxx, "msg": "xxx", "data": null}
+        ```
+        @@@
+        """
+
+        return {"todo": "get todo"}
 
 
-restful_api.add_resource(TodoList, "/todolist")
+restful_api.add_resource(Todo, "/todo")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
