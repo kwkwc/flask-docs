@@ -5,19 +5,24 @@
 Program:
     Flask-Docs
 Version:
-    0.2.7
+    0.2.8
 History:
     Created on 2018/05/20
-    Last modified on 2021/04/17
+    Last modified on 2021/04/18
 Author:
     kwkw
 """
 
+import logging
 import os
 
 from flask import Blueprint, current_app, jsonify
 from flask.views import MethodView
 from flask_restful import Resource
+
+project_name = "Flask-Docs"
+
+logger = logging.getLogger(__name__)
 
 
 class ApiDoc(object):
@@ -121,6 +126,7 @@ class ApiDoc(object):
                                 )
                         except Exception as e:
                             name = name.capitalize()
+                            logger.error("{} error - {}".format(project_name, e))
                         flag_rule = False
 
                     if func.methods is None:
@@ -177,7 +183,7 @@ class ApiDoc(object):
                             ) = self.get_doc_name_extra_doc_md(doc)
 
                         except Exception as e:
-                            pass
+                            logger.error("{} error - {}".format(project_name, e))
                         else:
                             dataDict[name]["children"].append(api)
 
@@ -250,7 +256,7 @@ class ApiDoc(object):
                         ) = self.get_doc_name_extra_doc_md(doc)
 
                     except Exception as e:
-                        pass
+                        logger.error("{} error - {}".format(project_name, e))
                     else:
                         dataDict[f.capitalize()]["children"].append(api)
 
@@ -291,6 +297,7 @@ class ApiDoc(object):
             doc = doc_src.split("@@@")[0]
         except Exception as e:
             doc = self.no_doc_text
+            logger.error("{} error - {}".format(project_name, e))
 
         if doc != self.no_doc_text:
             name_extra = (
@@ -323,9 +330,11 @@ class ApiDoc(object):
                 space_count = doc_src.split("@@@")[0].split("\n")[-1].count(" ")
             except Exception as e:
                 space_count = 0
+                logger.error("{} error - {}".format(project_name, e))
             doc_md = "\n".join(doc_md.split("\n" + " " * space_count))
         except Exception as e:
             doc_md = ""
+            logger.error("{} error - {}".format(project_name, e))
 
         return doc, name_extra, doc_md
 

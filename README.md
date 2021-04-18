@@ -28,16 +28,19 @@ from flask_docs import ApiDoc
 app = Flask(__name__)
 
 # Using CDN
-# app.config['API_DOC_CDN'] = True
+# app.config["API_DOC_CDN"] = True
 
 # Disable document pages
-# app.config['API_DOC_ENABLE'] = False
+# app.config["API_DOC_ENABLE"] = False
+
+# Allowed method
+# app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 # Api Document needs to be displayed
-app.config['API_DOC_MEMBER'] = ['api', 'platform']
+app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
 # Restful API documents to be excluded
-app.config['RESTFUL_API_DOC_EXCLUDE'] = []
+app.config["RESTFUL_API_DOC_EXCLUDE"] = []
 
 ApiDoc(app)
 ```
@@ -55,7 +58,7 @@ Api and document pages
 -----
 
 ````python
-@api.route('/add_data', methods=['POST'])
+@api.route("/add_data", methods=["POST"])
 def add_data():
     """Add some data
 
@@ -83,7 +86,7 @@ def add_data():
 ![sample_app](flask_docs/assets/sample_app_add.png)
 
 ````python
-@api.route('/delete_data', methods=['GET'])
+@api.route("/delete_data", methods=["GET"])
 def delete_data():
     """Delete some data
 
@@ -112,7 +115,7 @@ def delete_data():
 ![sample_app](flask_docs/assets/sample_app_delete.png)
 
 ````python
-@platform.route('/get_something', methods=['GET'])
+@platform.route("/get_something", methods=["GET"])
 def get_something():
     """Get some data
 
@@ -231,7 +234,7 @@ class TodoList(MethodView):
         return jsonify({"todos": "delete todolist"})
 
 
-app.add_url_rule('/todolist/', view_func=TodoList.as_view('todolist'))
+app.add_url_rule("/todolist/", view_func=TodoList.as_view("todolist"))
 ```
 
 Examples

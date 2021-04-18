@@ -5,7 +5,7 @@
 Program:
     Sample app
 Version:
-    0.2.7
+    0.2.8
 History:
     Created on 2018/05/20
     Last modified on 2021/04/18
@@ -24,6 +24,9 @@ app = Flask(__name__)
 
 # Disable document pages
 # app.config["API_DOC_ENABLE"] = False
+
+# Allowed method
+# app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 # Api Document needs to be displayed
 app.config["API_DOC_MEMBER"] = ["api", "platform"]

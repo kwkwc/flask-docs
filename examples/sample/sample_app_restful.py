@@ -5,10 +5,10 @@
 Program:
     Sample app restful
 Version:
-    0.2.6
+    0.2.7
 History:
     Created on 2018/05/20
-    Last modified on 2021/04/17
+    Last modified on 2021/04/18
 Author:
     kwkw
 """
@@ -25,6 +25,9 @@ app = Flask(__name__)
 
 # Disable document pages
 # app.config["API_DOC_ENABLE"] = False
+
+# Allowed method
+# app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 # RESTful Api documents to be excluded
 app.config["RESTFUL_API_DOC_EXCLUDE"] = []
