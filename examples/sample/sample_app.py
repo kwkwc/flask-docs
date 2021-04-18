@@ -5,10 +5,10 @@
 Program:
     Sample app
 Version:
-    0.2.6
+    0.2.7
 History:
     Created on 2018/05/20
-    Last modified on 2021/04/17
+    Last modified on 2021/04/18
 Author:
     kwkw
 """
@@ -82,7 +82,7 @@ def delete_data():
     @@@
     """
 
-    return jsonify({"api": "del data"})
+    return jsonify({"api": "delete data"})
 
 
 @platform.route("/get_something", methods=["GET"])

@@ -111,7 +111,7 @@ def delete_data():
     @@@
     """
 
-    return jsonify({"api": "del data"})
+    return jsonify({"api": "delete data"})
 ````
 
 ![sample_app](flask_docs/assets/sample_app_delete.png)
