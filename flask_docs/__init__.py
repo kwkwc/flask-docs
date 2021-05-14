@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.2.9
+    0.3.0
 History:
     Created on 2018/05/20
     Last modified on 2021/05/15
@@ -187,7 +187,7 @@ class ApiDoc(object):
                             ) = self.get_doc_name_extra_doc_md(doc)
 
                         except Exception as e:
-                            logger.error("{} error - {}".format(project_name, e))
+                            logger.exception("{} error - {}".format(project_name, e))
                         else:
                             dataDict[name]["children"].append(api)
 
@@ -260,7 +260,7 @@ class ApiDoc(object):
                         ) = self.get_doc_name_extra_doc_md(doc)
 
                     except Exception as e:
-                        logger.error("{} error - {}".format(project_name, e))
+                        logger.exception("{} error - {}".format(project_name, e))
                     else:
                         dataDict[f.capitalize()]["children"].append(api)
 
