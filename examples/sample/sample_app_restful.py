@@ -5,7 +5,7 @@
 Program:
     Sample app restful
 Version:
-    0.2.9
+    0.3.0
 History:
     Created on 2018/05/20
     Last modified on 2021/05/15
@@ -83,7 +83,7 @@ class Todo(Resource):
         |  type |  true    |    query     | str  | todo type |
 
         ### request
-        ```bash
+        ```
         http://127.0.0.1:5000/todo?name=xxx&type=code
         ```
 

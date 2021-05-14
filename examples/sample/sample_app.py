@@ -5,7 +5,7 @@
 Program:
     Sample app
 Version:
-    0.2.9
+    0.3.0
 History:
     Created on 2018/05/20
     Last modified on 2021/05/15
@@ -13,7 +13,7 @@ Author:
     kwkw
 """
 
-from flask import Blueprint, Flask, jsonify, render_template
+from flask import Blueprint, Flask, jsonify
 
 from flask_docs import ApiDoc
 
@@ -77,7 +77,7 @@ def delete_data():
     |  name  |  false   |    query     |  str | person's name |
 
     ### request
-    ```bash
+    ```
     http://127.0.0.1:5000/api/delete_data?name=xxx
     ```
 
