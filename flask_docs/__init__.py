@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.2.8
+    0.2.9
 History:
     Created on 2018/05/20
-    Last modified on 2021/04/18
+    Last modified on 2021/05/15
 Author:
     kwkw
 """
@@ -65,13 +65,17 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_CDN", False)
         app.config.setdefault("RESTFUL_API_DOC_EXCLUDE", [])
         app.config.setdefault("METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"])
+        app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
 
         with app.app_context():
             if not current_app.config["API_DOC_ENABLE"]:
                 return
 
             api_doc = Blueprint(
-                "api_doc", __name__, static_folder="static", url_prefix="/docs/api"
+                "api_doc",
+                __name__,
+                static_folder="static",
+                url_prefix=current_app.config["API_DOC_URL_PREFIX"],
             )
 
             @api_doc.route("/", methods=["GET"])

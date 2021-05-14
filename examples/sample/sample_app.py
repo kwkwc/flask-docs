@@ -5,10 +5,10 @@
 Program:
     Sample app
 Version:
-    0.2.8
+    0.2.9
 History:
     Created on 2018/05/20
-    Last modified on 2021/04/18
+    Last modified on 2021/05/15
 Author:
     kwkw
 """
@@ -27,6 +27,9 @@ app = Flask(__name__)
 
 # Allowed method
 # app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+
+# Custom url_prefix
+# app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
 # Api Document needs to be displayed
 app.config["API_DOC_MEMBER"] = ["api", "platform"]

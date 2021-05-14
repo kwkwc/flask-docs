@@ -34,6 +34,9 @@ app = Flask(__name__)
 # 允许的方法
 # app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
+# 自定义 url_prefix
+# app.config["API_DOC_URL_PREFIX"] = "/docs/api"
+
 # 需要显示文档的 Api
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
