@@ -39,11 +39,11 @@ app = Flask(__name__)
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
+# Restful API documents to be excluded
+# app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todo"]
+
 # Api Document needs to be displayed
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
-
-# Restful API documents to be excluded
-app.config["RESTFUL_API_DOC_EXCLUDE"] = []
 
 ApiDoc(app)
 ```

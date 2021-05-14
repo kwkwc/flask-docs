@@ -5,7 +5,7 @@
 Program:
     Sample app restful methodview
 Version:
-    0.2.8
+    0.2.9
 History:
     Created on 2018/05/20
     Last modified on 2021/05/15
@@ -33,7 +33,7 @@ app = Flask(__name__)
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
 # RESTful Api documents to be excluded
-app.config["RESTFUL_API_DOC_EXCLUDE"] = []
+# app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todolist"]
 
 ApiDoc(app, title="Sample App Restful Methodview", version="1.0.0")
 

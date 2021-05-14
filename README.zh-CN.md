@@ -37,11 +37,11 @@ app = Flask(__name__)
 # 自定义 url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
+# 需要排除的 RESTful Api 文档
+# app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todo"]
+
 # 需要显示文档的 Api
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
-
-# 需要排除的 RESTful Api 文档
-app.config["RESTFUL_API_DOC_EXCLUDE"] = []
 
 ApiDoc(app)
 ```
