@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.0.4
+    0.0.5
 History:
     Created on 2020/10/18
-    Last modified on 2021/04/17
+    Last modified on 2021/05/15
 Author:
     kwkw
 """
@@ -23,10 +23,11 @@ import unittest
 from flask import Blueprint, Flask
 from flask_restful import Api, Resource
 
-from flask_docs import ApiDoc
+from flask_docs import ApiDoc, change_doc
 
 app = Flask(__name__)
-app.config["API_DOC_MEMBER"] = ["api"]
+app.config["API_DOC_MEMBER"] = ["api", "platform"]
+app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todolist_exclude"]
 ApiDoc(app, title="Test App")
 
 
@@ -57,6 +58,7 @@ class TodoList(RestfulApiTestRoute):
         """Submission of data"""
         pass
 
+    @change_doc({"markdown": "json"})
     def get(self):
         """
         @@@
@@ -67,6 +69,10 @@ class TodoList(RestfulApiTestRoute):
 
 
 class TodoListNone(RestfulApiTestRoute):
+    pass
+
+
+class TodoListExclude(RestfulApiTestRoute):
     pass
 
 
@@ -92,6 +98,7 @@ class CoverageTestCase(unittest.TestCase):
         restful_api = Api(app)
         restful_api.add_resource(TodoList, "/todolist", "/todo")
         restful_api.add_resource(TodoListNone, "/todolist_none")
+        restful_api.add_resource(TodoListExclude, "/todolist_exclude")
 
         with app.test_client() as client:
             res = client.get("/docs/api/data")
