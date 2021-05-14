@@ -106,7 +106,7 @@ def delete_data():
     |  name  |  false   |    query     |  str | person's name |
 
     ### request
-    ```bash
+    ```
     http://127.0.0.1:5000/api/delete_data?name=xxx
     ```
 
@@ -200,7 +200,7 @@ class Todo(Resource):
         |  type |  true    |    query     | str  | todo type |
 
         ### request
-        ```bash
+        ```
         http://127.0.0.1:5000/todo?name=xxx&type=code
         ```
 
@@ -243,6 +243,41 @@ class TodoList(MethodView):
 
 
 app.add_url_rule("/todolist/", view_func=TodoList.as_view("todolist"))
+```
+
+装饰器 @change_doc
+-----
+> 复用注释
+
+```python
+from flask_docs import change_doc
+
+return_json_str = '{"code": xxxx, "msg": "xxx", "data": null}'
+
+@api.route("/add_data", methods=["POST"])
+@change_doc({"return_json": return_json_str})
+def add_data():
+    """Add some data
+
+    @@@
+    ### return
+    ```json
+    return_json
+    ```
+    @@@
+    """
+    return jsonify({"api": "add data"})
+
+
+@api.route("/delete_data", methods=["GET"])
+@change_doc({"return_json": return_json_str})
+def delete_data():
+    """Delete some data
+
+    return_json
+    """
+
+    return jsonify({"api": "delete data"})
 ```
 
 示例
