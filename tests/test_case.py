@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.0.5
+    0.0.6
 History:
     Created on 2020/10/18
-    Last modified on 2021/05/15
+    Last modified on 2021/05/16
 Author:
     kwkw
 """
@@ -26,6 +26,7 @@ from flask_restful import Api, Resource
 from flask_docs import ApiDoc, change_doc
 
 app = Flask(__name__)
+app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE"]
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
 app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todolist_exclude"]
 ApiDoc(app, title="Test App")
@@ -81,7 +82,7 @@ class CoverageTestCase(unittest.TestCase):
 
         api = Blueprint("api", __name__)
 
-        @api.route("/add_data", methods=["POST"])
+        @api.route("/add_data", methods=["POST", "PATCH"])
         @api.route("/post_data", methods=["POST", "PUT"])
         def add_data():
             pass
@@ -98,7 +99,7 @@ class CoverageTestCase(unittest.TestCase):
         restful_api = Api(app)
         restful_api.add_resource(TodoList, "/todolist", "/todo")
         restful_api.add_resource(TodoListNone, "/todolist_none")
-        restful_api.add_resource(TodoListExclude, "/todolist_exclude")
+        restful_api.add_resource(TodoListExclude, "/todolistexclude")
 
         with app.test_client() as client:
             res = client.get("/docs/api/data")
