@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.3.2
+    0.3.3
 History:
     Created on 2020/10/29
     Last modified on 2021/05/16
@@ -82,9 +82,9 @@ Author:
             version: '1.0.0',
             titleVersion: 'Documentation',
             noDocText: 'No doc found for this Api',
-            menuContentStyle: "overflow-y:auto;max-height:",
-            menuStyle: "overflow-y:auto;max-height:670px",
-            contentStyle: "overflow-y:auto;max-height:720px"
+            menuContentStyle: "padding-right:10px;overflow-y:auto;max-height:",
+            menuStyle: "padding-right:10px;overflow-y:auto;max-height:670px",
+            contentStyle: "padding-right:10px;overflow-y:auto;max-height:720px"
         },
         created: function () {
             let screenHeightMenu = window.innerHeight - 220
@@ -178,9 +178,9 @@ Author:
                             md += '### doc' + '\n'
                             md += '```doc\n' + con.doc + '\n```\n\n'
                         }
-                        md += con.doc_md + '\n'
+                        md += con.doc_md + '\n\n\n'
                     })
-                    md += '\n'
+                    md += '\n\n'
                 })
                 saveAs(new Blob([md], { type: 'text/markdown;charset=utf-8' }), this.title + ' (' + this.version + ')' + '.md')
             }

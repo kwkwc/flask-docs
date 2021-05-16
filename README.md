@@ -11,8 +11,8 @@
 Features
 -----
 
-- Automatic generation of markdown documents
-- Support for generating offline documents
+- Automatic generation of markdown documentation
+- Support for generating offline documentation
 - Support Flask-RESTful
 - Support flask.views.MethodView
 
