@@ -1,3 +1,15 @@
+<!-- 
+Program:
+    Flask-Docs HTML Template
+Version:
+    0.3.2
+History:
+    Created on 2020/10/29
+    Last modified on 2021/05/16
+Author:
+    kwkw
+-->
+
 <!DOCTYPE html>
 <html>
 
@@ -32,16 +44,18 @@
                         <el-col :span="8">
                             <el-input placeholder="Filter keyword" v-model="treeFilterText" style="padding-bottom:10px">
                             </el-input>
-                            <div style="overflow-y:auto;max-height:670px;">
+                            <div :style="menuStyle">
                                 <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps"
                                     :filter-node-method="treeFilterNode" ref="apiTree" @node-click="treeNodeClick">
                                 </el-tree>
                             </div>
                         </el-col>
                         <el-col :span="16" style="padding-left:20px">
-                            <article class="markdown-body">
-                                <div id="md"></div>
-                            </article>
+                            <div :style="contentStyle">
+                                <article class="markdown-body">
+                                    <div id="md"></div>
+                                </article>
+                            </div>
                         </el-col>
                     </el-row>
                 </el-main>
@@ -51,6 +65,7 @@
 </body>
 
 <!-- ___JS_TEMPLATE___ -->
+
 <script>
     new Vue({
         el: '#app',
@@ -66,9 +81,17 @@
             title: 'Documentation',
             version: '1.0.0',
             titleVersion: 'Documentation',
-            noDocText: 'No doc found for this Api'
+            noDocText: 'No doc found for this Api',
+            menuContentStyle: "overflow-y:auto;max-height:",
+            menuStyle: "overflow-y:auto;max-height:670px",
+            contentStyle: "overflow-y:auto;max-height:720px"
         },
         created: function () {
+            let screenHeightMenu = window.innerHeight - 220
+            let screenHeightContent = screenHeightMenu + 50
+            this.menuStyle = this.menuContentStyle + screenHeightMenu + "px"
+            this.contentStyle = this.menuContentStyle + screenHeightContent + "px"
+
             document.title = this.title
             document.getElementById('md').innerHTML = marked('# ' + this.title)
         },
@@ -194,6 +217,27 @@
             width: 96%;
             margin: 10px auto;
         }
+    }
+
+    /* Webkit */
+    ::-webkit-scrollbar {
+        background: #f7f7f9;
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #e5e5e5;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #bababa
+    }
+
+    /* Firefox */
+    * {
+        scrollbar-color: #e5e5e5 #f7f7f9;
+        scrollbar-width: thin;
     }
 
     .download {
