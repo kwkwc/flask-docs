@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.0.6
+    0.0.7
 History:
     Created on 2020/10/18
-    Last modified on 2021/05/16
+    Last modified on 2021/05/19
 Author:
     kwkw
 """
@@ -26,9 +26,9 @@ from flask_restful import Api, Resource
 from flask_docs import ApiDoc, change_doc
 
 app = Flask(__name__)
-app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE"]
+app.config["METHODS_LIST"] = ["GET", "POST", "DELETE"]
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
-app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todolist_exclude"]
+app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todolistexclude"]
 ApiDoc(app, title="Test App")
 
 
@@ -73,6 +73,11 @@ class TodoListNone(RestfulApiTestRoute):
     pass
 
 
+class TodoListNoneMethod(RestfulApiTestRoute):
+    def put(self):
+        pass
+
+
 class TodoListExclude(RestfulApiTestRoute):
     pass
 
@@ -99,7 +104,11 @@ class CoverageTestCase(unittest.TestCase):
         restful_api = Api(app)
         restful_api.add_resource(TodoList, "/todolist", "/todo")
         restful_api.add_resource(TodoListNone, "/todolist_none")
-        restful_api.add_resource(TodoListExclude, "/todolistexclude")
+        restful_api.add_resource(TodoListNoneMethod, "/todolist_none_method")
+        restful_api.add_resource(TodoListExclude, "/todolist_exclude")
+
+        todo = TodoList()
+        todo.get()
 
         with app.test_client() as client:
             res = client.get("/docs/api/data")
