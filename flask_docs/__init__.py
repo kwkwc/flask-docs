@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.3.1
+    0.3.2
 History:
     Created on 2018/05/20
-    Last modified on 2021/05/15
+    Last modified on 2021/05/19
 Author:
     kwkw
 """
@@ -85,6 +85,19 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
 
         with app.app_context():
+            if (
+                not isinstance(title, str)
+                or not isinstance(version, str)
+                or not isinstance(no_doc_text, str)
+                or not isinstance(current_app.config["API_DOC_MEMBER"], list)
+                or not isinstance(current_app.config["API_DOC_ENABLE"], bool)
+                or not isinstance(current_app.config["API_DOC_CDN"], bool)
+                or not isinstance(current_app.config["RESTFUL_API_DOC_EXCLUDE"], list)
+                or not isinstance(current_app.config["METHODS_LIST"], list)
+                or not isinstance(current_app.config["API_DOC_URL_PREFIX"], str)
+            ):
+                raise ValueError
+
             if not current_app.config["API_DOC_ENABLE"]:
                 return
 
@@ -119,36 +132,29 @@ class ApiDoc(object):
                     class_name_dict[c.__name__.lower()] = c.__name__
                 for rule in app.url_map.iter_rules():
                     func = app.view_functions[rule.endpoint]
-                    if func.__name__ not in c_dict:
+                    name = func.__name__
+                    
+                    if name not in c_dict:
                         continue
 
-                    name = func.__name__
                     if name in current_app.config["RESTFUL_API_DOC_EXCLUDE"]:
                         continue
 
                     c_doc = self.get_api_doc(func)
 
-                    flag_rule = True
-                    if flag_rule:
-                        # e.g. Repeat "Todolist(manage todolist)(Manage todolist)"
-                        try:
-                            if c_doc != self.no_doc_text:
-                                name = (
-                                    class_name_dict[name]
-                                    + "("
-                                    + c_doc.split("\n\n")[0]
-                                    .split("\n")[0]
-                                    .strip(" ")
-                                    .strip("\n\n")
-                                    .strip(" ")
-                                    .strip("\n")
-                                    .strip(" ")
-                                    + ")"
-                                )
-                        except Exception as e:
-                            name = name.capitalize()
-                            logger.error("{} error - {}".format(project_name, e))
-                        flag_rule = False
+                    if c_doc != self.no_doc_text:
+                        name = (
+                            class_name_dict[name]
+                            + "("
+                            + c_doc.split("\n\n")[0]
+                            .split("\n")[0]
+                            .strip(" ")
+                            .strip("\n\n")
+                            .strip(" ")
+                            .strip("\n")
+                            .strip(" ")
+                            + ")"
+                        )
 
                     if func.methods is None:
                         continue
@@ -186,7 +192,7 @@ class ApiDoc(object):
                                 result_list[0]["url"] = " ".join(
                                     list(set(result_list[0]["url"].split(" ")))
                                 )
-                                raise
+                                raise RuntimeError
 
                             api["name"] = name_m
                             api["url"] = url
@@ -262,7 +268,7 @@ class ApiDoc(object):
                             result_list[0]["method"] = " ".join(
                                 list(set(result_list[0]["method"].split(" ")))
                             )
-                            raise
+                            raise RuntimeError
 
                         api["name"] = name
                         api["url"] = url
@@ -314,11 +320,7 @@ class ApiDoc(object):
             return self.no_doc_text
 
     def get_doc_name_extra_doc_md(self, doc_src):
-        try:
-            doc = doc_src.split("@@@")[0]
-        except Exception as e:
-            doc = self.no_doc_text
-            logger.error("{} error - {}".format(project_name, e))
+        doc = doc_src.split("@@@")[0]
 
         if doc != self.no_doc_text:
             name_extra = (
@@ -347,11 +349,7 @@ class ApiDoc(object):
 
         try:
             doc_md = doc_src.split("@@@")[1].strip(" ")
-            try:
-                space_count = doc_src.split("@@@")[0].split("\n")[-1].count(" ")
-            except Exception as e:
-                space_count = 0
-                logger.error("{} error - {}".format(project_name, e))
+            space_count = doc_src.split("@@@")[0].split("\n")[-1].count(" ")
             doc_md = "\n".join(doc_md.split("\n" + " " * space_count))
         except Exception as e:
             doc_md = ""
