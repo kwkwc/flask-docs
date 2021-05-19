@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.3.2
+    0.3.3
 History:
     Created on 2018/05/20
     Last modified on 2021/05/19
@@ -133,7 +133,7 @@ class ApiDoc(object):
                 for rule in app.url_map.iter_rules():
                     func = app.view_functions[rule.endpoint]
                     name = func.__name__
-                    
+
                     if name not in c_dict:
                         continue
 
@@ -143,17 +143,8 @@ class ApiDoc(object):
                     c_doc = self.get_api_doc(func)
 
                     if c_doc != self.no_doc_text:
-                        name = (
-                            class_name_dict[name]
-                            + "("
-                            + c_doc.split("\n\n")[0]
-                            .split("\n")[0]
-                            .strip(" ")
-                            .strip("\n\n")
-                            .strip(" ")
-                            .strip("\n")
-                            .strip(" ")
-                            + ")"
+                        name = "{}({})".format(
+                            class_name_dict[name], self.clean_doc(c_doc)
                         )
 
                     if func.methods is None:
@@ -319,19 +310,22 @@ class ApiDoc(object):
         else:
             return self.no_doc_text
 
+    def clean_doc(self, doc_src):
+        return (
+            doc_src.split("\n\n")[0]
+            .split("\n")[0]
+            .strip(" ")
+            .strip("\n\n")
+            .strip(" ")
+            .strip("\n")
+            .strip(" ")
+        )
+
     def get_doc_name_extra_doc_md(self, doc_src):
         doc = doc_src.split("@@@")[0]
 
         if doc != self.no_doc_text:
-            name_extra = (
-                doc.split("\n\n")[0]
-                .split("\n")[0]
-                .strip(" ")
-                .strip("\n\n")
-                .strip(" ")
-                .strip("\n")
-                .strip(" ")
-            )
+            name_extra = self.clean_doc(doc)
         else:
             name_extra = ""
 
