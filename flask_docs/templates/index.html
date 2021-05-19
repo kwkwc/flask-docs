@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.3.3
+    0.3.4
 History:
     Created on 2020/10/29
-    Last modified on 2021/05/16
+    Last modified on 2021/05/20
 Author:
     kwkw
 -->
@@ -68,20 +68,20 @@ Author:
 
 <script>
     new Vue({
-        el: '#app',
+        el: "#app",
         data: {
             loading: false,
-            headerIndex: '1',
-            treeFilterText: '',
+            headerIndex: "1",
+            treeFilterText: "",
             treeData: {},
             treeDefaultProps: {
-                label: 'full_name',
-                children: 'children'
+                label: "full_name",
+                children: "children"
             },
-            title: 'Documentation',
-            version: '1.0.0',
-            titleVersion: 'Documentation',
-            noDocText: 'No doc found for this Api',
+            title: "Documentation",
+            version: "1.0.0",
+            titleVersion: "Documentation",
+            noDocText: "No doc found for this Api",
             menuContentStyle: "padding-right:10px;overflow-y:auto;max-height:",
             menuStyle: "padding-right:10px;overflow-y:auto;max-height:670px",
             contentStyle: "padding-right:10px;overflow-y:auto;max-height:720px"
@@ -93,22 +93,22 @@ Author:
             this.contentStyle = this.menuContentStyle + screenHeightContent + "px"
 
             document.title = this.title
-            document.getElementById('md').innerHTML = marked('# ' + this.title)
+            document.getElementById("md").innerHTML = marked("# " + this.title)
         },
         mounted: function () {
             this.loading = true
-            axios.get('data').then(res => {
+            axios.get("data").then(res => {
                 this.treeData = res.data.data
                 this.title = res.data.title
                 this.version = res.data.version
-                this.titleVersion = this.title + ' (' + this.version + ')'
+                this.titleVersion = this.title + " (" + this.version + ")"
                 this.noDocText = res.data.noDocText
                 document.title = this.titleVersion
-                document.getElementById('md').innerHTML = marked('# ' + this.titleVersion)
+                document.getElementById("md").innerHTML = marked("# " + this.titleVersion)
                 this.loading = false
             },
                 err => {
-                    this.$message.error('Error');
+                    this.$message.error("Error");
                     this.loading = false
                 }
             )
@@ -122,67 +122,73 @@ Author:
             },
             treeNodeClick(data) {
                 if (data.router != null) {
-                    let md = ''
-                    this.treeData[data.router]['children'].forEach((con, index) => {
+                    let md = ""
+                    this.treeData[data.router]["children"].forEach((con, index) => {
                         if (con.name == data.name) {
-                            md += '# ' + data.full_name + '\n\n'
-                            md += '### url' + '\n'
+                            md += "# " + data.full_name + "\n\n"
+                            md += "### url" + "\n"
                             var urls = new Array()
                             urls = con.url.split(" ")
+                            if (urls.length == 1) {
+                                urls = [urls[0].split("\t")[0]]
+                            }
                             for (i = 0; i < urls.length; i++) {
-                                md += '- ' + urls[i] + '\n\n'
+                                md += "- " + urls[i].replace(/\t/g, " ") + "\n\n"
                             }
-                            if (con.api_type === 'api') {
-                                md += '### method' + '\n'
-                                md += '- ' + con.method + '\n\n'
+                            if (con.api_type === "api") {
+                                md += "### method" + "\n"
+                                md += "- " + con.method + "\n\n"
                             }
-                            if (con.doc == this.noDocText && con.doc_md != '') {
+                            if (con.doc == this.noDocText && con.doc_md != "") {
                             }
                             else {
-                                md += '### doc' + '\n'
-                                md += '```doc\n' + con.doc + '\n```\n\n'
+                                md += "### doc" + "\n"
+                                md += "```doc\n" + con.doc + "\n```\n\n"
                             }
                             md += con.doc_md
                         }
                     })
-                    document.getElementById('md').innerHTML = marked(md)
-                    document.querySelectorAll('pre code').forEach((block) => {
+                    document.getElementById("md").innerHTML = marked(md)
+                    document.querySelectorAll("pre code").forEach((block) => {
                         hljs.highlightBlock(block)
                     })
                 }
             },
             download() {
-                let md = ''
+                let md = ""
                 this.treeDataNew.forEach((t, index) => {
-                    md += '# ' + t.full_name + '\n\n'
-                    this.treeData[t.full_name]['children'].forEach((con, index) => {
-                        if (con.name_extra == '') {
-                            md += '## ' + con.name + '\n\n'
+                    md += "# " + t.full_name + "\n\n"
+                    this.treeData[t.full_name]["children"].forEach((con, index) => {
+                        if (con.name_extra == "") {
+                            md += "## " + con.name + "\n\n"
                         }
                         else {
-                            md += '## ' + con.name + '(' + con.name_extra + ')' + '\n\n'
+                            md += "## " + con.name + "(" + con.name_extra + ")" + "\n\n"
                         }
-                        md += '### url' + '\n'
+                        md += "### url" + "\n"
                         var urls = new Array()
                         urls = con.url.split(" ")
+                        if (urls.length == 1) {
+                            urls = [urls[0].split("\t")[0]]
+                        }
                         for (i = 0; i < urls.length; i++) {
-                            md += '- ' + urls[i] + '\n\n'
+                            md += "- " + urls[i].replace(/\t/g, " ") + "\n\n"
                         }
-                        if (con.api_type === 'api') {
-                            md += '### method' + '\n'
-                            md += '- ' + con.method + '\n\n'
+                        if (con.api_type === "api") {
+                            md += "### method" + "\n"
+                            md += "- " + con.method + "\n\n"
                         }
-                        if (con.doc == this.noDocText && con.doc_md != '') {
+                        if (con.doc == this.noDocText && con.doc_md != "") {
                         }
                         else {
-                            md += '### doc' + '\n'
-                            md += '```doc\n' + con.doc + '\n```\n\n'
+                            md += "### doc" + "\n"
+                            md += "```doc\n" + con.doc + "\n```\n\n"
                         }
-                        md += con.doc_md + '\n\n\n'
+                        md += con.doc_md + "\n\n\n"
                     })
-                    md += '\n\n'
+                    md += "\n\n"
                 })
-                saveAs(new Blob([md], { type: 'text/markdown;charset=utf-8' }), this.title + ' (' + this.version + ')' + '.md')
+                saveAs(new Blob([md], { type: "text/markdown;charset=utf-8" }), this.title + " (" + this.version + ")" + ".md")
             }
         },
         computed: {
@@ -190,15 +196,15 @@ Author:
                 let treeDataNew = new Array()
                 for (key in this.treeData) {
                     let childrenData = new Array()
-                    this.treeData[key]['children'].forEach((con, index) => {
-                        if (con.name_extra == '') {
-                            childrenData.push({ 'full_name': con.name, 'name': con.name, 'router': con.router })
+                    this.treeData[key]["children"].forEach((con, index) => {
+                        if (con.name_extra == "") {
+                            childrenData.push({ "full_name": con.name, "name": con.name, "router": con.router })
                         }
                         else {
-                            childrenData.push({ 'full_name': con.name + '(' + con.name_extra + ')', 'name': con.name, 'router': con.router })
+                            childrenData.push({ "full_name": con.name + "(" + con.name_extra + ")", "name": con.name, "router": con.router })
                         }
                     })
-                    treeDataNew.push({ 'full_name': key, 'children': childrenData })
+                    treeDataNew.push({ "full_name": key, "children": childrenData })
                 }
                 return treeDataNew
             }

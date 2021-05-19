@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.3.5
+    0.3.6
 History:
     Created on 2018/05/20
     Last modified on 2021/05/20
@@ -127,9 +127,11 @@ class ApiDoc(object):
                 # Restful Api and MethodView Api
                 c_dict = {}
                 class_name_dict = {}
+
                 for c in self.get_all_subclasses(Resource, MethodView):
                     c_dict[c.__name__.lower()] = c
                     class_name_dict[c.__name__.lower()] = c.__name__
+
                 for rule in app.url_map.iter_rules():
                     func = app.view_functions[rule.endpoint]
                     name = func.__name__
@@ -244,6 +246,8 @@ class ApiDoc(object):
                                 if r in current_app.config["METHODS_LIST"]
                             ]
                         )
+                        if method:
+                            url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
 
                         result = filter(
                             lambda x: x["name"] == name,
