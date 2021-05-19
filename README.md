@@ -55,7 +55,7 @@ How to add markdown documents to the code:
 @@@
 ```
 
-# Run in /docs/api
+# Run in /docs/api/
 
 Api and document pages
 -----
