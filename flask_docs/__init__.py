@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.3.4
+    0.3.5
 History:
     Created on 2018/05/20
-    Last modified on 2021/05/19
+    Last modified on 2021/05/20
 Author:
     kwkw
 """
@@ -216,8 +216,10 @@ class ApiDoc(object):
                     if f not in current_app.config["API_DOC_MEMBER"]:
                         continue
 
-                    if f.capitalize() not in data_dict:
-                        data_dict[f.capitalize()] = {"children": []}
+                    f_capitalize = f.capitalize()
+
+                    if f_capitalize not in data_dict:
+                        data_dict[f_capitalize] = {"children": []}
 
                     api = {
                         "name": "",
@@ -226,7 +228,7 @@ class ApiDoc(object):
                         "method": "",
                         "doc": "",
                         "doc_md": "",
-                        "router": f.capitalize(),
+                        "router": f_capitalize,
                         "api_type": "api",
                     }
 
@@ -245,7 +247,7 @@ class ApiDoc(object):
 
                         result = filter(
                             lambda x: x["name"] == name,
-                            data_dict[f.capitalize()]["children"],
+                            data_dict[f_capitalize]["children"],
                         )
                         result_list = list(result)
                         if len(result_list) > 0:
@@ -276,12 +278,12 @@ class ApiDoc(object):
                     except Exception as e:
                         logger.exception("{} error - {}".format(PROJECT_NAME, e))
                     else:
-                        data_dict[f.capitalize()]["children"].append(api)
+                        data_dict[f_capitalize]["children"].append(api)
 
-                    if data_dict[f.capitalize()]["children"] == []:
-                        data_dict.pop(f.capitalize())
+                    if data_dict[f_capitalize]["children"] == []:
+                        data_dict.pop(f_capitalize)
                     else:
-                        data_dict[f.capitalize()]["children"].sort(
+                        data_dict[f_capitalize]["children"].sort(
                             key=lambda x: x["name"]
                         )
 
