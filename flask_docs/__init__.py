@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.3.3
+    0.3.4
 History:
     Created on 2018/05/20
     Last modified on 2021/05/19
@@ -21,7 +21,7 @@ from flask import Blueprint, current_app, jsonify
 from flask.views import MethodView
 from flask_restful import Resource
 
-project_name = "Flask-Docs"
+PROJECT_NAME = "Flask-Docs"
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +122,7 @@ class ApiDoc(object):
             @api_doc.route("/data", methods=["GET"])
             def data():
 
-                dataDict = {}
+                data_dict = {}
 
                 # Restful Api and MethodView Api
                 c_dict = {}
@@ -150,8 +150,8 @@ class ApiDoc(object):
                     if func.methods is None:
                         continue
 
-                    if name not in dataDict:
-                        dataDict[name] = {"children": []}
+                    if name not in data_dict:
+                        data_dict[name] = {"children": []}
 
                     for m in func.methods:
                         if m not in current_app.config["METHODS_LIST"]:
@@ -173,7 +173,7 @@ class ApiDoc(object):
 
                             result = filter(
                                 lambda x: x["name"] == name_m,
-                                dataDict[name]["children"],
+                                data_dict[name]["children"],
                             )
                             result_list = list(result)
                             if len(result_list) > 0:
@@ -201,14 +201,14 @@ class ApiDoc(object):
                             ) = self.get_doc_name_extra_doc_md(doc)
 
                         except Exception as e:
-                            logger.exception("{} error - {}".format(project_name, e))
+                            logger.exception("{} error - {}".format(PROJECT_NAME, e))
                         else:
-                            dataDict[name]["children"].append(api)
+                            data_dict[name]["children"].append(api)
 
-                    if dataDict[name]["children"] == []:
-                        dataDict.pop(name)
+                    if data_dict[name]["children"] == []:
+                        data_dict.pop(name)
                     else:
-                        dataDict[name]["children"].sort(key=lambda x: x["name"])
+                        data_dict[name]["children"].sort(key=lambda x: x["name"])
 
                 # Api
                 for rule in app.url_map.iter_rules():
@@ -216,8 +216,8 @@ class ApiDoc(object):
                     if f not in current_app.config["API_DOC_MEMBER"]:
                         continue
 
-                    if f.capitalize() not in dataDict:
-                        dataDict[f.capitalize()] = {"children": []}
+                    if f.capitalize() not in data_dict:
+                        data_dict[f.capitalize()] = {"children": []}
 
                     api = {
                         "name": "",
@@ -245,7 +245,7 @@ class ApiDoc(object):
 
                         result = filter(
                             lambda x: x["name"] == name,
-                            dataDict[f.capitalize()]["children"],
+                            data_dict[f.capitalize()]["children"],
                         )
                         result_list = list(result)
                         if len(result_list) > 0:
@@ -274,20 +274,20 @@ class ApiDoc(object):
                         ) = self.get_doc_name_extra_doc_md(doc)
 
                     except Exception as e:
-                        logger.exception("{} error - {}".format(project_name, e))
+                        logger.exception("{} error - {}".format(PROJECT_NAME, e))
                     else:
-                        dataDict[f.capitalize()]["children"].append(api)
+                        data_dict[f.capitalize()]["children"].append(api)
 
-                    if dataDict[f.capitalize()]["children"] == []:
-                        dataDict.pop(f.capitalize())
+                    if data_dict[f.capitalize()]["children"] == []:
+                        data_dict.pop(f.capitalize())
                     else:
-                        dataDict[f.capitalize()]["children"].sort(
+                        data_dict[f.capitalize()]["children"].sort(
                             key=lambda x: x["name"]
                         )
 
                 return jsonify(
                     {
-                        "data": dataDict,
+                        "data": data_dict,
                         "title": title,
                         "version": version,
                         "noDocText": self.no_doc_text,
@@ -347,7 +347,7 @@ class ApiDoc(object):
             doc_md = "\n".join(doc_md.split("\n" + " " * space_count))
         except Exception as e:
             doc_md = ""
-            logger.error("{} error - {}".format(project_name, e))
+            logger.error("{} error - {}".format(PROJECT_NAME, e))
 
         return doc, name_extra, doc_md
 
