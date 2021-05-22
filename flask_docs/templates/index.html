@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.3.4
+    0.3.5
 History:
     Created on 2020/10/29
-    Last modified on 2021/05/20
+    Last modified on 2021/05/23
 Author:
     kwkw
 -->
@@ -114,45 +114,27 @@ Author:
             )
         },
         methods: {
-            treeFilterNode(value, data) {
-                if (!value) return true
-                let srcStr = data.full_name.toLowerCase()
-                let desStr = value.toLowerCase()
-                return srcStr.indexOf(desStr) !== -1
-            },
-            treeNodeClick(data) {
-                if (data.router != null) {
-                    let md = ""
-                    this.treeData[data.router]["children"].forEach((con, index) => {
-                        if (con.name == data.name) {
-                            md += "# " + data.full_name + "\n\n"
-                            md += "### url" + "\n"
-                            var urls = new Array()
-                            urls = con.url.split(" ")
-                            if (urls.length == 1) {
-                                urls = [urls[0].split("\t")[0]]
-                            }
-                            for (i = 0; i < urls.length; i++) {
-                                md += "- " + urls[i].replace(/\t/g, " ") + "\n\n"
-                            }
-                            if (con.api_type === "api") {
-                                md += "### method" + "\n"
-                                md += "- " + con.method + "\n\n"
-                            }
-                            if (con.doc == this.noDocText && con.doc_md != "") {
-                            }
-                            else {
-                                md += "### doc" + "\n"
-                                md += "```doc\n" + con.doc + "\n```\n\n"
-                            }
-                            md += con.doc_md
-                        }
-                    })
-                    document.getElementById("md").innerHTML = marked(md)
-                    document.querySelectorAll("pre code").forEach((block) => {
-                        hljs.highlightBlock(block)
-                    })
+            make_md(md, con) {
+                md += "### url" + "\n"
+                var urls = new Array()
+                urls = con.url.split(" ")
+                if (urls.length == 1) {
+                    urls = [urls[0].split("\t")[0]]
                 }
+                for (i = 0; i < urls.length; i++) {
+                    md += "- " + urls[i].replace(/\t/g, " ") + "\n\n"
+                }
+                if (con.api_type === "api") {
+                    md += "### method" + "\n"
+                    md += "- " + con.method + "\n\n"
+                }
+                if (con.doc == this.noDocText && con.doc_md != "") {
+                }
+                else {
+                    md += "### doc" + "\n"
+                    md += "```doc\n" + con.doc + "\n```\n\n"
+                }
+                return md
             },
             download() {
                 let md = ""
@@ -165,30 +147,34 @@ Author:
                         else {
                             md += "## " + con.name + "(" + con.name_extra + ")" + "\n\n"
                         }
-                        md += "### url" + "\n"
-                        var urls = new Array()
-                        urls = con.url.split(" ")
-                        if (urls.length == 1) {
-                            urls = [urls[0].split("\t")[0]]
-                        }
-                        for (i = 0; i < urls.length; i++) {
-                            md += "- " + urls[i].replace(/\t/g, " ") + "\n\n"
-                        }
-                        if (con.api_type === "api") {
-                            md += "### method" + "\n"
-                            md += "- " + con.method + "\n\n"
-                        }
-                        if (con.doc == this.noDocText && con.doc_md != "") {
-                        }
-                        else {
-                            md += "### doc" + "\n"
-                            md += "```doc\n" + con.doc + "\n```\n\n"
-                        }
+                        md = this.make_md(md, con)
                         md += con.doc_md + "\n\n\n"
                     })
                     md += "\n\n"
                 })
                 saveAs(new Blob([md], { type: "text/markdown;charset=utf-8" }), this.title + " (" + this.version + ")" + ".md")
+            },
+            treeFilterNode(value, data) {
+                if (!value) return true
+                let srcStr = data.full_name.toLowerCase()
+                let desStr = value.toLowerCase()
+                return srcStr.indexOf(desStr) !== -1
+            },
+            treeNodeClick(data) {
+                if (data.router != null) {
+                    let md = ""
+                    this.treeData[data.router]["children"].forEach((con, index) => {
+                        if (con.name == data.name) {
+                            md += "# " + data.full_name + "\n\n"
+                            md = this.make_md(md, con)
+                            md += con.doc_md
+                        }
+                    })
+                    document.getElementById("md").innerHTML = marked(md)
+                    document.querySelectorAll("pre code").forEach((block) => {
+                        hljs.highlightBlock(block)
+                    })
+                }
             }
         },
         computed: {
