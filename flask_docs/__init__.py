@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.3.7
+    0.3.8
 History:
     Created on 2018/05/20
     Last modified on 2021/05/24
@@ -69,7 +69,11 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
         app.config.setdefault("RESTFUL_API_DOC_EXCLUDE", [])
-        app.config.setdefault("METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"])
+        app.config.setdefault("API_DOC_RESTFUL_EXCLUDE", [])
+        app.config.setdefault("METHODS_LIST", [])
+        app.config.setdefault(
+            "API_DOC_METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"]
+        )
         app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
 
         with app.app_context():
@@ -81,13 +85,23 @@ class ApiDoc(object):
                 or not isinstance(current_app.config["API_DOC_ENABLE"], bool)
                 or not isinstance(current_app.config["API_DOC_CDN"], bool)
                 or not isinstance(current_app.config["RESTFUL_API_DOC_EXCLUDE"], list)
+                or not isinstance(current_app.config["API_DOC_RESTFUL_EXCLUDE"], list)
                 or not isinstance(current_app.config["METHODS_LIST"], list)
+                or not isinstance(current_app.config["API_DOC_METHODS_LIST"], list)
                 or not isinstance(current_app.config["API_DOC_URL_PREFIX"], str)
             ):
                 raise ValueError
 
             if not current_app.config["API_DOC_ENABLE"]:
                 return
+
+            API_DOC_RESTFUL_EXCLUDE = current_app.config["API_DOC_RESTFUL_EXCLUDE"]
+            if current_app.config["RESTFUL_API_DOC_EXCLUDE"]:
+                API_DOC_RESTFUL_EXCLUDE = current_app.config["RESTFUL_API_DOC_EXCLUDE"]
+
+            API_DOC_METHODS_LIST = current_app.config["API_DOC_METHODS_LIST"]
+            if current_app.config["METHODS_LIST"]:
+                API_DOC_METHODS_LIST = current_app.config["METHODS_LIST"]
 
             api_doc = Blueprint(
                 "api_doc",
@@ -127,7 +141,7 @@ class ApiDoc(object):
                     if name not in c_dict:
                         continue
 
-                    if name in current_app.config["RESTFUL_API_DOC_EXCLUDE"]:
+                    if name in API_DOC_RESTFUL_EXCLUDE:
                         continue
 
                     c_doc = self.get_api_doc(func)
@@ -144,7 +158,7 @@ class ApiDoc(object):
                         data_dict[name] = {"children": []}
 
                     for m in func.methods:
-                        if m not in current_app.config["METHODS_LIST"]:
+                        if m not in API_DOC_METHODS_LIST:
                             continue
 
                         api = {
@@ -228,11 +242,7 @@ class ApiDoc(object):
                         name = self.get_api_name(func)
                         url = str(rule)
                         method = " ".join(
-                            [
-                                r
-                                for r in rule.methods
-                                if r in current_app.config["METHODS_LIST"]
-                            ]
+                            [r for r in rule.methods if r in API_DOC_METHODS_LIST]
                         )
                         if method:
                             url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))

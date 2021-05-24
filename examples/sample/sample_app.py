@@ -5,10 +5,10 @@
 Program:
     Sample app
 Version:
-    0.3.0
+    0.3.1
 History:
     Created on 2018/05/20
-    Last modified on 2021/05/15
+    Last modified on 2021/05/24
 Author:
     kwkw
 """
@@ -25,8 +25,8 @@ app = Flask(__name__)
 # Disable document pages
 # app.config["API_DOC_ENABLE"] = False
 
-# Allowed method
-# app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+# Methods allowed to be displayed
+# app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"

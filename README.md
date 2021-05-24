@@ -33,14 +33,14 @@ app = Flask(__name__)
 # Disable document pages
 # app.config["API_DOC_ENABLE"] = False
 
-# Allowed method
-# app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+# Methods allowed to be displayed
+# app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
 # Restful API documents to be excluded
-# app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todo"]
+# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
 
 # Api Document needs to be displayed
 app.config["API_DOC_MEMBER"] = ["api", "platform"]

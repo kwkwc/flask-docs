@@ -5,7 +5,7 @@
 Program:
     Sample app decorator
 Version:
-    1.0.1
+    1.0.2
 History:
     Created on 2021/05/15
     Last modified on 2021/05/24
@@ -25,8 +25,8 @@ app = Flask(__name__)
 # Disable document pages
 # app.config["API_DOC_ENABLE"] = False
 
-# Allowed method
-# app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+# Methods allowed to be displayed
+# app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"

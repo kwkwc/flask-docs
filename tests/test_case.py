@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.0.7
+    0.0.8
 History:
     Created on 2020/10/18
-    Last modified on 2021/05/19
+    Last modified on 2021/05/24
 Author:
     kwkw
 """
@@ -26,9 +26,9 @@ from flask_restful import Api, Resource
 from flask_docs import ApiDoc, change_doc
 
 app = Flask(__name__)
-app.config["METHODS_LIST"] = ["GET", "POST", "DELETE"]
+app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "DELETE"]
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
-app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todolistexclude"]
+app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todolistexclude"]
 ApiDoc(app, title="Test App")
 
 

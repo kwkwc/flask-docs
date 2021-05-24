@@ -31,14 +31,14 @@ app = Flask(__name__)
 # 禁用文档页面
 # app.config["API_DOC_ENABLE"] = False
 
-# 允许的方法
-# app.config["METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+# 允许显示的方法
+# app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 # 自定义 url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
 # 需要排除的 RESTful Api 文档
-# app.config["RESTFUL_API_DOC_EXCLUDE"] = ["todo"]
+# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
 
 # 需要显示文档的 Api
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
