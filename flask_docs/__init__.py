@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.3.6
+    0.3.7
 History:
     Created on 2018/05/20
-    Last modified on 2021/05/20
+    Last modified on 2021/05/24
 Author:
     kwkw
 """
@@ -27,19 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 def change_doc(doc_dict):
-    def decorator(func):
-        doc = func.__doc__
-        for k in doc_dict:
-            doc = doc.replace(k, doc_dict[k])
-        func.__doc__ = doc
-
-        @wraps(func)
-        def decorated_function(*args, **kw):
-            return func(*args, **kw)
-
-        return decorated_function
-
-    return decorator
+    return ApiDoc.change_doc(doc_dict)
 
 
 class ApiDoc(object):
@@ -369,3 +357,19 @@ class ApiDoc(object):
             all_subclasses.extend(tmp)
 
         return all_subclasses
+
+    @staticmethod
+    def change_doc(doc_dict):
+        def decorator(func):
+            doc = func.__doc__
+            for k in doc_dict:
+                doc = doc.replace(k, doc_dict[k])
+            func.__doc__ = doc
+
+            @wraps(func)
+            def decorated_function(*args, **kw):
+                return func(*args, **kw)
+
+            return decorated_function
+
+        return decorator

@@ -5,17 +5,17 @@
 Program:
     Sample app decorator
 Version:
-    1.0.0
+    1.0.1
 History:
     Created on 2021/05/15
-    Last modified on 2021/05/15
+    Last modified on 2021/05/24
 Author:
     kwkw
 """
 
 from flask import Blueprint, Flask, jsonify
 
-from flask_docs import ApiDoc, change_doc
+from flask_docs import ApiDoc
 
 app = Flask(__name__)
 
@@ -42,7 +42,7 @@ return_json_str = '{"code": xxxx, "msg": "xxx", "data": null}'
 
 
 @api.route("/add_data", methods=["POST"])
-@change_doc({"return_json": return_json_str})
+@ApiDoc.change_doc({"return_json": return_json_str})
 def add_data():
     """Add some data
 
@@ -57,7 +57,7 @@ def add_data():
 
 
 @api.route("/delete_data", methods=["GET"])
-@change_doc({"return_json": return_json_str})
+@ApiDoc.change_doc({"return_json": return_json_str})
 def delete_data():
     """Delete some data
 
