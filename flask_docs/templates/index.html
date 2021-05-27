@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.3.5
+    0.3.6
 History:
     Created on 2020/10/29
-    Last modified on 2021/05/23
+    Last modified on 2021/05/27
 Author:
     kwkw
 -->
@@ -87,10 +87,7 @@ Author:
             contentStyle: "padding-right:10px;overflow-y:auto;max-height:720px"
         },
         created: function () {
-            let screenHeightMenu = window.innerHeight - 220
-            let screenHeightContent = screenHeightMenu + 50
-            this.menuStyle = this.menuContentStyle + screenHeightMenu + "px"
-            this.contentStyle = this.menuContentStyle + screenHeightContent + "px"
+            this.changeWindowSize()
 
             document.title = this.title
             document.getElementById("md").innerHTML = marked("# " + this.title)
@@ -112,8 +109,18 @@ Author:
                     this.loading = false
                 }
             )
+
+            window.onresize = () => {
+                this.changeWindowSize()
+            }
         },
         methods: {
+            changeWindowSize() {
+                let screenHeightMenu = window.innerHeight - 220
+                let screenHeightContent = screenHeightMenu + 50
+                this.menuStyle = this.menuContentStyle + screenHeightMenu + "px"
+                this.contentStyle = this.menuContentStyle + screenHeightContent + "px"
+            },
             make_md(md, con) {
                 md += "### url" + "\n"
                 var urls = new Array()
