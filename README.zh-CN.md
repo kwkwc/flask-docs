@@ -16,6 +16,11 @@
 - 支持 Flask-RESTful
 - 支持 flask.views.MethodView
 
+安装
+-----
+
+`pip3 install Flask-Docs`
+
 使用
 -----
 
@@ -285,12 +290,7 @@ def delete_data():
 
 [完整示例][examples]
 
-安装
------
-
-`pip3 install Flask-Docs`
-
-参考
+致谢
 -----
 
 [flask_api_doc](https://github.com/tobyqin/flask_api_doc/)
@@ -298,5 +298,7 @@ def delete_data():
 [Flask-Bootstrap](https://github.com/mbr/flask-bootstrap/)
 
 [github-markdown-css](https://github.com/sindresorhus/github-markdown-css/)
+
+[Bytesize Icons](https://github.com/danklammer/bytesize-icons/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples

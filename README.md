@@ -16,6 +16,11 @@ Features
 - Support Flask-RESTful
 - Support flask.views.MethodView
 
+Installation
+-----
+
+`pip3 install Flask-Docs`
+
 Usage
 -----
 
@@ -280,12 +285,7 @@ Examples
 
 [Complete example][examples]
 
-Installation
------
-
-`pip3 install Flask-Docs`
-
-Reference
+Thanks
 -----
 
 [flask_api_doc](https://github.com/tobyqin/flask_api_doc/)
@@ -293,5 +293,7 @@ Reference
 [Flask-Bootstrap](https://github.com/mbr/flask-bootstrap/)
 
 [github-markdown-css](https://github.com/sindresorhus/github-markdown-css/)
+
+[Bytesize Icons](https://github.com/danklammer/bytesize-icons/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples
