@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.3.8
+    0.3.9
 History:
     Created on 2018/05/20
-    Last modified on 2021/05/24
+    Last modified on 2021/05/31
 Author:
     kwkw
 """
@@ -68,6 +68,8 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_MEMBER", [])
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
+        app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
+        app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
         app.config.setdefault("RESTFUL_API_DOC_EXCLUDE", [])
         app.config.setdefault("API_DOC_RESTFUL_EXCLUDE", [])
         app.config.setdefault("METHODS_LIST", [])
@@ -84,6 +86,8 @@ class ApiDoc(object):
                 or not isinstance(current_app.config["API_DOC_MEMBER"], list)
                 or not isinstance(current_app.config["API_DOC_ENABLE"], bool)
                 or not isinstance(current_app.config["API_DOC_CDN"], bool)
+                or not isinstance(current_app.config["API_DOC_CDN_CSS_TEMPLATE"], str)
+                or not isinstance(current_app.config["API_DOC_CDN_JS_TEMPLATE"], str)
                 or not isinstance(current_app.config["RESTFUL_API_DOC_EXCLUDE"], list)
                 or not isinstance(current_app.config["API_DOC_RESTFUL_EXCLUDE"], list)
                 or not isinstance(current_app.config["METHODS_LIST"], list)
@@ -113,9 +117,17 @@ class ApiDoc(object):
             @api_doc.route("/", methods=["GET"])
             def index():
                 if current_app.config["API_DOC_CDN"]:
+                    CSS_TEMPLATE = ApiDoc.CSS_TEMPLATE_CDN
+                    JS_TEMPLATE = ApiDoc.JS_TEMPLATE_CDN
+
+                    if current_app.config["API_DOC_CDN_CSS_TEMPLATE"]:
+                        CSS_TEMPLATE = current_app.config["API_DOC_CDN_CSS_TEMPLATE"]
+                    if current_app.config["API_DOC_CDN_JS_TEMPLATE"]:
+                        JS_TEMPLATE = current_app.config["API_DOC_CDN_JS_TEMPLATE"]
+
                     return ApiDoc.INDEX_HTML.replace(
-                        "<!-- ___CSS_TEMPLATE___ -->", ApiDoc.CSS_TEMPLATE_CDN
-                    ).replace("<!-- ___JS_TEMPLATE___ -->", ApiDoc.JS_TEMPLATE_CDN)
+                        "<!-- ___CSS_TEMPLATE___ -->", CSS_TEMPLATE
+                    ).replace("<!-- ___JS_TEMPLATE___ -->", JS_TEMPLATE)
                 else:
                     return ApiDoc.INDEX_HTML.replace(
                         "<!-- ___CSS_TEMPLATE___ -->", ApiDoc.CSS_TEMPLATE_LOCAL
