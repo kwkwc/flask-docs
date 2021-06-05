@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.0
+    0.4.1
 History:
     Created on 2020/10/29
     Last modified on 2021/06/06
@@ -363,38 +363,43 @@ Author:
                     headerTag = item.name.split(":")
                     headers[headerTag[0]] = headerTag[1]
                 })
+
                 data = ""
                 params = {}
-                if (!headers["content-type"] || (headers["content-type"] &&
-                    (headers["content-type"] !== "application/x-www-form-urlencoded" &&
-                        headers["content-type"] !== "multipart/form-data"))) {
-                    try {
-                        data = JSON.parse(this.bodyTextarea)
-                    }
-                    catch (err) {
-                        data = this.bodyTextarea
-                        this.$notify.error({
-                            title: "Error",
-                            message: "The request body is incorrect"
-                        })
-                    }
-                }
-                else {
-                    data = this.bodyTextarea
-                }
+                if (this.bodyTextarea !== "") {
+                    if (this.methodValue === "GET" || this.methodValue === "DELETE") {
+                        try {
+                            this.bodyTextarea.split("&").forEach((item, index) => {
+                                params[item.split("=")[0]] = item.split("=")[1]
+                            })
+                        }
+                        catch (err) {
+                            params = this.bodyTextarea
+                            this.$notify.error({
+                                title: "Error",
+                                message: "The request params is incorrect"
+                            })
+                        }
 
-                if (this.methodValue === "GET" || this.methodValue === "DELETE") {
-                    try {
-                        this.bodyTextarea.split("&").forEach((item, index) => {
-                            params[item.split("=")[0]] = item.split("=")[1]
-                        })
                     }
-                    catch (err) {
-                        params = this.bodyTextarea
-                        this.$notify.error({
-                            title: "Error",
-                            message: "The request body is incorrect"
-                        })
+                    else {
+                        if (!headers["content-type"] || (headers["content-type"] &&
+                            (headers["content-type"] !== "application/x-www-form-urlencoded" &&
+                                headers["content-type"] !== "multipart/form-data"))) {
+                            try {
+                                data = JSON.parse(this.bodyTextarea)
+                            }
+                            catch (err) {
+                                data = this.bodyTextarea
+                                this.$notify.error({
+                                    title: "Error",
+                                    message: "The request body is incorrect"
+                                })
+                            }
+                        }
+                        else {
+                            data = this.bodyTextarea
+                        }
                     }
                 }
 
