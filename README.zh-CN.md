@@ -8,21 +8,19 @@
 
 [English](README.md)
 
-特性
------
+## 特性
 
 - 根据代码注释自动生成文档
 - 支持离线 markdown 文档下载
 - 支持 Flask-RESTful
 - 支持 flask.views.MethodView
+- 支持在线调试
 
-安装
------
+## 安装
 
 `pip3 install Flask-Docs`
 
-使用
------
+## 使用
 
 ```python
 from flask import Flask
@@ -51,8 +49,7 @@ app.config["API_DOC_MEMBER"] = ["api", "platform"]
 ApiDoc(app)
 ```
 
-如何书写 markdown 格式文档
------
+## 如何书写 markdown 格式文档
 
 ```
 @@@
@@ -60,15 +57,13 @@ ApiDoc(app)
 @@@
 ```
 
-查看文档页面
------
+## 查看文档页面
 
 ```
 http://127.0.0.1/docs/api/
 ```
 
-Api demo
------
+## Api demo
 
 ````python
 @api.route("/add_data", methods=["POST"])
@@ -155,8 +150,7 @@ def get_something():
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
 
-Flask-RESTful Api demo
------
+## Flask-RESTful Api demo
 
 ````python
 from flask_restful import Resource, Api
@@ -226,9 +220,9 @@ restful_api.add_resource(Todo, "/todo")
 
 ![sample_app](flask_docs/assets/sample_app_restful_get.png)
 
-flask.views.MethodView Api demo
------
-> ***目前只支持与类名相同的 url_rule***
+## flask.views.MethodView Api demo
+
+> **_目前只支持与类名相同的 url_rule_**
 
 ```python
 from flask.views import MethodView
@@ -250,11 +244,11 @@ class TodoList(MethodView):
 app.add_url_rule("/todolist/", view_func=TodoList.as_view("todolist"))
 ```
 
-装饰器 @ApiDoc.change_doc
------
+## 装饰器 @ApiDoc.change_doc
+
 > 复用注释
 
-```python
+````python
 from flask_docs import ApiDoc
 
 return_json_str = '{"code": xxxx, "msg": "xxx", "data": null}'
@@ -283,15 +277,17 @@ def delete_data():
     """
 
     return jsonify({"api": "delete data"})
-```
+````
 
-示例
------
+## 调试模式
+
+![debug](flask_docs/assets/debug.png)
+
+## 示例
 
 [完整示例][examples]
 
-致谢
------
+## 致谢
 
 [flask_api_doc](https://github.com/tobyqin/flask_api_doc/)
 
@@ -300,5 +296,7 @@ def delete_data():
 [github-markdown-css](https://github.com/sindresorhus/github-markdown-css/)
 
 [Bytesize Icons](https://github.com/danklammer/bytesize-icons/)
+
+[RESTClient](https://github.com/chao/RESTClient/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples

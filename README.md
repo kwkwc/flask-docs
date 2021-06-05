@@ -8,21 +8,19 @@
 
 [简体中文](README.zh-CN.md)
 
-Features
------
+## Features
 
 - Automatic generation of markdown documentation
 - Support for generating offline documentation
 - Support Flask-RESTful
 - Support flask.views.MethodView
+- Support online debugging
 
-Installation
------
+## Installation
 
 `pip3 install Flask-Docs`
 
-Usage
------
+## Usage
 
 Here is an example:
 
@@ -54,6 +52,7 @@ ApiDoc(app)
 ```
 
 How to add markdown documents to the code:
+
 ```
 @@@
 # Write your markdown document here
@@ -62,8 +61,7 @@ How to add markdown documents to the code:
 
 # Run in /docs/api/
 
-Api and document pages
------
+## Api and document pages
 
 ````python
 @api.route("/add_data", methods=["POST"])
@@ -150,8 +148,7 @@ def get_something():
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
 
-Flask-RESTful Api and document pages
------
+## Flask-RESTful Api and document pages
 
 ````python
 from flask_restful import Resource, Api
@@ -221,9 +218,9 @@ restful_api.add_resource(Todo, "/todo")
 
 ![sample_app](flask_docs/assets/sample_app_restful_get.png)
 
-flask.views.MethodView Api
------
-> ***For the time being, only url_rule with the same class name are supported***
+## flask.views.MethodView Api
+
+> **_For the time being, only url_rule with the same class name are supported_**
 
 ```python
 from flask.views import MethodView
@@ -245,11 +242,11 @@ class TodoList(MethodView):
 app.add_url_rule("/todolist/", view_func=TodoList.as_view("todolist"))
 ```
 
-Decorator @ApiDoc.change_doc
------
+## Decorator @ApiDoc.change_doc
+
 > Reuse comments
 
-```python
+````python
 from flask_docs import ApiDoc
 
 return_json_str = '{"code": xxxx, "msg": "xxx", "data": null}'
@@ -278,15 +275,17 @@ def delete_data():
     """
 
     return jsonify({"api": "delete data"})
-```
+````
 
-Examples
------
+## Debugging mode
+
+![debug](flask_docs/assets/debug.png)
+
+## Examples
 
 [Complete example][examples]
 
-Thanks
------
+## Thanks
 
 [flask_api_doc](https://github.com/tobyqin/flask_api_doc/)
 
@@ -295,5 +294,7 @@ Thanks
 [github-markdown-css](https://github.com/sindresorhus/github-markdown-css/)
 
 [Bytesize Icons](https://github.com/danklammer/bytesize-icons/)
+
+[RESTClient](https://github.com/chao/RESTClient/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples
