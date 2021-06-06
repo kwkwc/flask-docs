@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.1
+    0.4.2
 History:
     Created on 2020/10/29
     Last modified on 2021/06/06
@@ -163,7 +163,7 @@ Author:
             methodList: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT", "PATCH"],
             methodOptions: [],
             methodValue: "GET",
-            hostOptions: [{ "value": "http://127.0.0.1:5000", "label": "http://127.0.0.1:5000" }],
+            hostOptions: [],
             hostValue: "http://127.0.0.1:5000",
             hostValueBak: "",
             urlOptions: [],
@@ -185,25 +185,9 @@ Author:
             this.makeMethodOptions()
         },
         mounted: function () {
-            this.loading = true
-            axios.get("data").then(res => {
-                this.treeData = res.data.data
-                this.PROJECT_NAME = res.data.PROJECT_NAME
-                this.PROJECT_VERSION = res.data.PROJECT_VERSION
-                this.title = res.data.title
-                this.version = res.data.version
-                this.titleVersion = this.title + " (" + this.version + ")"
-                this.noDocText = res.data.noDocText
-                document.title = this.titleVersion
-                document.getElementById("md").innerHTML = marked("# " + this.titleVersion)
-                this.makeUrlOptions(res.data.data)
-                this.loading = false
-            },
-                err => {
-                    this.$message.error("Error");
-                    this.loading = false
-                }
-            )
+            this.getData()
+            this.getHostCache()
+            this.getHeaderCache()
 
             window.onresize = () => {
                 this.changeWindowSize()
@@ -215,6 +199,28 @@ Author:
                 let screenHeightContent = screenHeightMenu + 50
                 this.menuStyle = this.menuContentStyle + screenHeightMenu + "px"
                 this.contentStyle = this.menuContentStyle + screenHeightContent + "px"
+            },
+            getData() {
+                this.loading = true
+                axios.get("data").then(res => {
+                    this.treeData = res.data.data
+                    this.PROJECT_NAME = res.data.PROJECT_NAME
+                    this.PROJECT_VERSION = res.data.PROJECT_VERSION
+                    this.title = res.data.title
+                    this.version = res.data.version
+                    this.titleVersion = this.title + " (" + this.version + ")"
+                    this.noDocText = res.data.noDocText
+                    document.title = this.titleVersion
+                    document.getElementById("md").innerHTML = marked("# " + this.titleVersion)
+                    this.makeUrlOptions(res.data.data)
+                    this.getUrlCache()
+                    this.loading = false
+                },
+                    err => {
+                        this.$message.error("Error");
+                        this.loading = false
+                    }
+                )
             },
             make_md(md, con) {
                 md += "### url" + "\n"
@@ -350,10 +356,12 @@ Author:
                         name: [this.headerNameInput.trim(), this.headerValueInput.trim()].join(":"),
                         type: this.headerTagsTypeDict[type]
                     })
+                    this.setCache("cache:header", this.headerTags)
                 }
             },
             delHeader(tag) {
                 this.headerTags.splice(this.headerTags.indexOf(tag), 1)
+                this.setCache("cache:header", this.headerTags)
             },
             sendRequest() {
                 if ((this.hostValue === "") || (this.urlValue === "")) {
@@ -370,19 +378,9 @@ Author:
                 params = {}
                 if (this.bodyTextarea !== "") {
                     if (this.methodValue === "GET" || this.methodValue === "DELETE") {
-                        try {
-                            this.bodyTextarea.split("&").forEach((item, index) => {
-                                params[item.split("=")[0]] = item.split("=")[1]
-                            })
-                        }
-                        catch (err) {
-                            params = this.bodyTextarea
-                            this.$notify.error({
-                                title: "Error",
-                                message: "The request params is incorrect"
-                            })
-                        }
-
+                        this.bodyTextarea.split("&").forEach((item, index) => {
+                            params[item.split("=")[0]] = item.split("=")[1]
+                        })
                     }
                     else {
                         if (!headers["content-type"] || (headers["content-type"] &&
@@ -404,6 +402,7 @@ Author:
                         }
                     }
                 }
+                this.setBodyCache()
 
                 document.getElementById("responseHeaderText").innerHTML = ""
                 document.getElementById("responsePreviewText").innerHTML = ""
@@ -473,6 +472,55 @@ Author:
                         this.loading = false
                     }
                 )
+            },
+            setCache(k, v) {
+                try {
+                    localStorage.setItem(k, JSON.stringify(v));
+                }
+                catch (err) {
+                    localStorage.setItem(k, v);
+                }
+            },
+            getCache(k) {
+                let cacheValue = ""
+                try {
+                    cacheValue = JSON.parse(localStorage.getItem(k))
+                }
+                catch (err) {
+                    cacheValue = localStorage.getItem(k)
+                }
+                return cacheValue
+            },
+            setBodyCache() {
+                bodyKey = "cache:body:" + sha1([this.hostValue, this.urlValue, this.methodValue].join("-"))
+                this.setCache(bodyKey, this.bodyTextarea)
+            },
+            getHostCache() {
+                let hostCacheOptions = this.getCache("cache:host")
+                if (hostCacheOptions) {
+                    this.hostOptions = hostCacheOptions
+                }
+            },
+            getUrlCache() {
+                let urlCacheOptions = this.getCache("cache:url")
+                if (urlCacheOptions) {
+                    urlCacheOptions.forEach((item, index) => {
+                        this.changeOptions("urlOptions", "urlOptionsBak", item.label)
+                    })
+                }
+            },
+            getHeaderCache() {
+                let headerCacheTags = this.getCache("cache:header")
+                if (headerCacheTags) {
+                    this.headerTags = headerCacheTags
+                }
+            },
+            getBodyCache() {
+                if ((this.hostValue === "") || (this.urlValue === "")) {
+                    return
+                }
+                bodyKey = "cache:body:" + sha1([this.hostValue, this.urlValue, this.methodValue].join("-"))
+                this.bodyTextarea = this.getCache(bodyKey)
             }
         },
         computed: {
@@ -497,11 +545,18 @@ Author:
             treeFilterText(val) {
                 this.$refs.apiTree.filter(val)
             },
+            methodValue(val) {
+                this.getBodyCache()
+            },
             hostValue(val) {
                 this.changeOptions("hostOptions", "hostOptionsBak", val)
+                this.setCache("cache:host", this.hostOptions)
+                this.getBodyCache()
             },
             urlValue(val) {
                 this.changeOptions("urlOptions", "urlValueBak", val)
+                this.setCache("cache:url", this.urlOptions)
+                this.getBodyCache()
             }
         }
     })

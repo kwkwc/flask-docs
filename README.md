@@ -277,9 +277,9 @@ def delete_data():
     return jsonify({"api": "delete data"})
 ````
 
-## Debugging mode
+## Debugger
 
-![debug](flask_docs/assets/debug.png)
+![debugger](flask_docs/assets/debugger.png)
 
 ## Examples
 
