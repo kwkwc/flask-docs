@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.2
+    0.4.3
 History:
     Created on 2020/10/29
     Last modified on 2021/06/06
@@ -482,7 +482,6 @@ Author:
                 }
             },
             getCache(k) {
-                let cacheValue = ""
                 try {
                     cacheValue = JSON.parse(localStorage.getItem(k))
                 }
@@ -520,7 +519,10 @@ Author:
                     return
                 }
                 bodyKey = "cache:body:" + sha1([this.hostValue, this.urlValue, this.methodValue].join("-"))
-                this.bodyTextarea = this.getCache(bodyKey)
+                let bodyCacheTextarea = this.getCache(bodyKey)
+                if (bodyCacheTextarea) {
+                    this.bodyTextarea = bodyCacheTextarea
+                }
             }
         },
         computed: {
