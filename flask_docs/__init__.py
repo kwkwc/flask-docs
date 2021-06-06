@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.3.9
+    0.4.0
 History:
     Created on 2018/05/20
-    Last modified on 2021/05/31
+    Last modified on 2021/06/06
 Author:
     kwkw
 """
@@ -21,7 +21,10 @@ from flask import Blueprint, current_app, jsonify
 from flask.views import MethodView
 from flask_restful import Resource
 
+from flask_docs.version import __version__
+
 PROJECT_NAME = "Flask-Docs"
+PROJECT_VERSION = __version__
 
 logger = logging.getLogger(__name__)
 
@@ -307,6 +310,8 @@ class ApiDoc(object):
                         "title": title,
                         "version": version,
                         "noDocText": self.no_doc_text,
+                        "PROJECT_NAME": PROJECT_NAME,
+                        "PROJECT_VERSION": PROJECT_VERSION,
                     }
                 )
 

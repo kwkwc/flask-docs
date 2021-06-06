@@ -2,6 +2,8 @@ import os
 
 from setuptools import setup
 
+from flask_docs.version import __version__
+
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -9,7 +11,7 @@ def read(fname):
 
 setup(
     name="Flask-Docs",
-    version="0.4.0",
+    version=__version__,
     url="https://github.com/kwkwc/flask-docs",
     license="MIT",
     author="kwkw",
