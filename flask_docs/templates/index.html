@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.5
+    0.4.6
 History:
     Created on 2020/10/29
     Last modified on 2021/06/07
@@ -364,6 +364,18 @@ Author:
                 this.headerTags.splice(this.headerTags.indexOf(tag), 1)
                 this.setCache("cache:header", this.headerTags)
             },
+            makeResponse(res) {
+                resStatus = [res.status, res.statusText].join(" ")
+                resHeaders = res.headers
+                resData = res.data
+                let resHeadersdict = Object.assign({ "status code": resStatus }, resHeaders)
+                document.getElementById("responseHeaderText").innerHTML = JSON.stringify(resHeadersdict, null, 4)
+                document.getElementById("responsePreviewText").innerHTML = JSON.stringify(resData, null, 4)
+                document.getElementById("responseResponseText").innerHTML = JSON.stringify(resData)
+                document.querySelectorAll("pre code").forEach((block) => {
+                    hljs.highlightElement(block)
+                })
+            },
             sendRequest() {
                 if ((this.hostValue === "") || (this.urlValue === "")) {
                     return
@@ -416,19 +428,7 @@ Author:
                     data: data,
                     params: params
                 }).then(res => {
-                    resStatus = [res.status, res.statusText].join(" ")
-                    resHeaders = res.headers
-                    resData = res.data
-                    document.getElementById("responseHeaderText").innerHTML = JSON.stringify({
-                        "status code": resStatus, "content-length": resHeaders["content-length"],
-                        "content-type": resHeaders["content-type"], "date": resHeaders["date"],
-                        "server": resHeaders["server"]
-                    }, null, 4)
-                    document.getElementById("responsePreviewText").innerHTML = JSON.stringify(resData, null, 4)
-                    document.getElementById("responseResponseText").innerHTML = JSON.stringify(resData)
-                    document.querySelectorAll("pre code").forEach((block) => {
-                        hljs.highlightElement(block)
-                    })
+                    this.makeResponse(res)
                     this.$notify({
                         title: "Success",
                         type: "success"
@@ -438,18 +438,7 @@ Author:
                     err => {
                         if (err.response) {
                             errResponse = err.response
-                            errStatus = [errResponse.status, errResponse.statusText].join(" ")
-                            errHeaders = errResponse.headers
-                            errData = errResponse.data
-                            document.getElementById("responseHeaderText").innerHTML = JSON.stringify({
-                                "status code": errStatus, "content-length": errHeaders["content-length"],
-                                "content-type": errHeaders["content-type"]
-                            }, null, 4)
-                            document.getElementById("responsePreviewText").innerHTML = JSON.stringify(errData, null, 4)
-                            document.getElementById("responseResponseText").innerHTML = JSON.stringify(errData)
-                            document.querySelectorAll("pre code").forEach((block) => {
-                                hljs.highlightElement(block)
-                            })
+                            this.makeResponse(errResponse)
                             this.$notify({
                                 title: "Warning",
                                 type: "warning"
