@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.7
+    0.4.8
 History:
     Created on 2020/10/29
     Last modified on 2021/06/07
@@ -165,7 +165,7 @@ Author:
             methodOptions: [],
             methodValue: "GET",
             hostOptions: [],
-            hostValue: "http://127.0.0.1:5000",
+            hostValue: "http://127.0.0.1",
             hostValueBak: "",
             urlOptions: [],
             urlValue: "",
@@ -211,6 +211,7 @@ Author:
                     this.version = res.data.version
                     this.titleVersion = this.title + " (" + this.version + ")"
                     this.noDocText = res.data.noDocText
+                    this.hostValue = res.data.host
                     document.title = this.titleVersion
                     document.getElementById("md").innerHTML = marked("# " + this.titleVersion)
                     this.makeUrlOptions(res.data.data)

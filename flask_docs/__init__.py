@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.4.0
+    0.4.1
 History:
     Created on 2018/05/20
-    Last modified on 2021/06/06
+    Last modified on 2021/06/07
 Author:
     kwkw
 """
@@ -17,7 +17,7 @@ import logging
 import os
 from functools import wraps
 
-from flask import Blueprint, current_app, jsonify
+from flask import Blueprint, current_app, jsonify, request
 from flask.views import MethodView
 from flask_restful import Resource
 
@@ -138,6 +138,10 @@ class ApiDoc(object):
 
             @api_doc.route("/data", methods=["GET"])
             def data():
+
+                url_prefix = current_app.config["API_DOC_URL_PREFIX"]
+                referer = request.headers.get("referer", "http://127.0.0.1")
+                host = referer.split(url_prefix)[0]
 
                 data_dict = {}
 
@@ -312,6 +316,7 @@ class ApiDoc(object):
                         "noDocText": self.no_doc_text,
                         "PROJECT_NAME": PROJECT_NAME,
                         "PROJECT_VERSION": PROJECT_VERSION,
+                        "host": host
                     }
                 )
 
