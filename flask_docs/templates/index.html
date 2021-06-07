@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.4
+    0.4.5
 History:
     Created on 2020/10/29
     Last modified on 2021/06/07
@@ -420,7 +420,7 @@ Author:
                     resHeaders = res.headers
                     resData = res.data
                     document.getElementById("responseHeaderText").innerHTML = JSON.stringify({
-                        "status": resStatus, "content-length": resHeaders["content-length"],
+                        "status code": resStatus, "content-length": resHeaders["content-length"],
                         "content-type": resHeaders["content-type"], "date": resHeaders["date"],
                         "server": resHeaders["server"]
                     }, null, 4)
@@ -442,7 +442,7 @@ Author:
                             errHeaders = errResponse.headers
                             errData = errResponse.data
                             document.getElementById("responseHeaderText").innerHTML = JSON.stringify({
-                                "status": errStatus, "content-length": errHeaders["content-length"],
+                                "status code": errStatus, "content-length": errHeaders["content-length"],
                                 "content-type": errHeaders["content-type"]
                             }, null, 4)
                             document.getElementById("responsePreviewText").innerHTML = JSON.stringify(errData, null, 4)
