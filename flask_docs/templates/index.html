@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.6
+    0.4.7
 History:
     Created on 2020/10/29
     Last modified on 2021/06/07
@@ -117,13 +117,13 @@ Author:
                         <el-divider content-position="left">Response</el-divider>
                         <el-tabs type="card" v-model="responseTabsActiveName">
                             <el-tab-pane label="Headers" name="Headers">
-                                <pre class="response-tab-pane"><code id="responseHeaderText">&nbsp;</code></pre>
+                                <pre><code id="responseHeaderText">&nbsp;</code></pre>
                             </el-tab-pane>
                             <el-tab-pane label="Response" name="Response">
-                                <pre class="response-tab-pane"><code id="responseResponseText">&nbsp;</code></pre>
+                                <pre><code id="responseResponseText">&nbsp;</code></pre>
                             </el-tab-pane>
                             <el-tab-pane label="Preview" name="Preview">
-                                <pre class="response-tab-pane"><code id="responsePreviewText">&nbsp;</code></pre>
+                                <pre><code id="responsePreviewText">&nbsp;</code></pre>
                             </el-tab-pane>
                         </el-tabs>
                     </el-card>
@@ -597,13 +597,16 @@ Author:
         float: right;
     }
 
-    .response-tab-pane {
-        background-color: #f6f8fa;
-    }
-
     pre {
         white-space: pre-wrap;
         word-wrap: break-word;
+        font-size: 85%;
+        line-height: 1.45;
+        background-color: #f6f8fa;
+    }
+
+    code {
+        font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
     }
 
     .project-name-version {
