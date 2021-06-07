@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.8
+    0.4.9
 History:
     Created on 2020/10/29
-    Last modified on 2021/06/07
+    Last modified on 2021/06/08
 Author:
     kwkw
 -->
@@ -189,6 +189,7 @@ Author:
             this.getData()
             this.getHostCache()
             this.getHeaderCache()
+            this.pageShow()
 
             window.onresize = () => {
                 this.changeWindowSize()
@@ -291,11 +292,13 @@ Author:
                     this.debugShowIcon = "el-icon-document"
                     this.debugDisplay = "display:block"
                     this.docDisplay = "display:none"
+                    this.setCache("cache:page", "debugger")
                 }
                 else {
                     this.debugShowIcon = "el-icon-picture-outline-round"
                     this.debugDisplay = "display:none"
                     this.docDisplay = "display:block"
+                    this.setCache("cache:page", "document")
                 }
             },
             makeMethodOptions() {
@@ -513,6 +516,12 @@ Author:
                 let bodyCacheTextarea = this.getCache(bodyKey)
                 if (bodyCacheTextarea) {
                     this.bodyTextarea = bodyCacheTextarea
+                }
+            },
+            pageShow() {
+                let pageCache = this.getCache("cache:page")
+                if (pageCache && pageCache === "debugger") {
+                    this.debugShow()
                 }
             }
         },

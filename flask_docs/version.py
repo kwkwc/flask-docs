@@ -6,9 +6,9 @@ Program:
     Flask-Docs Version
 History:
     Created on 2021/06/06
-    Last modified on 2021/06/07
+    Last modified on 2021/06/08
 Author:
     kwkw
 """
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
