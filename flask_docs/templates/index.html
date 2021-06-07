@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.4.3
+    0.4.4
 History:
     Created on 2020/10/29
-    Last modified on 2021/06/06
+    Last modified on 2021/06/07
 Author:
     kwkw
 -->
@@ -129,7 +129,8 @@ Author:
                     </el-card>
                 </el-main>
             </el-container>
-            <span class="project-name-version">{{PROJECT_NAME}} v{{PROJECT_VERSION}}</span>
+            <a class="project-name-version" href="https://github.com/kwkwc/flask-docs/" target="_blank">{{PROJECT_NAME}}
+                v{{PROJECT_VERSION}}</a>
         </el-card>
     </div>
 </body>
@@ -621,6 +622,7 @@ Author:
         margin-bottom: 6px;
         font-size: 12px;
         color: #e5e5e5;
+        text-decoration: none;
     }
 </style>
 
