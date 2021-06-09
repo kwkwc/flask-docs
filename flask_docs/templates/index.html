@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.5.0
+    0.5.1
 History:
     Created on 2020/10/29
-    Last modified on 2021/06/09
+    Last modified on 2021/06/10
 Author:
     kwkw
 -->
@@ -373,9 +373,16 @@ Author:
                 resHeaders = res.headers
                 resData = res.data
                 let resHeadersdict = Object.assign({ "status code": resStatus }, resHeaders)
+
                 document.getElementById("responseHeaderText").innerHTML = JSON.stringify(resHeadersdict, null, 4)
-                document.getElementById("responsePreviewText").innerHTML = JSON.stringify(resData, null, 4)
-                document.getElementById("responseResponseText").innerHTML = JSON.stringify(resData)
+                if (resHeaders["content-type"] !== undefined && resHeaders["content-type"].indexOf("application/json") != -1) {
+                    document.getElementById("responseResponseText").innerHTML = JSON.stringify(resData)
+                    document.getElementById("responsePreviewText").innerHTML = JSON.stringify(resData, null, 4)
+                }
+                else {
+                    document.getElementById("responseResponseText").innerHTML = resData
+                    document.getElementById("responsePreviewText").innerHTML = resData
+                }
                 document.querySelectorAll("pre code").forEach((block) => {
                     hljs.highlightElement(block)
                 })
