@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.5.1
+    0.5.2
 History:
     Created on 2020/10/29
     Last modified on 2021/06/10
@@ -117,13 +117,19 @@ Author:
                         <el-divider content-position="left">Response</el-divider>
                         <el-tabs type="card" v-model="responseTabsActiveName">
                             <el-tab-pane label="Headers" name="Headers">
-                                <pre><code id="responseHeaderText">&nbsp;</code></pre>
+                                <div id="responseHeaderText">
+                                    <pre><code>&nbsp;</code></pre>
+                                </div>
                             </el-tab-pane>
                             <el-tab-pane label="Response" name="Response">
-                                <pre><code id="responseResponseText">&nbsp;</code></pre>
+                                <div id="responseResponseText">
+                                    <pre><code>&nbsp;</code></pre>
+                                </div>
                             </el-tab-pane>
                             <el-tab-pane label="Preview" name="Preview">
-                                <pre><code id="responsePreviewText">&nbsp;</code></pre>
+                                <div id="responsePreviewText">
+                                    <pre><code>&nbsp;</code></pre>
+                                </div>
                             </el-tab-pane>
                         </el-tabs>
                     </el-card>
@@ -368,20 +374,27 @@ Author:
                 this.headerTags.splice(this.headerTags.indexOf(tag), 1)
                 this.setCache("cache:header", this.headerTags)
             },
+            makeHljsPreCode(id, text) {
+                document.getElementById(id).innerHTML = "<pre><code>" + text + "</code></pre>"
+            },
             makeResponse(res) {
                 resStatus = [res.status, res.statusText].join(" ")
                 resHeaders = res.headers
                 resData = res.data
                 let resHeadersdict = Object.assign({ "status code": resStatus }, resHeaders)
 
-                document.getElementById("responseHeaderText").innerHTML = JSON.stringify(resHeadersdict, null, 4)
+                this.makeHljsPreCode("responseHeaderText", JSON.stringify(resHeadersdict, null, 4))
                 if (resHeaders["content-type"] !== undefined && resHeaders["content-type"].indexOf("application/json") != -1) {
-                    document.getElementById("responseResponseText").innerHTML = JSON.stringify(resData)
-                    document.getElementById("responsePreviewText").innerHTML = JSON.stringify(resData, null, 4)
+                    this.makeHljsPreCode("responseResponseText", JSON.stringify(resData))
+                    this.makeHljsPreCode("responsePreviewText", JSON.stringify(resData, null, 4))
+                }
+                else if (resHeaders["content-type"] !== undefined && resHeaders["content-type"].indexOf("text/html") != -1) {
+                    document.getElementById("responseResponseText").innerHTML = "<code>" + resData + "</code>"
+                    document.getElementById("responsePreviewText").innerHTML = "<code>" + resData + "</code>"
                 }
                 else {
-                    document.getElementById("responseResponseText").innerHTML = resData
-                    document.getElementById("responsePreviewText").innerHTML = resData
+                    this.makeHljsPreCode("responseResponseText", resData)
+                    this.makeHljsPreCode("responsePreviewText", resData)
                 }
                 document.querySelectorAll("pre code").forEach((block) => {
                     hljs.highlightElement(block)
