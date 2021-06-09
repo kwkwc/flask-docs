@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.5.3
+    0.5.4
 History:
     Created on 2020/10/29
     Last modified on 2021/06/10
@@ -115,6 +115,8 @@ Author:
                     </el-card>
                     <el-card class="box-card" style="margin-top:10px">
                         <el-divider content-position="left">Response</el-divider>
+                        <el-button class="copyResponse" type="text" icon="el-icon-document-copy" @click="copyResponse">
+                        </el-button>
                         <el-tabs type="card" v-model="responseTabsActiveName">
                             <el-tab-pane label="Headers" name="Headers">
                                 <div id="responseHeaderText">
@@ -181,7 +183,8 @@ Author:
             headerTagsTypeDict: { 0: "primary", 1: "success", 2: "info", 3: "warning", 4: "danger" },
             headerTags: [],
             bodyTextarea: "",
-            responseTabsActiveName: "Headers"
+            responseTabsActiveName: "Headers",
+            responseTabsActiveDict: { "Headers": "responseHeaderText", "Response": "responseResponseText", "Preview": "responsePreviewText" }
         },
         created: function () {
             this.changeWindowSize()
@@ -549,6 +552,20 @@ Author:
                 if (pageCache && pageCache === "debugger") {
                     this.debugShow()
                 }
+            },
+            copyResponse() {
+                let text = document.getElementById(this.responseTabsActiveDict[this.responseTabsActiveName]).innerText
+                let input = document.createElement("textarea")
+                document.body.appendChild(input)
+                input.value = text
+                input.select();
+                if (document.execCommand("copy")) {
+                    this.$message({
+                        message: "Copied",
+                        type: "success"
+                    })
+                }
+                document.body.removeChild(input)
             }
         },
         computed: {
@@ -652,6 +669,14 @@ Author:
         font-size: 12px;
         color: #e5e5e5;
         text-decoration: none;
+    }
+
+    .copyResponse {
+        margin-top: 57px;
+        padding-left: 6px;
+        padding-right: 20px;
+        font-size: 20px;
+        float: right;
     }
 </style>
 
