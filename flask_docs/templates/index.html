@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.5.4
+    0.5.5
 History:
     Created on 2020/10/29
     Last modified on 2021/06/10
@@ -658,6 +658,12 @@ Author:
         background-color: #f6f8fa;
     }
 
+    @-moz-document url-prefix() {
+        pre {
+            margin-top: 12px
+        }
+    }
+
     code,
     textarea {
         font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
@@ -672,7 +678,7 @@ Author:
     }
 
     .copyResponse {
-        margin-top: 57px;
+        margin-top: 54px;
         padding-left: 6px;
         padding-right: 20px;
         font-size: 20px;
