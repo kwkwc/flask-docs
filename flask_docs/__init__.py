@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.4.1
+    0.4.2
 History:
     Created on 2018/05/20
-    Last modified on 2021/06/07
+    Last modified on 2021/06/20
 Author:
     kwkw
 """
@@ -316,7 +316,7 @@ class ApiDoc(object):
                         "noDocText": self.no_doc_text,
                         "PROJECT_NAME": PROJECT_NAME,
                         "PROJECT_VERSION": PROJECT_VERSION,
-                        "host": host
+                        "host": host,
                     }
                 )
 
@@ -367,13 +367,12 @@ class ApiDoc(object):
         if doc == "":
             doc = self.no_doc_text
 
-        try:
+        if len(doc_src.split("@@@")) >= 2:
             doc_md = doc_src.split("@@@")[1].strip(" ")
             space_count = doc_src.split("@@@")[0].split("\n")[-1].count(" ")
             doc_md = "\n".join(doc_md.split("\n" + " " * space_count))
-        except Exception as e:
+        else:
             doc_md = ""
-            logger.error("{} error - {}".format(PROJECT_NAME, e))
 
         return doc, name_extra, doc_md
 
