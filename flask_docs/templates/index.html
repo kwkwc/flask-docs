@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.5.5
+    0.5.6
 History:
     Created on 2020/10/29
-    Last modified on 2021/06/10
+    Last modified on 2021/06/30
 Author:
     kwkw
 -->
@@ -49,8 +49,9 @@ Author:
                             <el-input placeholder="Filter keyword" v-model="treeFilterText" style="padding-bottom:10px">
                             </el-input>
                             <div :style="menuStyle">
-                                <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps"
-                                    :filter-node-method="treeFilterNode" ref="apiTree" @node-click="treeNodeClick">
+                                <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps" node-key="id"
+                                    highlight-current :filter-node-method="treeFilterNode" ref="apiTree"
+                                    @node-click="treeNodeClick">
                                 </el-tree>
                             </div>
                         </el-col>
@@ -226,6 +227,7 @@ Author:
                     document.getElementById("md").innerHTML = marked("# " + this.titleVersion)
                     this.makeUrlOptions(res.data.data)
                     this.getUrlCache()
+                    this.jumpAnchor()
                     this.loading = false
                 },
                     err => {
@@ -294,6 +296,7 @@ Author:
                     document.querySelectorAll("pre code").forEach((block) => {
                         hljs.highlightElement(block)
                     })
+                    this.dropAnchor(data.id)
                 }
             },
             debugShow() {
@@ -566,6 +569,26 @@ Author:
                     })
                 }
                 document.body.removeChild(input)
+            },
+            dropAnchor(anchor) {
+                let currentUrl = window.location.href
+                let hostUrl = currentUrl.split("#")[0]
+                history.pushState("", "", hostUrl + "#" + anchor)
+            },
+            jumpAnchor() {
+                this.$nextTick(function () {
+                    try {
+                        let currentUrl = decodeURI(window.location.href)
+                        let anchor = currentUrl.split("#")[1]
+                        let anchorParent = anchor.split("-")[0]
+                        this.$refs.apiTree.store.nodesMap[anchorParent].expanded = true
+                        this.$refs.apiTree.setCurrentKey(anchor)
+                        let node = this.$refs.apiTree.getNode(anchor)
+                        this.treeNodeClick(node.data)
+                    }
+                    catch (err) {
+                    }
+                })
             }
         },
         computed: {
@@ -574,14 +597,15 @@ Author:
                 for (key in this.treeData) {
                     let childrenData = new Array()
                     this.treeData[key]["children"].forEach((con, index) => {
+                        let id = con.router + "-" + con.name
                         if (con.name_extra == "") {
-                            childrenData.push({ "full_name": con.name, "name": con.name, "router": con.router })
+                            childrenData.push({ "id": id, "full_name": con.name, "name": con.name, "router": con.router })
                         }
                         else {
-                            childrenData.push({ "full_name": con.name + "(" + con.name_extra + ")", "name": con.name, "router": con.router })
+                            childrenData.push({ "id": id, "full_name": con.name + "(" + con.name_extra + ")", "name": con.name, "router": con.router })
                         }
                     })
-                    treeDataNew.push({ "full_name": key, "children": childrenData })
+                    treeDataNew.push({ "id": key, "full_name": key, "children": childrenData })
                 }
                 return treeDataNew
             }
