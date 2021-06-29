@@ -1,6 +1,6 @@
 # Flask-Docs
 
-[![Build Status](https://travis-ci.org/kwkwc/flask-docs.svg?branch=master)](https://travis-ci.org/kwkwc/flask-docs)
+[![Upload Python Package](https://github.com/kwkwc/flask-docs/actions/workflows/python-publish.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/python-publish.yml)
 [![Coverage Status](https://coveralls.io/repos/github/kwkwc/flask-docs/badge.svg?branch=master)](https://coveralls.io/github/kwkwc/flask-docs?branch=master)
 [![PyPI](https://img.shields.io/pypi/v/Flask-Docs)](https://pypi.org/project/Flask-Docs/)
 
