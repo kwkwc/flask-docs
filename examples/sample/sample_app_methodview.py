@@ -3,12 +3,12 @@
 
 """
 Program:
-    Sample app restful methodview
+    Sample app methodview
 Version:
-    0.3.0
+    0.3.1
 History:
-    Created on 2018/05/20
-    Last modified on 2021/05/24
+    Created on 2019/07/15
+    Last modified on 2021/07/08
 Author:
     kwkw
 """
@@ -35,7 +35,7 @@ app = Flask(__name__)
 # RESTful Api documents to be excluded
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todolist"]
 
-ApiDoc(app, title="Sample App Restful Methodview", version="1.0.0")
+ApiDoc(app, title="Sample App MethodView", version="1.0.0")
 
 
 class TodoList(MethodView):
