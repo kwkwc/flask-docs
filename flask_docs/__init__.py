@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.4.6
+    0.4.7
 History:
     Created on 2018/05/20
     Last modified on 2021/07/08
@@ -59,8 +59,6 @@ class ApiDoc(object):
 
     def init_app(self, app, title="Api Doc", version="1.0.0", no_doc_text=""):
 
-        self.no_doc_text = no_doc_text
-
         app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
         app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
         app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
@@ -111,32 +109,36 @@ class ApiDoc(object):
                 return
 
             # Will be removed in version 0.5.0
-            conf_warn_template = '{} warning - The "{{}}" setting is deprecated and scheduled for removal in version 0.5.0. Use the "{{}}" instead'.format(
+            old_conf_warn_template = '{} warning - The "{{}}" setting is deprecated and scheduled for removal in version 0.5.0. Use the "{{}}" instead'.format(
                 PROJECT_NAME
             )
 
-            API_DOC_RESTFUL_EXCLUDE = current_app.config["API_DOC_RESTFUL_EXCLUDE"]
-            if current_app.config["RESTFUL_API_DOC_EXCLUDE"]:
-                API_DOC_RESTFUL_EXCLUDE = current_app.config["RESTFUL_API_DOC_EXCLUDE"]
+            self.no_doc_text = current_app.config["API_DOC_NO_DOC_TEXT"]
+            if no_doc_text:
+                self.no_doc_text = no_doc_text
                 logger.warning(
-                    conf_warn_template.format(
+                    old_conf_warn_template.format("no_doc_text", "API_DOC_NO_DOC_TEXT")
+                )
+
+            self.restful_exclude_list = current_app.config["API_DOC_RESTFUL_EXCLUDE"]
+            if current_app.config["RESTFUL_API_DOC_EXCLUDE"]:
+                self.restful_exclude_list = current_app.config[
+                    "RESTFUL_API_DOC_EXCLUDE"
+                ]
+                logger.warning(
+                    old_conf_warn_template.format(
                         "RESTFUL_API_DOC_EXCLUDE", "API_DOC_RESTFUL_EXCLUDE"
                     )
                 )
 
-            API_DOC_METHODS_LIST = current_app.config["API_DOC_METHODS_LIST"]
+            self.methods_list = current_app.config["API_DOC_METHODS_LIST"]
             if current_app.config["METHODS_LIST"]:
-                API_DOC_METHODS_LIST = current_app.config["METHODS_LIST"]
+                self.methods_list = current_app.config["METHODS_LIST"]
                 logger.warning(
-                    conf_warn_template.format("METHODS_LIST", "API_DOC_METHODS_LIST")
+                    old_conf_warn_template.format(
+                        "METHODS_LIST", "API_DOC_METHODS_LIST"
+                    )
                 )
-
-            if self.no_doc_text:
-                logger.warning(
-                    conf_warn_template.format("no_doc_text", "API_DOC_NO_DOC_TEXT")
-                )
-            else:
-                self.no_doc_text = current_app.config["API_DOC_NO_DOC_TEXT"]
             # Will be removed in version 0.5.0 end
 
             api_doc = Blueprint(
@@ -189,7 +191,7 @@ class ApiDoc(object):
                     if name not in c_dict:
                         continue
 
-                    if name in API_DOC_RESTFUL_EXCLUDE:
+                    if name in self.restful_exclude_list:
                         continue
 
                     c_doc = self.get_api_doc(func)
@@ -206,7 +208,7 @@ class ApiDoc(object):
                         data_dict[name] = {"children": []}
 
                     for m in func.methods:
-                        if m not in API_DOC_METHODS_LIST:
+                        if m not in self.methods_list:
                             continue
 
                         api = {
@@ -290,7 +292,7 @@ class ApiDoc(object):
                         name = self.get_api_name(func)
                         url = str(rule)
                         method = " ".join(
-                            [r for r in rule.methods if r in API_DOC_METHODS_LIST]
+                            [r for r in rule.methods if r in self.methods_list]
                         )
                         if method:
                             url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
