@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.4.3
+    0.4.4
 History:
     Created on 2018/05/20
     Last modified on 2021/07/08
@@ -92,16 +92,34 @@ class ApiDoc(object):
             if not current_app.config["API_DOC_ENABLE"]:
                 return
 
+            # Will be removed in version 0.5.0
+            conf_warn_template = '{} warning - The "{{}}" setting is deprecated and scheduled for removal in version 0.5.0. Use the "{{}}" instead'.format(
+                PROJECT_NAME
+            )
+
             API_DOC_RESTFUL_EXCLUDE = current_app.config["API_DOC_RESTFUL_EXCLUDE"]
             if current_app.config["RESTFUL_API_DOC_EXCLUDE"]:
                 API_DOC_RESTFUL_EXCLUDE = current_app.config["RESTFUL_API_DOC_EXCLUDE"]
+                logger.warning(
+                    conf_warn_template.format(
+                        "RESTFUL_API_DOC_EXCLUDE", "API_DOC_RESTFUL_EXCLUDE"
+                    )
+                )
 
             API_DOC_METHODS_LIST = current_app.config["API_DOC_METHODS_LIST"]
             if current_app.config["METHODS_LIST"]:
                 API_DOC_METHODS_LIST = current_app.config["METHODS_LIST"]
+                logger.warning(
+                    conf_warn_template.format("METHODS_LIST", "API_DOC_METHODS_LIST")
+                )
 
-            if not self.no_doc_text:
+            if self.no_doc_text:
+                logger.warning(
+                    conf_warn_template.format("no_doc_text", "API_DOC_NO_DOC_TEXT")
+                )
+            else:
                 self.no_doc_text = current_app.config["API_DOC_NO_DOC_TEXT"]
+            # Will be removed in version 0.5.0 end
 
             api_doc = Blueprint(
                 "api_doc",
