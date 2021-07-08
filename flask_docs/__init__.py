@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.4.4
+    0.4.5
 History:
     Created on 2018/05/20
     Last modified on 2021/07/08
@@ -56,38 +56,51 @@ class ApiDoc(object):
 
         self.no_doc_text = no_doc_text
 
-        app.config.setdefault("API_DOC_MEMBER", [])
-        app.config.setdefault("API_DOC_ENABLE", True)
-        app.config.setdefault("API_DOC_CDN", False)
         app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
         app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
+        app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
+        app.config.setdefault("API_DOC_NO_DOC_TEXT", "No doc found for this Api")
+        app.config.setdefault("API_DOC_ENABLE", True)
+        app.config.setdefault("API_DOC_CDN", False)
+        app.config.setdefault("API_DOC_MEMBER", [])
         app.config.setdefault("RESTFUL_API_DOC_EXCLUDE", [])
         app.config.setdefault("API_DOC_RESTFUL_EXCLUDE", [])
         app.config.setdefault("METHODS_LIST", [])
         app.config.setdefault(
             "API_DOC_METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"]
         )
-        app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
-        app.config.setdefault("API_DOC_NO_DOC_TEXT", "No doc found for this Api")
 
         with app.app_context():
-            if (
-                not isinstance(title, str)
-                or not isinstance(version, str)
-                or not isinstance(no_doc_text, str)
-                or not isinstance(current_app.config["API_DOC_MEMBER"], list)
-                or not isinstance(current_app.config["API_DOC_ENABLE"], bool)
-                or not isinstance(current_app.config["API_DOC_CDN"], bool)
-                or not isinstance(current_app.config["API_DOC_CDN_CSS_TEMPLATE"], str)
-                or not isinstance(current_app.config["API_DOC_CDN_JS_TEMPLATE"], str)
-                or not isinstance(current_app.config["RESTFUL_API_DOC_EXCLUDE"], list)
-                or not isinstance(current_app.config["API_DOC_RESTFUL_EXCLUDE"], list)
-                or not isinstance(current_app.config["METHODS_LIST"], list)
-                or not isinstance(current_app.config["API_DOC_METHODS_LIST"], list)
-                or not isinstance(current_app.config["API_DOC_URL_PREFIX"], str)
-                or not isinstance(current_app.config["API_DOC_NO_DOC_TEXT"], str)
+            if not all(
+                [
+                    isinstance(title, str),
+                    isinstance(version, str),
+                    isinstance(no_doc_text, str),
+                ]
             ):
-                raise ValueError
+                raise ValueError(
+                    "title or version or no_doc_text incorrect value type, correct type <class 'str'>"
+                )
+            self.check_config_type(
+                [
+                    "API_DOC_CDN_CSS_TEMPLATE",
+                    "API_DOC_CDN_JS_TEMPLATE",
+                    "API_DOC_URL_PREFIX",
+                    "API_DOC_NO_DOC_TEXT",
+                ],
+                str,
+            )
+            self.check_config_type(["API_DOC_ENABLE", "API_DOC_CDN"], bool)
+            self.check_config_type(
+                [
+                    "API_DOC_MEMBER",
+                    "RESTFUL_API_DOC_EXCLUDE",
+                    "API_DOC_RESTFUL_EXCLUDE",
+                    "METHODS_LIST",
+                    "API_DOC_METHODS_LIST",
+                ],
+                list,
+            )
 
             if not current_app.config["API_DOC_ENABLE"]:
                 return
@@ -332,6 +345,13 @@ class ApiDoc(object):
                 )
 
             app.register_blueprint(api_doc)
+
+    def check_config_type(self, config_list, type):
+        for c in config_list:
+            if not isinstance(current_app.config[c], type):
+                raise ValueError(
+                    "{} incorrect value type, correct type {}".format(c, type)
+                )
 
     def get_api_name(self, func):
         """e.g. Convert 'do_work' to 'Do Work'"""
