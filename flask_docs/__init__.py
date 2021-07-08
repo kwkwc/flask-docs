@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.4.7
+    0.4.8
 History:
     Created on 2018/05/20
     Last modified on 2021/07/08
@@ -31,7 +31,8 @@ logger = logging.getLogger(__name__)
 
 def change_doc(doc_dict):
     logger.warning(
-        '{} warning - The "change_doc" decorator is deprecated and scheduled for removal in version 0.5.0. Use the "ApiDoc.change_doc" instead'.format(
+        '{} warning - The "change_doc" decorator is deprecated and scheduled for removal \
+            in version 0.5.0. Use the "ApiDoc.change_doc" instead'.format(
             PROJECT_NAME
         )
     )
@@ -74,16 +75,10 @@ class ApiDoc(object):
         )
 
         with app.app_context():
-            if not all(
-                [
-                    isinstance(title, str),
-                    isinstance(version, str),
-                    isinstance(no_doc_text, str),
-                ]
-            ):
-                raise ValueError(
-                    "title or version or no_doc_text incorrect value type, correct type <class 'str'>"
-                )
+            self.check_variable_type(
+                {"title": title, "version": version, "no_doc_text": no_doc_text},
+                str,
+            )
             self.check_config_type(
                 [
                     "API_DOC_CDN_CSS_TEMPLATE",
@@ -109,7 +104,8 @@ class ApiDoc(object):
                 return
 
             # Will be removed in version 0.5.0
-            old_conf_warn_template = '{} warning - The "{{}}" setting is deprecated and scheduled for removal in version 0.5.0. Use the "{{}}" instead'.format(
+            old_conf_warn_template = '{} warning - The "{{}}" setting is deprecated and scheduled for removal \
+                in version 0.5.0. Use the "{{}}" instead'.format(
                 PROJECT_NAME
             )
 
@@ -177,167 +173,10 @@ class ApiDoc(object):
                 data_dict = {}
 
                 # Restful Api and MethodView Api
-                c_dict = {}
-                class_name_dict = {}
-
-                for c in self.get_all_subclasses(Resource, MethodView):
-                    c_dict[c.__name__.lower()] = c
-                    class_name_dict[c.__name__.lower()] = c.__name__
-
-                for rule in app.url_map.iter_rules():
-                    func = app.view_functions[rule.endpoint]
-                    name = func.__name__
-
-                    if name not in c_dict:
-                        continue
-
-                    if name in self.restful_exclude_list:
-                        continue
-
-                    c_doc = self.get_api_doc(func)
-
-                    if c_doc != self.no_doc_text:
-                        name = "{}({})".format(
-                            class_name_dict[name], self.clean_doc(c_doc)
-                        )
-
-                    if func.methods is None:
-                        continue
-
-                    if name not in data_dict:
-                        data_dict[name] = {"children": []}
-
-                    for m in func.methods:
-                        if m not in self.methods_list:
-                            continue
-
-                        api = {
-                            "name": "",
-                            "name_extra": "",
-                            "url": "",
-                            "doc": "",
-                            "doc_md": "",
-                            "router": name,
-                            "api_type": "restful_api",
-                        }
-
-                        try:
-                            name_m = m
-                            url = str(rule)
-
-                            result = filter(
-                                lambda x: x["name"] == name_m,
-                                data_dict[name]["children"],
-                            )
-                            result_list = list(result)
-                            if len(result_list) > 0:
-                                result_list[0]["url"] = (
-                                    result_list[0]["url"] + " " + url
-                                )
-                                result_list[0]["url"] = " ".join(
-                                    list(set(result_list[0]["url"].split(" ")))
-                                )
-                                raise RuntimeError
-
-                            api["name"] = name_m
-                            api["url"] = url
-
-                            doc = eval(
-                                "c_dict[func.__name__].{}.__doc__".format(m.lower())
-                            ).replace("\t", "    ")
-
-                            doc = doc if doc else self.no_doc_text
-
-                            (
-                                api["doc"],
-                                api["name_extra"],
-                                api["doc_md"],
-                            ) = self.get_doc_name_extra_doc_md(doc)
-
-                        except Exception as e:
-                            logger.exception("{} error - {}".format(PROJECT_NAME, e))
-                        else:
-                            data_dict[name]["children"].append(api)
-
-                    if data_dict[name]["children"] == []:
-                        data_dict.pop(name)
-                    else:
-                        data_dict[name]["children"].sort(key=lambda x: x["name"])
+                data_dict.update(self.get_restful_methodview_api_data())
 
                 # Api
-                for rule in app.url_map.iter_rules():
-                    f = str(rule).split("/")[1]
-                    if f not in current_app.config["API_DOC_MEMBER"]:
-                        continue
-
-                    f_capitalize = f.capitalize()
-
-                    if f_capitalize not in data_dict:
-                        data_dict[f_capitalize] = {"children": []}
-
-                    api = {
-                        "name": "",
-                        "name_extra": "",
-                        "url": "",
-                        "method": "",
-                        "doc": "",
-                        "doc_md": "",
-                        "router": f_capitalize,
-                        "api_type": "api",
-                    }
-
-                    try:
-                        func = app.view_functions[rule.endpoint]
-
-                        name = self.get_api_name(func)
-                        url = str(rule)
-                        method = " ".join(
-                            [r for r in rule.methods if r in self.methods_list]
-                        )
-                        if method:
-                            url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
-
-                        result = filter(
-                            lambda x: x["name"] == name,
-                            data_dict[f_capitalize]["children"],
-                        )
-                        result_list = list(result)
-                        if len(result_list) > 0:
-                            result_list[0]["url"] = result_list[0]["url"] + " " + url
-                            result_list[0]["url"] = " ".join(
-                                list(set(result_list[0]["url"].split(" ")))
-                            )
-                            result_list[0]["method"] = (
-                                result_list[0]["method"] + " " + method
-                            )
-                            result_list[0]["method"] = " ".join(
-                                list(set(result_list[0]["method"].split(" ")))
-                            )
-                            raise RuntimeError
-
-                        api["name"] = name
-                        api["url"] = url
-                        api["method"] = method
-
-                        doc = self.get_api_doc(func)
-
-                        (
-                            api["doc"],
-                            api["name_extra"],
-                            api["doc_md"],
-                        ) = self.get_doc_name_extra_doc_md(doc)
-
-                    except Exception as e:
-                        logger.exception("{} error - {}".format(PROJECT_NAME, e))
-                    else:
-                        data_dict[f_capitalize]["children"].append(api)
-
-                    if data_dict[f_capitalize]["children"] == []:
-                        data_dict.pop(f_capitalize)
-                    else:
-                        data_dict[f_capitalize]["children"].sort(
-                            key=lambda x: x["name"]
-                        )
+                data_dict.update(self.get_api_data())
 
                 return jsonify(
                     {
@@ -353,16 +192,172 @@ class ApiDoc(object):
 
             app.register_blueprint(api_doc)
 
-    def check_config_type(self, config_list, type):
-        for c in config_list:
-            if not isinstance(current_app.config[c], type):
-                raise ValueError(
-                    "{} incorrect value type, correct type {}".format(c, type)
+    def get_restful_methodview_api_data(self):
+        """Restful Api and MethodView Api"""
+
+        data_dict = {}
+
+        c_dict = {}
+        class_name_dict = {}
+
+        for c in self.get_all_subclasses(Resource, MethodView):
+            c_dict[c.__name__.lower()] = c
+            class_name_dict[c.__name__.lower()] = c.__name__
+
+        for rule in current_app.url_map.iter_rules():
+            func = current_app.view_functions[rule.endpoint]
+            name = func.__name__
+
+            if name not in c_dict:
+                continue
+
+            if name in self.restful_exclude_list:
+                continue
+
+            c_doc = self.get_api_doc(func)
+
+            if c_doc != self.no_doc_text:
+                name = "{}({})".format(class_name_dict[name], self.clean_doc(c_doc))
+
+            if func.methods is None:
+                continue
+
+            if name not in data_dict:
+                data_dict[name] = {"children": []}
+
+            for m in func.methods:
+                if m not in self.methods_list:
+                    continue
+
+                api = {
+                    "name": "",
+                    "name_extra": "",
+                    "url": "",
+                    "doc": "",
+                    "doc_md": "",
+                    "router": name,
+                    "api_type": "restful_api",
+                }
+
+                try:
+                    name_m = m
+                    url = str(rule)
+
+                    result = filter(
+                        lambda x: x["name"] == name_m,
+                        data_dict[name]["children"],
+                    )
+                    result_list = list(result)
+                    if len(result_list) > 0:
+                        result_list[0]["url"] = result_list[0]["url"] + " " + url
+                        result_list[0]["url"] = " ".join(
+                            list(set(result_list[0]["url"].split(" ")))
+                        )
+                        raise RuntimeError
+
+                    api["name"] = name_m
+                    api["url"] = url
+
+                    doc = eval(
+                        "c_dict[func.__name__].{}.__doc__".format(m.lower())
+                    ).replace("\t", "    ")
+
+                    doc = doc if doc else self.no_doc_text
+
+                    (
+                        api["doc"],
+                        api["name_extra"],
+                        api["doc_md"],
+                    ) = self.get_doc_name_extra_doc_md(doc)
+
+                except Exception as e:
+                    logger.exception("{} error - {}".format(PROJECT_NAME, e))
+                else:
+                    data_dict[name]["children"].append(api)
+
+            if data_dict[name]["children"] == []:
+                data_dict.pop(name)
+            else:
+                data_dict[name]["children"].sort(key=lambda x: x["name"])
+
+        return data_dict
+
+    def get_api_data(self):
+        """Api"""
+
+        data_dict = {}
+
+        for rule in current_app.url_map.iter_rules():
+            f = str(rule).split("/")[1]
+            if f not in current_app.config["API_DOC_MEMBER"]:
+                continue
+
+            f_capitalize = f.capitalize()
+
+            if f_capitalize not in data_dict:
+                data_dict[f_capitalize] = {"children": []}
+
+            api = {
+                "name": "",
+                "name_extra": "",
+                "url": "",
+                "method": "",
+                "doc": "",
+                "doc_md": "",
+                "router": f_capitalize,
+                "api_type": "api",
+            }
+
+            try:
+                func = current_app.view_functions[rule.endpoint]
+
+                name = self.get_api_name(func)
+                url = str(rule)
+                method = " ".join([r for r in rule.methods if r in self.methods_list])
+                if method:
+                    url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
+
+                result = filter(
+                    lambda x: x["name"] == name,
+                    data_dict[f_capitalize]["children"],
                 )
+                result_list = list(result)
+                if len(result_list) > 0:
+                    result_list[0]["url"] = result_list[0]["url"] + " " + url
+                    result_list[0]["url"] = " ".join(
+                        list(set(result_list[0]["url"].split(" ")))
+                    )
+                    result_list[0]["method"] = result_list[0]["method"] + " " + method
+                    result_list[0]["method"] = " ".join(
+                        list(set(result_list[0]["method"].split(" ")))
+                    )
+                    raise RuntimeError
+
+                api["name"] = name
+                api["url"] = url
+                api["method"] = method
+
+                doc = self.get_api_doc(func)
+
+                (
+                    api["doc"],
+                    api["name_extra"],
+                    api["doc_md"],
+                ) = self.get_doc_name_extra_doc_md(doc)
+
+            except Exception as e:
+                logger.exception("{} error - {}".format(PROJECT_NAME, e))
+            else:
+                data_dict[f_capitalize]["children"].append(api)
+
+            if data_dict[f_capitalize]["children"] == []:
+                data_dict.pop(f_capitalize)
+            else:
+                data_dict[f_capitalize]["children"].sort(key=lambda x: x["name"])
+
+        return data_dict
 
     def get_api_name(self, func):
-        """e.g. Convert 'do_work' to 'Do Work'"""
-
         words = func.__name__.split("_")
         words = [w.capitalize() for w in words]
 
@@ -426,6 +421,24 @@ class ApiDoc(object):
             all_subclasses.extend(tmp)
 
         return all_subclasses
+
+    def check_variable_type(self, variable_dict, type):
+        for k in variable_dict:
+            if not isinstance(variable_dict[k], type):
+                raise ValueError(
+                    "{} is the incorrect type of value, the correct type is {}".format(
+                        k, type
+                    )
+                )
+
+    def check_config_type(self, config_list, type):
+        for c in config_list:
+            if not isinstance(current_app.config[c], type):
+                raise ValueError(
+                    "{} is the incorrect type of value, the correct type is {}".format(
+                        c, type
+                    )
+                )
 
     @staticmethod
     def change_doc(doc_dict):
