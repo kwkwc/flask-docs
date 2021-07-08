@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.4.2
+    0.4.3
 History:
     Created on 2018/05/20
-    Last modified on 2021/06/20
+    Last modified on 2021/07/08
 Author:
     kwkw
 """
@@ -48,23 +48,11 @@ class ApiDoc(object):
     with open(os.path.join(APP_TEMPLATES, "js_template_local.html"), "r") as h:
         JS_TEMPLATE_LOCAL = h.read()
 
-    def __init__(
-        self,
-        app=None,
-        title="Api Doc",
-        version="1.0.0",
-        no_doc_text="No doc found for this Api",
-    ):
+    def __init__(self, app=None, title="Api Doc", version="1.0.0", no_doc_text=""):
         if app is not None:
             self.init_app(app, title, version, no_doc_text)
 
-    def init_app(
-        self,
-        app,
-        title="Api Doc",
-        version="1.0.0",
-        no_doc_text="No doc found for this Api",
-    ):
+    def init_app(self, app, title="Api Doc", version="1.0.0", no_doc_text=""):
 
         self.no_doc_text = no_doc_text
 
@@ -80,6 +68,7 @@ class ApiDoc(object):
             "API_DOC_METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"]
         )
         app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
+        app.config.setdefault("API_DOC_NO_DOC_TEXT", "No doc found for this Api")
 
         with app.app_context():
             if (
@@ -96,6 +85,7 @@ class ApiDoc(object):
                 or not isinstance(current_app.config["METHODS_LIST"], list)
                 or not isinstance(current_app.config["API_DOC_METHODS_LIST"], list)
                 or not isinstance(current_app.config["API_DOC_URL_PREFIX"], str)
+                or not isinstance(current_app.config["API_DOC_NO_DOC_TEXT"], str)
             ):
                 raise ValueError
 
@@ -109,6 +99,9 @@ class ApiDoc(object):
             API_DOC_METHODS_LIST = current_app.config["API_DOC_METHODS_LIST"]
             if current_app.config["METHODS_LIST"]:
                 API_DOC_METHODS_LIST = current_app.config["METHODS_LIST"]
+
+            if not self.no_doc_text:
+                self.no_doc_text = current_app.config["API_DOC_NO_DOC_TEXT"]
 
             api_doc = Blueprint(
                 "api_doc",
