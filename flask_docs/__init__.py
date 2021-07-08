@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.4.5
+    0.4.6
 History:
     Created on 2018/05/20
     Last modified on 2021/07/08
@@ -30,6 +30,11 @@ logger = logging.getLogger(__name__)
 
 
 def change_doc(doc_dict):
+    logger.warning(
+        '{} warning - The "change_doc" decorator is deprecated and scheduled for removal in version 0.5.0. Use the "ApiDoc.change_doc" instead'.format(
+            PROJECT_NAME
+        )
+    )
     return ApiDoc.change_doc(doc_dict)
 
 
