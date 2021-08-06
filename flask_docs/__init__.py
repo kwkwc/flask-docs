@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.5.2
+    0.5.3
 History:
     Created on 2018/05/20
     Last modified on 2021/08/06
@@ -275,7 +275,9 @@ class ApiDoc(object):
                     ) = self.get_doc_name_extra_doc_md(doc)
 
                 except Exception as e:
-                    logger.exception("{} error - {}".format(PROJECT_NAME, e))
+                    logger.error(
+                        "{} error - {} - {} - {}".format(PROJECT_NAME, e, name, name_m)
+                    )
                 else:
                     data_dict[name]["children"].append(api)
 
@@ -313,8 +315,8 @@ class ApiDoc(object):
             }
 
             try:
+                name = ""
                 func = current_app.view_functions[rule.endpoint]
-
                 name = self.get_api_name(func)
                 url = str(rule)
                 method = " ".join([r for r in rule.methods if r in self.methods_list])
@@ -350,7 +352,11 @@ class ApiDoc(object):
                 ) = self.get_doc_name_extra_doc_md(doc)
 
             except Exception as e:
-                logger.exception("{} error - {}".format(PROJECT_NAME, e))
+                logger.error(
+                    "{} error - {} - {} - {}".format(
+                        PROJECT_NAME, e, f_capitalize, name
+                    )
+                )
             else:
                 data_dict[f_capitalize]["children"].append(api)
 
