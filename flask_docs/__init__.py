@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.5.0
+    0.5.1
 History:
     Created on 2018/05/20
     Last modified on 2021/08/06
@@ -216,10 +216,10 @@ class ApiDoc(object):
 
             name = class_name_dict[name]
 
-            c_doc = self.get_api_doc(func)
+            c_doc = self.clean_doc(self.get_api_doc(func))
 
-            if c_doc != self.no_doc_text:
-                name = "{}({})".format(name, self.clean_doc(c_doc))
+            if c_doc and c_doc != self.no_doc_text:
+                name = "{}({})".format(name, c_doc)
 
             if func.methods is None:
                 continue
