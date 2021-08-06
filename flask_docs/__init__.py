@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.5.4
+    0.5.5
 History:
     Created on 2018/05/20
     Last modified on 2021/08/06
@@ -65,8 +65,10 @@ class ApiDoc(object):
         )
 
         with app.app_context():
-            self.check_variable_type({"title": title, "version": version}, str)
-            self.check_config_type(
+            self._check_value_type(
+                {"title": title, "version": version}, str, data_type="variable"
+            )
+            self._check_value_type(
                 [
                     "API_DOC_CDN_CSS_TEMPLATE",
                     "API_DOC_CDN_JS_TEMPLATE",
@@ -75,8 +77,8 @@ class ApiDoc(object):
                 ],
                 str,
             )
-            self.check_config_type(["API_DOC_ENABLE", "API_DOC_CDN"], bool)
-            self.check_config_type(
+            self._check_value_type(["API_DOC_ENABLE", "API_DOC_CDN"], bool)
+            self._check_value_type(
                 [
                     "API_DOC_MEMBER",
                     "API_DOC_RESTFUL_EXCLUDE",
@@ -124,26 +126,26 @@ class ApiDoc(object):
                 data_dict = {}
 
                 # Restful Api and MethodView Api
-                data_dict.update(self.get_restful_methodview_api_data())
+                data_dict.update(self._get_restful_methodview_api_data())
 
                 # Api
-                data_dict.update(self.get_api_data())
+                data_dict.update(self._get_api_data())
 
                 return jsonify(
                     {
-                        "data": data_dict,
-                        "title": title,
-                        "version": version,
-                        "noDocText": current_app.config["API_DOC_NO_DOC_TEXT"],
                         "PROJECT_NAME": PROJECT_NAME,
                         "PROJECT_VERSION": PROJECT_VERSION,
                         "host": host,
+                        "title": title,
+                        "version": version,
+                        "noDocText": current_app.config["API_DOC_NO_DOC_TEXT"],
+                        "data": data_dict,
                     }
                 )
 
             app.register_blueprint(api_doc)
 
-    def get_restful_methodview_api_data(self):
+    def _get_restful_methodview_api_data(self):
         """Restful Api and MethodView Api"""
 
         data_dict = {}
@@ -151,7 +153,7 @@ class ApiDoc(object):
         c_dict = {}
         class_name_dict = {}
 
-        for c in self.get_all_subclasses(Resource, MethodView):
+        for c in self._get_all_subclasses(Resource, MethodView):
             c_dict[c.__name__.lower()] = c
             class_name_dict[c.__name__.lower()] = c.__name__
 
@@ -167,7 +169,7 @@ class ApiDoc(object):
 
             name = class_name_dict[name]
 
-            c_doc = self.clean_doc(self.get_api_doc(func))
+            c_doc = self._clean_doc(self._get_api_doc(func))
 
             if c_doc and c_doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
                 name = "{}({})".format(name, c_doc)
@@ -202,10 +204,10 @@ class ApiDoc(object):
                     )
                     result_list = list(result)
                     if len(result_list) > 0:
-                        result_list[0]["url"] = result_list[0]["url"] + " " + url
-                        result_list[0]["url"] = " ".join(
-                            list(set(result_list[0]["url"].split(" ")))
-                        )
+                        for k, v in [("url", url)]:
+                            result_list[0][k] = " ".join(
+                                list(set(" ".join([result_list[0][k], v]).split(" ")))
+                            )
                         raise RuntimeError
 
                     api["name"] = name_m
@@ -221,7 +223,7 @@ class ApiDoc(object):
                         api["doc"],
                         api["name_extra"],
                         api["doc_md"],
-                    ) = self.get_doc_name_extra_doc_md(doc)
+                    ) = self._get_doc_name_extra_doc_md(doc)
 
                 except Exception as e:
                     logger.error(
@@ -237,7 +239,7 @@ class ApiDoc(object):
 
         return data_dict
 
-    def get_api_data(self):
+    def _get_api_data(self):
         """Api"""
 
         data_dict = {}
@@ -266,7 +268,7 @@ class ApiDoc(object):
             try:
                 name = ""
                 func = current_app.view_functions[rule.endpoint]
-                name = self.get_api_name(func)
+                name = self._get_api_name(func)
                 url = str(rule)
                 method = " ".join(
                     [
@@ -284,27 +286,23 @@ class ApiDoc(object):
                 )
                 result_list = list(result)
                 if len(result_list) > 0:
-                    result_list[0]["url"] = result_list[0]["url"] + " " + url
-                    result_list[0]["url"] = " ".join(
-                        list(set(result_list[0]["url"].split(" ")))
-                    )
-                    result_list[0]["method"] = result_list[0]["method"] + " " + method
-                    result_list[0]["method"] = " ".join(
-                        list(set(result_list[0]["method"].split(" ")))
-                    )
+                    for k, v in [("url", url), ("method", method)]:
+                        result_list[0][k] = " ".join(
+                            list(set(" ".join([result_list[0][k], v]).split(" ")))
+                        )
                     raise RuntimeError
 
                 api["name"] = name
                 api["url"] = url
                 api["method"] = method
 
-                doc = self.get_api_doc(func)
+                doc = self._get_api_doc(func)
 
                 (
                     api["doc"],
                     api["name_extra"],
                     api["doc_md"],
-                ) = self.get_doc_name_extra_doc_md(doc)
+                ) = self._get_doc_name_extra_doc_md(doc)
 
             except Exception as e:
                 logger.error(
@@ -322,19 +320,20 @@ class ApiDoc(object):
 
         return data_dict
 
-    def get_api_name(self, func):
+    def _get_api_name(self, func):
         words = func.__name__.split("_")
         words = [w.capitalize() for w in words]
 
         return " ".join(words)
 
-    def get_api_doc(self, func):
-        if func.__doc__:
-            return func.__doc__.replace("\t", "    ")
+    def _get_api_doc(self, func):
+        func_doc = func.__doc__
+        if func_doc:
+            return func_doc.replace("\t", "    ")
         else:
             return current_app.config["API_DOC_NO_DOC_TEXT"]
 
-    def clean_doc(self, doc_src):
+    def _clean_doc(self, doc_src):
         return (
             doc_src.split("\n\n")[0]
             .split("\n")[0]
@@ -345,11 +344,11 @@ class ApiDoc(object):
             .strip(" ")
         )
 
-    def get_doc_name_extra_doc_md(self, doc_src):
+    def _get_doc_name_extra_doc_md(self, doc_src):
         doc = doc_src.split("@@@")[0]
 
         if doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
-            name_extra = self.clean_doc(doc)
+            name_extra = self._clean_doc(doc)
         else:
             name_extra = ""
 
@@ -374,7 +373,7 @@ class ApiDoc(object):
 
         return doc, name_extra, doc_md
 
-    def get_all_subclasses(self, cls, clsmv=None):
+    def _get_all_subclasses(self, cls, clsmv=None):
         if clsmv is None:
             clsmv = []
         else:
@@ -382,26 +381,21 @@ class ApiDoc(object):
         all_subclasses = []
         for subclass in cls.__subclasses__() + clsmv:
             all_subclasses.append(subclass)
-            tmp = self.get_all_subclasses(subclass, None)
+            tmp = self._get_all_subclasses(subclass, None)
             all_subclasses.extend(tmp)
 
         return all_subclasses
 
-    def check_variable_type(self, variable_dict, type):
-        for k in variable_dict:
-            if not isinstance(variable_dict[k], type):
+    def _check_value_type(self, data_packages, type, data_type="config"):
+        for d in data_packages:
+            if data_type == "config":
+                value = current_app.config[d]
+            elif data_type == "variable":
+                value = data_packages[d]
+            if not isinstance(value, type):
                 raise ValueError(
                     "{} is the incorrect type of value, the correct type is {}".format(
-                        k, type
-                    )
-                )
-
-    def check_config_type(self, config_list, type):
-        for c in config_list:
-            if not isinstance(current_app.config[c], type):
-                raise ValueError(
-                    "{} is the incorrect type of value, the correct type is {}".format(
-                        c, type
+                        d, type
                     )
                 )
 
