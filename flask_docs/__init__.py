@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.4.8
+    0.4.9
 History:
     Created on 2018/05/20
-    Last modified on 2021/07/08
+    Last modified on 2021/08/06
 Author:
     kwkw
 """
@@ -258,9 +258,9 @@ class ApiDoc(object):
                     api["name"] = name_m
                     api["url"] = url
 
-                    doc = eval(
-                        "c_dict[func.__name__].{}.__doc__".format(m.lower())
-                    ).replace("\t", "    ")
+                    doc = eval("c_dict[func.__name__].{}.__doc__".format(m.lower()))
+                    if doc:
+                        doc = doc.replace("\t", "    ")
 
                     doc = doc if doc else self.no_doc_text
 
