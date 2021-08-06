@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.4.9
+    0.5.0
 History:
     Created on 2018/05/20
     Last modified on 2021/08/06
@@ -214,10 +214,12 @@ class ApiDoc(object):
             if name in self.restful_exclude_list:
                 continue
 
+            name = class_name_dict[name]
+
             c_doc = self.get_api_doc(func)
 
             if c_doc != self.no_doc_text:
-                name = "{}({})".format(class_name_dict[name], self.clean_doc(c_doc))
+                name = "{}({})".format(name, self.clean_doc(c_doc))
 
             if func.methods is None:
                 continue
