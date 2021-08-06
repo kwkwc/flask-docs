@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.5.3
+    0.5.4
 History:
     Created on 2018/05/20
     Last modified on 2021/08/06
@@ -29,16 +29,6 @@ PROJECT_VERSION = __version__
 logger = logging.getLogger(__name__)
 
 
-def change_doc(doc_dict):
-    logger.warning(
-        '{} warning - The "change_doc" decorator is deprecated and scheduled for removal \
-            in version 0.5.0. Use the "ApiDoc.change_doc" instead'.format(
-            PROJECT_NAME
-        )
-    )
-    return ApiDoc.change_doc(doc_dict)
-
-
 class ApiDoc(object):
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     APP_TEMPLATES = os.path.join(APP_ROOT, "templates")
@@ -54,11 +44,11 @@ class ApiDoc(object):
     with open(os.path.join(APP_TEMPLATES, "js_template_local.html"), "r") as h:
         JS_TEMPLATE_LOCAL = h.read()
 
-    def __init__(self, app=None, title="Api Doc", version="1.0.0", no_doc_text=""):
+    def __init__(self, app=None, title="Api Doc", version="1.0.0"):
         if app is not None:
-            self.init_app(app, title, version, no_doc_text)
+            self.init_app(app, title, version)
 
-    def init_app(self, app, title="Api Doc", version="1.0.0", no_doc_text=""):
+    def init_app(self, app, title="Api Doc", version="1.0.0"):
 
         app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
         app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
@@ -69,18 +59,13 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
         app.config.setdefault("API_DOC_MEMBER", [])
-        app.config.setdefault("RESTFUL_API_DOC_EXCLUDE", [])
         app.config.setdefault("API_DOC_RESTFUL_EXCLUDE", [])
-        app.config.setdefault("METHODS_LIST", [])
         app.config.setdefault(
             "API_DOC_METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"]
         )
 
         with app.app_context():
-            self.check_variable_type(
-                {"title": title, "version": version, "no_doc_text": no_doc_text},
-                str,
-            )
+            self.check_variable_type({"title": title, "version": version}, str)
             self.check_config_type(
                 [
                     "API_DOC_CDN_CSS_TEMPLATE",
@@ -94,9 +79,7 @@ class ApiDoc(object):
             self.check_config_type(
                 [
                     "API_DOC_MEMBER",
-                    "RESTFUL_API_DOC_EXCLUDE",
                     "API_DOC_RESTFUL_EXCLUDE",
-                    "METHODS_LIST",
                     "API_DOC_METHODS_LIST",
                 ],
                 list,
@@ -104,40 +87,6 @@ class ApiDoc(object):
 
             if not current_app.config["API_DOC_ENABLE"]:
                 return
-
-            # Will be removed in version 0.5.0
-            old_conf_warn_template = '{} warning - The "{{}}" setting is deprecated and scheduled for removal \
-                in version 0.5.0. Use the "{{}}" instead'.format(
-                PROJECT_NAME
-            )
-
-            self.no_doc_text = current_app.config["API_DOC_NO_DOC_TEXT"]
-            if no_doc_text:
-                self.no_doc_text = no_doc_text
-                logger.warning(
-                    old_conf_warn_template.format("no_doc_text", "API_DOC_NO_DOC_TEXT")
-                )
-
-            self.restful_exclude_list = current_app.config["API_DOC_RESTFUL_EXCLUDE"]
-            if current_app.config["RESTFUL_API_DOC_EXCLUDE"]:
-                self.restful_exclude_list = current_app.config[
-                    "RESTFUL_API_DOC_EXCLUDE"
-                ]
-                logger.warning(
-                    old_conf_warn_template.format(
-                        "RESTFUL_API_DOC_EXCLUDE", "API_DOC_RESTFUL_EXCLUDE"
-                    )
-                )
-
-            self.methods_list = current_app.config["API_DOC_METHODS_LIST"]
-            if current_app.config["METHODS_LIST"]:
-                self.methods_list = current_app.config["METHODS_LIST"]
-                logger.warning(
-                    old_conf_warn_template.format(
-                        "METHODS_LIST", "API_DOC_METHODS_LIST"
-                    )
-                )
-            # Will be removed in version 0.5.0 end
 
             api_doc = Blueprint(
                 "api_doc",
@@ -185,7 +134,7 @@ class ApiDoc(object):
                         "data": data_dict,
                         "title": title,
                         "version": version,
-                        "noDocText": self.no_doc_text,
+                        "noDocText": current_app.config["API_DOC_NO_DOC_TEXT"],
                         "PROJECT_NAME": PROJECT_NAME,
                         "PROJECT_VERSION": PROJECT_VERSION,
                         "host": host,
@@ -213,14 +162,14 @@ class ApiDoc(object):
             if name not in c_dict:
                 continue
 
-            if name in self.restful_exclude_list:
+            if name in current_app.config["API_DOC_RESTFUL_EXCLUDE"]:
                 continue
 
             name = class_name_dict[name]
 
             c_doc = self.clean_doc(self.get_api_doc(func))
 
-            if c_doc and c_doc != self.no_doc_text:
+            if c_doc and c_doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
                 name = "{}({})".format(name, c_doc)
 
             if func.methods is None:
@@ -230,7 +179,7 @@ class ApiDoc(object):
                 data_dict[name] = {"children": []}
 
             for m in func.methods:
-                if m not in self.methods_list:
+                if m not in current_app.config["API_DOC_METHODS_LIST"]:
                     continue
 
                 api = {
@@ -266,7 +215,7 @@ class ApiDoc(object):
                     if doc:
                         doc = doc.replace("\t", "    ")
 
-                    doc = doc if doc else self.no_doc_text
+                    doc = doc if doc else current_app.config["API_DOC_NO_DOC_TEXT"]
 
                     (
                         api["doc"],
@@ -319,7 +268,13 @@ class ApiDoc(object):
                 func = current_app.view_functions[rule.endpoint]
                 name = self.get_api_name(func)
                 url = str(rule)
-                method = " ".join([r for r in rule.methods if r in self.methods_list])
+                method = " ".join(
+                    [
+                        r
+                        for r in rule.methods
+                        if r in current_app.config["API_DOC_METHODS_LIST"]
+                    ]
+                )
                 if method:
                     url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
 
@@ -377,7 +332,7 @@ class ApiDoc(object):
         if func.__doc__:
             return func.__doc__.replace("\t", "    ")
         else:
-            return self.no_doc_text
+            return current_app.config["API_DOC_NO_DOC_TEXT"]
 
     def clean_doc(self, doc_src):
         return (
@@ -393,7 +348,7 @@ class ApiDoc(object):
     def get_doc_name_extra_doc_md(self, doc_src):
         doc = doc_src.split("@@@")[0]
 
-        if doc != self.no_doc_text:
+        if doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
             name_extra = self.clean_doc(doc)
         else:
             name_extra = ""
@@ -408,7 +363,7 @@ class ApiDoc(object):
         )
 
         if doc == "":
-            doc = self.no_doc_text
+            doc = current_app.config["API_DOC_NO_DOC_TEXT"]
 
         if len(doc_src.split("@@@")) >= 2:
             doc_md = doc_src.split("@@@")[1].strip(" ")
