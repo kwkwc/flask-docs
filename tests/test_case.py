@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.0.8
+    0.0.9
 History:
     Created on 2020/10/18
-    Last modified on 2021/05/24
+    Last modified on 2021/08/06
 Author:
     kwkw
 """
@@ -23,7 +23,7 @@ import unittest
 from flask import Blueprint, Flask
 from flask_restful import Api, Resource
 
-from flask_docs import ApiDoc, change_doc
+from flask_docs import ApiDoc
 
 app = Flask(__name__)
 app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "DELETE"]
@@ -59,7 +59,7 @@ class TodoList(RestfulApiTestRoute):
         """Submission of data"""
         pass
 
-    @change_doc({"markdown": "json"})
+    @ApiDoc.change_doc({"markdown": "json"})
     def get(self):
         """
         @@@
