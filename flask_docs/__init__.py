@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.5.1
+    0.5.2
 History:
     Created on 2018/05/20
     Last modified on 2021/08/06
@@ -63,7 +63,9 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
         app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
         app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
-        app.config.setdefault("API_DOC_NO_DOC_TEXT", "No doc found for this Api")
+        app.config.setdefault(
+            "API_DOC_NO_DOC_TEXT", "No documentation found for this Api"
+        )
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
         app.config.setdefault("API_DOC_MEMBER", [])
