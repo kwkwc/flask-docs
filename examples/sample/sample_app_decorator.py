@@ -5,10 +5,10 @@
 Program:
     Sample app decorator
 Version:
-    1.0.2
+    1.0.3
 History:
     Created on 2021/05/15
-    Last modified on 2021/05/24
+    Last modified on 2021/08/17
 Author:
     kwkw
 """
@@ -34,7 +34,12 @@ app = Flask(__name__)
 # Api Document needs to be displayed
 app.config["API_DOC_MEMBER"] = ["api"]
 
-ApiDoc(app, title="Sample App", version="1.0.0")
+ApiDoc(
+    app,
+    title="Sample App",
+    version="1.0.0",
+    description="A simple app decorator demo",
+)
 
 api = Blueprint("api", __name__)
 

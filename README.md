@@ -48,7 +48,12 @@ app = Flask(__name__)
 # Api Document needs to be displayed
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
-ApiDoc(app)
+ApiDoc(
+    app,
+    title="Sample App",
+    version="1.0.0",
+    description="A simple app API",
+)
 ```
 
 How to add markdown documents to the code:

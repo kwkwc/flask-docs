@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.5.6
+    0.5.7
 History:
     Created on 2018/05/20
     Last modified on 2021/08/17
@@ -44,11 +44,11 @@ class ApiDoc(object):
     with open(os.path.join(APP_TEMPLATES, "js_template_local.html"), "r") as h:
         JS_TEMPLATE_LOCAL = h.read()
 
-    def __init__(self, app=None, title="Api Doc", version="1.0.0"):
+    def __init__(self, app=None, title="Api Doc", version="1.0.0", description=""):
         if app is not None:
-            self.init_app(app, title, version)
+            self.init_app(app, title, version, description)
 
-    def init_app(self, app, title="Api Doc", version="1.0.0"):
+    def init_app(self, app, title="Api Doc", version="1.0.0", description=""):
 
         app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
         app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
@@ -66,7 +66,9 @@ class ApiDoc(object):
 
         with app.app_context():
             self._check_value_type(
-                {"title": title, "version": version}, str, data_type="variable"
+                {"title": title, "version": version, "description": description},
+                str,
+                data_type="variable",
             )
             self._check_value_type(
                 [
@@ -138,6 +140,7 @@ class ApiDoc(object):
                         "host": host,
                         "title": title,
                         "version": version,
+                        "description": description,
                         "noDocText": current_app.config["API_DOC_NO_DOC_TEXT"],
                         "data": data_dict,
                     }

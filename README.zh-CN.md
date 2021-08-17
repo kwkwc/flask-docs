@@ -46,7 +46,12 @@ app = Flask(__name__)
 # 需要显示文档的 Api
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
-ApiDoc(app)
+ApiDoc(
+    app,
+    title="Sample App",
+    version="1.0.0",
+    description="A simple app API",
+)
 ```
 
 ## 如何书写 markdown 格式文档

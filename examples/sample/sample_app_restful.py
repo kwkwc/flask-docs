@@ -5,10 +5,10 @@
 Program:
     Sample app restful
 Version:
-    0.3.1
+    0.3.2
 History:
     Created on 2018/05/20
-    Last modified on 2021/05/24
+    Last modified on 2021/08/17
 Author:
     kwkw
 """
@@ -36,7 +36,12 @@ app = Flask(__name__)
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
 
 restful_api = Api(app)
-ApiDoc(app, title="Sample App Restful", version="1.0.0")
+ApiDoc(
+    app,
+    title="Sample App Restful",
+    version="1.0.0",
+    description="A simple app restful API",
+)
 
 
 class Todo(Resource):
