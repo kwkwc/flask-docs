@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.5.8
+    0.5.9
 History:
     Created on 2020/10/29
     Last modified on 2021/08/17
@@ -269,12 +269,11 @@ Author:
                 this.treeDataNew.forEach((t, index) => {
                     md += "# " + t.full_name + "\n\n"
                     this.treeData[t.full_name]["children"].forEach((con, index) => {
-                        if (con.name_extra == "") {
-                            md += "## " + con.name + "\n\n"
+                        md += "## " + con.name
+                        if (con.name_extra != "") {
+                            md += "(" + con.name_extra + ")"
                         }
-                        else {
-                            md += "## " + con.name + "(" + con.name_extra + ")" + "\n\n"
-                        }
+                        md += "\n\n"
                         md = this.make_md(md, con)
                         md += con.doc_md + "\n\n\n"
                     })
