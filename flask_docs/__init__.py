@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.5.7
+    0.5.8
 History:
     Created on 2018/05/20
-    Last modified on 2021/08/17
+    Last modified on 2021/08/19
 Author:
     kwkw
 """
@@ -216,7 +216,7 @@ class ApiDoc(object):
                     api["name"] = name_m
                     api["url"] = url
 
-                    doc = eval("c_dict[func.__name__].{}.__doc__".format(m.lower()))
+                    doc = getattr(c_dict[func.__name__], m.lower()).__doc__
 
                     doc = (
                         doc.replace("\t", "    ")
