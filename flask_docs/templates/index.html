@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.0
+    0.6.1
 History:
     Created on 2020/10/29
     Last modified on 2021/09/06
@@ -439,7 +439,8 @@ Author:
                     else {
                         if (!headers["content-type"] || (headers["content-type"] &&
                             (headers["content-type"].indexOf("application/x-www-form-urlencoded") === -1 &&
-                                headers["content-type"].indexOf("multipart/form-data") === -1))) {
+                                headers["content-type"].indexOf("multipart/form-data") === -1 &&
+                                headers["content-type"].indexOf("text/plain") === -1))) {
                             try {
                                 data = JSON.parse(this.bodyTextarea)
                             }
