@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.5.8
+    0.5.9
 History:
     Created on 2018/05/20
-    Last modified on 2021/08/19
+    Last modified on 2021/09/25
 Author:
     kwkw
 """
@@ -250,14 +250,14 @@ class ApiDoc(object):
         data_dict = {}
 
         for rule in current_app.url_map.iter_rules():
-            f = str(rule).split("/")[1]
-            if f not in current_app.config["API_DOC_MEMBER"]:
+
+            bp_name = rule.endpoint.split(".")[0]
+
+            if bp_name not in current_app.config["API_DOC_MEMBER"]:
                 continue
 
-            f_capitalize = f.capitalize()
-
-            if f_capitalize not in data_dict:
-                data_dict[f_capitalize] = {"children": []}
+            if bp_name not in data_dict:
+                data_dict[bp_name] = {"children": []}
 
             api = {
                 "name": "",
@@ -266,7 +266,7 @@ class ApiDoc(object):
                 "method": "",
                 "doc": "",
                 "doc_md": "",
-                "router": f_capitalize,
+                "router": bp_name,
                 "api_type": "api",
             }
 
@@ -287,7 +287,7 @@ class ApiDoc(object):
 
                 result = filter(
                     lambda x: x["name"] == name,
-                    data_dict[f_capitalize]["children"],
+                    data_dict[bp_name]["children"],
                 )
                 result_list = list(result)
                 if len(result_list) > 0:
@@ -312,16 +312,16 @@ class ApiDoc(object):
             except Exception as e:
                 logger.error(
                     "{} error - {} - {} - {}".format(
-                        PROJECT_NAME, e, f_capitalize, name
+                        PROJECT_NAME, e, bp_name, name
                     )
                 )
             else:
-                data_dict[f_capitalize]["children"].append(api)
+                data_dict[bp_name]["children"].append(api)
 
-            if data_dict[f_capitalize]["children"] == []:
-                data_dict.pop(f_capitalize)
+            if data_dict[bp_name]["children"] == []:
+                data_dict.pop(bp_name)
             else:
-                data_dict[f_capitalize]["children"].sort(key=lambda x: x["name"])
+                data_dict[bp_name]["children"].sort(key=lambda x: x["name"])
 
         return data_dict
 
