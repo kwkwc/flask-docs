@@ -42,11 +42,14 @@ app = Flask(__name__)
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
-# Restful API documents to be excluded
+# Lowercase RESTful Api class name to exclude
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
 
-# Api Document needs to be displayed
+# Name of the Api blueprint to be displayed
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
+
+# Name of the Submembers Api function to be excluded
+# app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
 
 ApiDoc(
     app,

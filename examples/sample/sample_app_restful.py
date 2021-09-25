@@ -5,10 +5,10 @@
 Program:
     Sample app restful
 Version:
-    0.3.2
+    0.3.3
 History:
     Created on 2018/05/20
-    Last modified on 2021/08/17
+    Last modified on 2021/09/25
 Author:
     kwkw
 """
@@ -32,7 +32,7 @@ app = Flask(__name__)
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
-# RESTful Api documents to be excluded
+# Lowercase RESTful Api class name to exclude
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
 
 restful_api = Api(app)

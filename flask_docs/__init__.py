@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.5.9
+    0.6.0
 History:
     Created on 2018/05/20
     Last modified on 2021/09/25
@@ -59,6 +59,7 @@ class ApiDoc(object):
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
         app.config.setdefault("API_DOC_MEMBER", [])
+        app.config.setdefault("API_DOC_MEMBER_SUB_EXCLUDE", [])
         app.config.setdefault("API_DOC_RESTFUL_EXCLUDE", [])
         app.config.setdefault(
             "API_DOC_METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"]
@@ -83,6 +84,7 @@ class ApiDoc(object):
             self._check_value_type(
                 [
                     "API_DOC_MEMBER",
+                    "API_DOC_MEMBER_SUB_EXCLUDE",
                     "API_DOC_RESTFUL_EXCLUDE",
                     "API_DOC_METHODS_LIST",
                 ],
@@ -252,8 +254,12 @@ class ApiDoc(object):
         for rule in current_app.url_map.iter_rules():
 
             bp_name = rule.endpoint.split(".")[0]
+            member_sub_name = rule.endpoint.split(".")[-1]
 
             if bp_name not in current_app.config["API_DOC_MEMBER"]:
+                continue
+
+            if member_sub_name in current_app.config["API_DOC_MEMBER_SUB_EXCLUDE"]:
                 continue
 
             if bp_name not in data_dict:
@@ -311,9 +317,7 @@ class ApiDoc(object):
 
             except Exception as e:
                 logger.error(
-                    "{} error - {} - {} - {}".format(
-                        PROJECT_NAME, e, bp_name, name
-                    )
+                    "{} error - {} - {} - {}".format(PROJECT_NAME, e, bp_name, name)
                 )
             else:
                 data_dict[bp_name]["children"].append(api)
