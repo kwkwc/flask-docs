@@ -23,7 +23,7 @@
 ## 使用
 
 ```python
-from flask import Flask
+from flask import Blueprint, Flask, jsonify
 from flask_docs import ApiDoc
 
 app = Flask(__name__)
@@ -55,6 +55,9 @@ ApiDoc(
     version="1.0.0",
     description="A simple app API",
 )
+
+api = Blueprint("api", __name__)
+platform = Blueprint("platform", __name__)
 ```
 
 ## 如何书写 markdown 格式文档
@@ -97,6 +100,9 @@ def add_data():
     @@@
     """
     return jsonify({"api": "add data"})
+
+
+app.register_blueprint(api, url_prefix="/api")
 ````
 
 ![sample_app](flask_docs/assets/sample_app_add.png)
@@ -126,6 +132,9 @@ def delete_data():
     """
 
     return jsonify({"api": "delete data"})
+
+
+app.register_blueprint(api, url_prefix="/api")
 ````
 
 ![sample_app](flask_docs/assets/sample_app_delete.png)
@@ -154,6 +163,9 @@ def get_something():
     """
 
     return jsonify({"platform": "get something"})
+
+
+app.register_blueprint(platform, url_prefix="/platform")
 ````
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
@@ -221,6 +233,7 @@ class Todo(Resource):
         return {"todo": "get todo"}
 
 
+restful_api = Api(app)
 restful_api.add_resource(Todo, "/todo")
 ````
 
@@ -239,13 +252,13 @@ class TodoList(MethodView):
     """Manage todolist"""
 
     def put(self):
-        """Change the data
-        """
+        """Change the data"""
+
         return jsonify({"todos": "put todolist"})
 
     def delete(self):
-        """Delete the data
-        """
+        """Delete the data"""
+
         return jsonify({"todos": "delete todolist"})
 
 
