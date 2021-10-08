@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.2
+    0.6.3
 History:
     Created on 2020/10/29
     Last modified on 2021/10/08
@@ -34,7 +34,7 @@ Author:
 
 <body>
     <div id="app" v-cloak>
-        <el-card class="box-card">
+        <el-card class="box-card" :style="mainDisplay">
             <el-container>
                 <el-header>
                     <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
@@ -141,6 +141,23 @@ Author:
             <a class="project-name-version" href="https://github.com/kwkwc/flask-docs/" target="_blank">{{PROJECT_NAME}}
                 v{{PROJECT_VERSION}}</a>
         </el-card>
+        <div class="auth" :style="authDisplay">
+            <el-card class="auth-box-card">
+                <div slot="header">
+                    <span>
+                        <h2>Welcome to Flask-Docs</h2>
+                    </span>
+                    <span>Please enter the original password for $API_DOC_PASSWORD_SHA2</span>
+                </div>
+                <el-row>
+                    <el-input v-model="authPassword" style="width:70%;min-width:160px;" placeholder="PASSWORD"
+                        show-password ref="passwordInput" @keyup.enter.native="verifyAuth">
+                    </el-input>
+                    <el-button type="primary" style="width:100px;" @click="verifyAuth" :loading="loading">SUBMIT
+                    </el-button>
+                </el-row>
+            </el-card>
+        </div>
     </div>
 </body>
 
@@ -186,7 +203,11 @@ Author:
             headerTags: [],
             bodyTextarea: "",
             responseTabsActiveName: "Headers",
-            responseTabsActiveDict: { "Headers": "responseHeaderText", "Response": "responseResponseText", "Preview": "responsePreviewText" }
+            responseTabsActiveDict: { "Headers": "responseHeaderText", "Response": "responseResponseText", "Preview": "responsePreviewText" },
+            authPassword: "",
+            authPasswordSHA2: sha256(""),
+            authDisplay: "display:none",
+            mainDisplay: "display:none"
         },
         created: function () {
             this.changeWindowSize()
@@ -197,6 +218,7 @@ Author:
             this.makeMethodOptions()
         },
         mounted: function () {
+            this.getAuthCache()
             this.getData()
             this.getHostCache()
             this.getHeaderCache()
@@ -215,7 +237,14 @@ Author:
             },
             getData() {
                 this.loading = true
-                axios.get("data").then(res => {
+                axios({
+                    method: "GET",
+                    url: "data",
+                    timeout: 1000 * 30,
+                    headers: { "Auth-Password-SHA2": this.authPasswordSHA2 }
+                }).then(res => {
+                    this.setCache("cache:auth", this.authPasswordSHA2)
+                    this.mainShow()
                     this.treeData = res.data.data
                     this.PROJECT_NAME = res.data.PROJECT_NAME
                     this.PROJECT_VERSION = res.data.PROJECT_VERSION
@@ -237,7 +266,14 @@ Author:
                     this.loading = false
                 },
                     err => {
-                        this.$message.error("Error")
+                        if (err.response && err.response.status === 401) {
+                            this.authShow()
+                            this.$message.error("unauthorized")
+                        }
+                        else {
+                            this.mainShow()
+                            this.$message.error("Error")
+                        }
                         this.loading = false
                     }
                 )
@@ -595,6 +631,31 @@ Author:
                     catch (err) {
                     }
                 })
+            },
+            getAuthCache() {
+                let authCache = this.getCache("cache:auth")
+                if (authCache) {
+                    this.authPasswordSHA2 = authCache
+                }
+            },
+            authShow() {
+                this.authDisplay = "display:block"
+                this.mainDisplay = "display:none"
+                this.$nextTick(function () {
+                    this.$refs.passwordInput.focus()
+                })
+            },
+            mainShow() {
+                this.authDisplay = "display:none"
+                this.mainDisplay = "display:block"
+            },
+            verifyAuth() {
+                let authPassword = this.authPassword.trim()
+                if (authPassword === "") {
+                    return
+                }
+                this.authPasswordSHA2 = sha256(authPassword)
+                this.getData()
             }
         },
         computed: {
@@ -713,6 +774,18 @@ Author:
         padding-right: 20px;
         font-size: 20px;
         float: right;
+    }
+
+    .auth {
+        position: fixed;
+        left: 50%;
+        top: 42%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+
+    .auth-box-card {
+        max-width: 580px;
     }
 </style>
 

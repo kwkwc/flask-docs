@@ -34,6 +34,10 @@ app = Flask(__name__)
 # 禁用文档页面
 # app.config["API_DOC_ENABLE"] = False
 
+# SHA256 加密的授权密码，例如这里是 admin
+# echo -n admin | shasum -a 256
+# app.config["API_DOC_PASSWORD_SHA2"] = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+
 # 允许显示的方法
 # app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 

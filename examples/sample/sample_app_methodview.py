@@ -5,10 +5,10 @@
 Program:
     Sample app methodview
 Version:
-    0.3.2
+    0.3.3
 History:
     Created on 2019/07/15
-    Last modified on 2021/08/17
+    Last modified on 2021/10/08
 Author:
     kwkw
 """
@@ -25,6 +25,10 @@ app = Flask(__name__)
 
 # Disable document pages
 # app.config["API_DOC_ENABLE"] = False
+
+# SHA256 encrypted authorization password, e.g. here is admin
+# echo -n admin | shasum -a 256
+# app.config["API_DOC_PASSWORD_SHA2"] = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
 
 # Methods allowed to be displayed
 # app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "PUT", "DELETE", "PATCH"]

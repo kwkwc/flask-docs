@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.6.0
+    0.6.1
 History:
     Created on 2018/05/20
-    Last modified on 2021/09/25
+    Last modified on 2021/10/08
 Author:
     kwkw
 """
@@ -64,6 +64,7 @@ class ApiDoc(object):
         app.config.setdefault(
             "API_DOC_METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"]
         )
+        app.config.setdefault("API_DOC_PASSWORD_SHA2", "")
 
         with app.app_context():
             self._check_value_type(
@@ -77,6 +78,7 @@ class ApiDoc(object):
                     "API_DOC_CDN_JS_TEMPLATE",
                     "API_DOC_URL_PREFIX",
                     "API_DOC_NO_DOC_TEXT",
+                    "API_DOC_PASSWORD_SHA2",
                 ],
                 str,
             )
@@ -121,6 +123,7 @@ class ApiDoc(object):
                     ).replace("<!-- ___JS_TEMPLATE___ -->", ApiDoc.JS_TEMPLATE_LOCAL)
 
             @api_doc.route("/data", methods=["GET"])
+            @self._verify_password
             def data():
 
                 url_prefix = current_app.config["API_DOC_URL_PREFIX"]
@@ -407,6 +410,23 @@ class ApiDoc(object):
                         d, type
                     )
                 )
+
+    def _unauthorized(self):
+        response = jsonify({"error": "unauthorized"})
+        response.status_code = 401
+        return response
+
+    def _verify_password(self, func):
+        @wraps(func)
+        def decorated_function(*args, **kw):
+            API_DOC_PASSWORD_SHA2 = current_app.config["API_DOC_PASSWORD_SHA2"]
+            auth_password_sha2 = request.headers.get("Auth-Password-SHA2")
+
+            if API_DOC_PASSWORD_SHA2 and API_DOC_PASSWORD_SHA2 != auth_password_sha2:
+                return self._unauthorized()
+            return func(*args, **kw)
+
+        return decorated_function
 
     @staticmethod
     def change_doc(doc_dict):
