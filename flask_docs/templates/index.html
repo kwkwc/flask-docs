@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.1
+    0.6.2
 History:
     Created on 2020/10/29
-    Last modified on 2021/09/06
+    Last modified on 2021/10/08
 Author:
     kwkw
 -->
@@ -237,7 +237,7 @@ Author:
                     this.loading = false
                 },
                     err => {
-                        this.$message.error("Error");
+                        this.$message.error("Error")
                         this.loading = false
                     }
                 )
@@ -484,7 +484,7 @@ Author:
                             this.$notify({
                                 title: "Warning",
                                 type: "warning"
-                            });
+                            })
                             this.loading = false
                             return
                         } else if (err.request) {
@@ -507,10 +507,10 @@ Author:
             },
             setCache(k, v) {
                 try {
-                    localStorage.setItem(k, JSON.stringify(v));
+                    localStorage.setItem(k, JSON.stringify(v))
                 }
                 catch (err) {
-                    localStorage.setItem(k, v);
+                    localStorage.setItem(k, v)
                 }
             },
             getCache(k) {
@@ -567,7 +567,7 @@ Author:
                 let input = document.createElement("textarea")
                 document.body.appendChild(input)
                 input.value = text
-                input.select();
+                input.select()
                 if (document.execCommand("copy")) {
                     this.$message({
                         message: "Copied",
