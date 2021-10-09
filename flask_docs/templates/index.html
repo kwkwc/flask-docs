@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.5
+    0.6.6
 History:
     Created on 2020/10/29
     Last modified on 2021/10/09
@@ -270,7 +270,12 @@ Author:
                     err => {
                         if (err.response && err.response.status === 401) {
                             this.authShow()
-                            this.$message.error("unauthorized")
+                            if (this.authPassword != "") {
+                                this.$message.error("Incorrect password")
+                            }
+                            else {
+                                this.$message.error("Unauthorized")
+                            }
                         }
                         else {
                             this.mainShow()
