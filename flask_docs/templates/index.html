@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.4
+    0.6.5
 History:
     Created on 2020/10/29
     Last modified on 2021/10/09
@@ -39,7 +39,8 @@ Author:
                 <el-header>
                     <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
                         <el-menu-item index="1">{{ titleVersion }}</el-menu-item>
-                        <el-button class="lock" type="text" icon="el-icon-lock" @click="lock" v-if="authPasswordSHA2 != ''"></el-button>
+                        <el-button class="lock" type="text" icon="el-icon-lock" @click="lock"
+                            v-if="authPasswordSHA2 != ''"></el-button>
                         <el-button class="download" type="text" icon="el-icon-download" @click="download"></el-button>
                         <el-button class="debug" type="text" :icon="debugShowIcon" @click="debugShow"></el-button>
                     </el-menu>
@@ -122,17 +123,17 @@ Author:
                         <el-tabs type="card" v-model="responseTabsActiveName">
                             <el-tab-pane label="Headers" name="Headers">
                                 <div id="responseHeaderText">
-                                    <pre><code>&nbsp;</code></pre>
+                                    <pre><code class="hljs language-bash">&nbsp;</code></pre>
                                 </div>
                             </el-tab-pane>
                             <el-tab-pane label="Response" name="Response">
                                 <div id="responseResponseText">
-                                    <pre><code>&nbsp;</code></pre>
+                                    <pre><code class="hljs language-bash">&nbsp;</code></pre>
                                 </div>
                             </el-tab-pane>
                             <el-tab-pane label="Preview" name="Preview">
                                 <div id="responsePreviewText">
-                                    <pre><code>&nbsp;</code></pre>
+                                    <pre><code class="hljs language-bash">&nbsp;</code></pre>
                                 </div>
                             </el-tab-pane>
                         </el-tabs>
