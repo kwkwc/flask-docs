@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.3
+    0.6.4
 History:
     Created on 2020/10/29
-    Last modified on 2021/10/08
+    Last modified on 2021/10/09
 Author:
     kwkw
 -->
@@ -39,6 +39,7 @@ Author:
                 <el-header>
                     <el-menu :default-active="headerIndex" class="el-menu-demo" mode="horizontal">
                         <el-menu-item index="1">{{ titleVersion }}</el-menu-item>
+                        <el-button class="lock" type="text" icon="el-icon-lock" @click="lock" v-if="authPasswordSHA2 != ''"></el-button>
                         <el-button class="download" type="text" icon="el-icon-download" @click="download"></el-button>
                         <el-button class="debug" type="text" :icon="debugShowIcon" @click="debugShow"></el-button>
                     </el-menu>
@@ -205,7 +206,7 @@ Author:
             responseTabsActiveName: "Headers",
             responseTabsActiveDict: { "Headers": "responseHeaderText", "Response": "responseResponseText", "Preview": "responsePreviewText" },
             authPassword: "",
-            authPasswordSHA2: sha256(""),
+            authPasswordSHA2: "",
             authDisplay: "display:none",
             mainDisplay: "display:none"
         },
@@ -656,6 +657,12 @@ Author:
                 }
                 this.authPasswordSHA2 = sha256(authPassword)
                 this.getData()
+            },
+            lock() {
+                localStorage.removeItem("cache:auth")
+                this.authPasswordSHA2 = ""
+                this.authPassword = ""
+                this.getData()
             }
         },
         computed: {
@@ -727,14 +734,13 @@ Author:
         scrollbar-width: thin;
     }
 
-    .debug {
-        padding-top: 25px;
-        padding-right: 20px;
-        font-size: 20px;
-        float: right;
+    .el-button+.el-button {
+        margin-left: 0px;
     }
 
-    .download {
+    .debug,
+    .download,
+    .lock {
         padding-top: 25px;
         padding-right: 20px;
         font-size: 20px;
