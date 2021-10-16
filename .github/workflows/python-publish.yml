@@ -32,14 +32,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest-cov
         pip install -r tests/requirements.txt
     - name: Lint with flake8
       run: |
         flake8 flask_docs/__init__.py --ignore=E501
     - name: Test with pytest
       run: |
-        pytest tests/test_case.py --doctest-modules
+        pytest --cov=./ --cov-report=xml
     - name: Build package
       run: |
         pip install wheel
@@ -49,3 +49,8 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: "Upload coverage to Codecov"
+      uses: codecov/codecov-action@v2
+      with:
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
