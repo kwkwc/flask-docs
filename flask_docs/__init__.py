@@ -5,21 +5,20 @@
 Program:
     Flask-Docs
 Version:
-    0.6.1
+    0.6.2
 History:
     Created on 2018/05/20
-    Last modified on 2021/10/08
+    Last modified on 2021/10/16
 Author:
     kwkw
 """
 
+import copy
 import logging
 import os
 from functools import wraps
 
 from flask import Blueprint, current_app, jsonify, request
-from flask.views import MethodView
-from flask_restful import Resource
 
 from flask_docs.version import __version__
 
@@ -132,8 +131,8 @@ class ApiDoc(object):
 
                 data_dict = {}
 
-                # Restful Api and MethodView Api
-                data_dict.update(self._get_restful_methodview_api_data())
+                # Restful Api
+                data_dict.update(self._get_restful_api_data())
 
                 # Api
                 data_dict.update(self._get_api_data())
@@ -153,99 +152,51 @@ class ApiDoc(object):
 
             app.register_blueprint(api_doc)
 
-    def _get_restful_methodview_api_data(self):
-        """Restful Api and MethodView Api"""
+    def _get_restful_api_data(self):
+        """Restful Api"""
 
         data_dict = {}
 
-        c_dict = {}
-        class_name_dict = {}
-
-        for c in self._get_all_subclasses(Resource, MethodView):
-            c_dict[c.__name__.lower()] = c
-            class_name_dict[c.__name__.lower()] = c.__name__
-
         for rule in current_app.url_map.iter_rules():
             func = current_app.view_functions[rule.endpoint]
-            name = func.__name__
 
-            if name not in c_dict:
+            if not hasattr(func, "view_class"):
                 continue
-
-            if name in current_app.config["API_DOC_RESTFUL_EXCLUDE"]:
-                continue
-
-            name = class_name_dict[name]
-
-            c_doc = self._clean_doc(self._get_api_doc(func))
-
-            if c_doc and c_doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
-                name = "{}({})".format(name, c_doc)
 
             if func.methods is None:
                 continue
 
-            if name not in data_dict:
-                data_dict[name] = {"children": []}
+            c_name = func.view_class.__name__
 
-            for m in func.methods:
-                if m not in current_app.config["API_DOC_METHODS_LIST"]:
+            if c_name in current_app.config["API_DOC_RESTFUL_EXCLUDE"]:
+                continue
+
+            c_doc = self._clean_doc(self._get_api_doc(func))
+
+            if c_doc and c_doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
+                c_name = "{}({})".format(c_name, c_doc)
+
+            data_dict.setdefault(c_name, {"children": []})
+
+            for method in func.methods:
+                if method not in current_app.config["API_DOC_METHODS_LIST"]:
                     continue
 
-                api = {
-                    "name": "",
-                    "name_extra": "",
-                    "url": "",
-                    "doc": "",
-                    "doc_md": "",
-                    "router": name,
+                api_data = {
+                    "url": str(rule),
+                    "method": method,
+                    "router": c_name,
                     "api_type": "restful_api",
                 }
 
-                try:
-                    name_m = m
-                    url = str(rule)
+                self._add_api_data(
+                    data_dict, api_data, getattr(func.view_class, method.lower())
+                )
 
-                    result = filter(
-                        lambda x: x["name"] == name_m,
-                        data_dict[name]["children"],
-                    )
-                    result_list = list(result)
-                    if len(result_list) > 0:
-                        for k, v in [("url", url)]:
-                            result_list[0][k] = " ".join(
-                                list(set(" ".join([result_list[0][k], v]).split(" ")))
-                            )
-                        raise RuntimeError
-
-                    api["name"] = name_m
-                    api["url"] = url
-
-                    doc = getattr(c_dict[func.__name__], m.lower()).__doc__
-
-                    doc = (
-                        doc.replace("\t", "    ")
-                        if doc
-                        else current_app.config["API_DOC_NO_DOC_TEXT"]
-                    )
-
-                    (
-                        api["doc"],
-                        api["name_extra"],
-                        api["doc_md"],
-                    ) = self._get_doc_name_extra_doc_md(doc)
-
-                except Exception as e:
-                    logger.error(
-                        "{} error - {} - {} - {}".format(PROJECT_NAME, e, name, name_m)
-                    )
-                else:
-                    data_dict[name]["children"].append(api)
-
-            if data_dict[name]["children"] == []:
-                data_dict.pop(name)
+            if data_dict[c_name]["children"] == []:
+                data_dict.pop(c_name)
             else:
-                data_dict[name]["children"].sort(key=lambda x: x["name"])
+                data_dict[c_name]["children"].sort(key=lambda x: x["name"])
 
         return data_dict
 
@@ -255,6 +206,10 @@ class ApiDoc(object):
         data_dict = {}
 
         for rule in current_app.url_map.iter_rules():
+            func = current_app.view_functions[rule.endpoint]
+
+            if hasattr(func, "view_class"):
+                continue
 
             bp_name = rule.endpoint.split(".")[0]
             member_sub_name = rule.endpoint.split(".")[-1]
@@ -265,78 +220,80 @@ class ApiDoc(object):
             if member_sub_name in current_app.config["API_DOC_MEMBER_SUB_EXCLUDE"]:
                 continue
 
-            if bp_name not in data_dict:
-                data_dict[bp_name] = {"children": []}
+            data_dict.setdefault(bp_name, {"children": []})
 
-            api = {
-                "name": "",
-                "name_extra": "",
-                "url": "",
-                "method": "",
-                "doc": "",
-                "doc_md": "",
+            url = str(rule)
+
+            method = " ".join(
+                [
+                    r
+                    for r in rule.methods
+                    if r in current_app.config["API_DOC_METHODS_LIST"]
+                ]
+            )
+            if method:
+                url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
+
+            api_data = {
+                "url": url,
+                "method": method,
                 "router": bp_name,
                 "api_type": "api",
             }
 
-            try:
-                name = ""
-                func = current_app.view_functions[rule.endpoint]
-                name = self._get_api_name(func)
-                url = str(rule)
-                method = " ".join(
-                    [
-                        r
-                        for r in rule.methods
-                        if r in current_app.config["API_DOC_METHODS_LIST"]
-                    ]
-                )
-                if method:
-                    url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
+            self._add_api_data(data_dict, api_data, func)
 
-                result = filter(
-                    lambda x: x["name"] == name,
-                    data_dict[bp_name]["children"],
-                )
-                result_list = list(result)
-                if len(result_list) > 0:
-                    for k, v in [("url", url), ("method", method)]:
-                        result_list[0][k] = " ".join(
-                            list(set(" ".join([result_list[0][k], v]).split(" ")))
-                        )
-                    raise RuntimeError
-
-                api["name"] = name
-                api["url"] = url
-                api["method"] = method
-
-                doc = self._get_api_doc(func)
-
-                (
-                    api["doc"],
-                    api["name_extra"],
-                    api["doc_md"],
-                ) = self._get_doc_name_extra_doc_md(doc)
-
-            except Exception as e:
-                logger.error(
-                    "{} error - {} - {} - {}".format(PROJECT_NAME, e, bp_name, name)
-                )
+        for k in copy.deepcopy(data_dict):
+            if data_dict[k]["children"] == []:
+                data_dict.pop(k)
             else:
-                data_dict[bp_name]["children"].append(api)
-
-            if data_dict[bp_name]["children"] == []:
-                data_dict.pop(bp_name)
-            else:
-                data_dict[bp_name]["children"].sort(key=lambda x: x["name"])
+                data_dict[k]["children"].sort(key=lambda x: x["name"])
 
         return data_dict
+
+    def _add_api_data(self, data_dict, api_data, func):
+        if api_data["api_type"] == "restful_api":
+            api_name = api_data["method"]
+        elif api_data["api_type"] == "api":
+            api_name = self._get_api_name(func)
+
+        router = api_data["router"]
+
+        try:
+            result = filter(
+                lambda x: x["name"] == api_name,
+                data_dict[router]["children"],
+            )
+            result_list = list(result)
+            if len(result_list) > 0:
+                for k, v in [("url", api_data["url"]), ("method", api_data["method"])]:
+                    result_list[0][k] = " ".join(
+                        list(set(" ".join([result_list[0][k], v]).split(" ")))
+                    )
+                raise RuntimeError
+
+            api_data["name"] = api_name
+
+            doc = self._get_api_doc(func)
+
+            (
+                api_data["doc"],
+                api_data["name_extra"],
+                api_data["doc_md"],
+            ) = self._get_doc_name_extra_doc_md(doc)
+
+        except Exception as e:
+            logger.error(
+                "{} error - {} - {} - {}".format(PROJECT_NAME, e, router, api_name)
+            )
+        else:
+            data_dict[router]["children"].append(api_data)
 
     def _get_api_name(self, func):
         words = func.__name__.split("_")
         words = [w.capitalize() for w in words]
 
-        return " ".join(words)
+        return "".join(words)
 
     def _get_api_doc(self, func):
         func_doc = func.__doc__
@@ -384,19 +341,6 @@ class ApiDoc(object):
             doc_md = ""
 
         return doc, name_extra, doc_md
-
-    def _get_all_subclasses(self, cls, clsmv=None):
-        if clsmv is None:
-            clsmv = []
-        else:
-            clsmv = clsmv.__subclasses__()[1:]
-        all_subclasses = []
-        for subclass in cls.__subclasses__() + clsmv:
-            all_subclasses.append(subclass)
-            tmp = self._get_all_subclasses(subclass, None)
-            all_subclasses.extend(tmp)
-
-        return all_subclasses
 
     def _check_value_type(self, data_packages, type, data_type="config"):
         for d in data_packages:
