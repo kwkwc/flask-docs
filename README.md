@@ -13,6 +13,7 @@
 - Automatic generation of markdown documentation
 - Support for generating offline documentation
 - Support Flask-RESTful
+- Support Flask-RESTX
 - Support flask.views.MethodView
 - Support online debugging
 
@@ -44,8 +45,8 @@ app = Flask(__name__)
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
-# Lowercase RESTful Api class name to exclude
-# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
+# RESTful Api class name to exclude
+# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
 # Name of the Api blueprint to be displayed
 app.config["API_DOC_MEMBER"] = ["api", "platform"]

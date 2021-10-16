@@ -3,18 +3,18 @@
 
 """
 Program:
-    Sample app methodview
+    Sample app restx
 Version:
-    0.3.4
+    1.0.0
 History:
-    Created on 2019/07/15
+    Created on 2021/10/17
     Last modified on 2021/10/17
 Author:
     kwkw
 """
 
-from flask import Flask, jsonify
-from flask.views import MethodView
+from flask import Flask
+from flask_restx import Api, Resource
 
 from flask_docs import ApiDoc
 
@@ -39,15 +39,17 @@ app = Flask(__name__)
 # RESTful Api class name to exclude
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["TodoList"]
 
+restx_api = Api(app)
 ApiDoc(
     app,
-    title="Sample App MethodView",
+    title="Sample App RESTX",
     version="1.0.0",
-    description="A simple app MethodView API",
+    description="A simple app RESTX API",
 )
 
 
-class TodoList(MethodView):
+@restx_api.route('/todolist')
+class TodoList(Resource):
     """Manage todolist"""
 
     def put(self):
@@ -60,9 +62,6 @@ class TodoList(MethodView):
 
         return jsonify({"todos": "delete todolist"})
 
-
-# For the time being, only url_rule with the same class name are supported
-app.add_url_rule("/todolist/", view_func=TodoList.as_view("todolist"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

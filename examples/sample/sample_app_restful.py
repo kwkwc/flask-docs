@@ -5,10 +5,10 @@
 Program:
     Sample app restful
 Version:
-    0.3.4
+    0.3.5
 History:
     Created on 2018/05/20
-    Last modified on 2021/10/08
+    Last modified on 2021/10/17
 Author:
     kwkw
 """
@@ -36,8 +36,8 @@ app = Flask(__name__)
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
-# Lowercase RESTful Api class name to exclude
-# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
+# RESTful Api class name to exclude
+# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
 restful_api = Api(app)
 ApiDoc(
