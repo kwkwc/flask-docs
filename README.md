@@ -1,7 +1,7 @@
 # Flask-Docs
 
 [![Upload Python Package](https://github.com/kwkwc/flask-docs/actions/workflows/python-publish.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/python-publish.yml)
-[![Coverage Status](https://coveralls.io/repos/github/kwkwc/flask-docs/badge.svg?branch=master)](https://coveralls.io/github/kwkwc/flask-docs?branch=master)
+[![codecov](https://codecov.io/gh/kwkwc/flask-docs/branch/master/graph/badge.svg?token=EV69K9WPJ0)](https://codecov.io/gh/kwkwc/flask-docs)
 [![PyPI](https://img.shields.io/pypi/v/Flask-Docs)](https://pypi.org/project/Flask-Docs/)
 
 > Adds Docs support to Flask.
