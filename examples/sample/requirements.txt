@@ -1,3 +1,4 @@
 Flask
 Flask-Docs
 Flask-RESTful
+Flask-RESTX

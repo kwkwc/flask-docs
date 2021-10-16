@@ -13,6 +13,7 @@
 - 根据代码注释自动生成文档
 - 支持离线 markdown 文档下载
 - 支持 Flask-RESTful
+- 支持 Flask-RESTX
 - 支持 flask.views.MethodView
 - 支持在线调试
 
@@ -44,8 +45,8 @@ app = Flask(__name__)
 # 自定义 url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
-# 需要排除的 RESTful Api 类名小写
-# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["todo"]
+# 需要排除的 RESTful Api 类名
+# app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
 # 需要显示的 Api 蓝图名称
 app.config["API_DOC_MEMBER"] = ["api", "platform"]
