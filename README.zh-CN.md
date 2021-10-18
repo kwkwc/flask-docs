@@ -25,11 +25,22 @@
 ## 使用
 
 ```python
-from flask import Blueprint, Flask, jsonify
+from flask import Flask
 from flask_docs import ApiDoc
 
 app = Flask(__name__)
 
+
+ApiDoc(
+    app,
+    title="Sample App",
+    version="1.0.0",
+    description="A simple app API",
+)
+```
+
+## 配置
+```python
 # 使用 CDN
 # app.config["API_DOC_CDN"] = True
 
@@ -50,20 +61,10 @@ app = Flask(__name__)
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
 # 需要显示的 Api 蓝图名称
-app.config["API_DOC_MEMBER"] = ["api", "platform"]
+# app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
 # 需要排除的子成员 Api 函数名称
 # app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
-
-ApiDoc(
-    app,
-    title="Sample App",
-    version="1.0.0",
-    description="A simple app API",
-)
-
-api = Blueprint("api", __name__)
-platform = Blueprint("platform", __name__)
 ```
 
 ## 如何书写 markdown 格式文档

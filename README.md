@@ -25,11 +25,23 @@
 ## Usage
 
 ```python
-from flask import Blueprint, Flask, jsonify
+from flask import Flask
 from flask_docs import ApiDoc
 
 app = Flask(__name__)
 
+
+ApiDoc(
+    app,
+    title="Sample App",
+    version="1.0.0",
+    description="A simple app API",
+)
+```
+
+## Configuration
+
+```python
 # Using CDN
 # app.config["API_DOC_CDN"] = True
 
@@ -50,23 +62,13 @@ app = Flask(__name__)
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
 # Name of the Api blueprint to be displayed
-app.config["API_DOC_MEMBER"] = ["api", "platform"]
+# app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
 # Name of the Submembers Api function to be excluded
 # app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
-
-ApiDoc(
-    app,
-    title="Sample App",
-    version="1.0.0",
-    description="A simple app API",
-)
-
-api = Blueprint("api", __name__)
-platform = Blueprint("platform", __name__)
 ```
 
-How to add markdown documents to the code:
+## How to add markdown documents to the code
 
 ```
 @@@
@@ -74,7 +76,11 @@ How to add markdown documents to the code:
 @@@
 ```
 
-# Run in /docs/api/
+## View the documentation page
+
+```
+http://127.0.0.1/docs/api/
+```
 
 ## Api and document pages
 
