@@ -39,7 +39,7 @@ jobs:
         flake8 flask_docs/__init__.py --ignore=E501
     - name: Test with pytest
       run: |
-        pytest --cov=./ --cov-report=xml
+        pytest --cov=flask_docs --cov-report=xml
     - name: Build package
       run: |
         pip install wheel
