@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.7
+    0.6.8
 History:
     Created on 2020/10/29
-    Last modified on 2021/10/18
+    Last modified on 2021/10/20
 Author:
     kwkw
 -->
@@ -48,7 +48,8 @@ Author:
                 <el-main v-loading="loading" :style="docDisplay">
                     <el-row>
                         <el-col :span="8">
-                            <el-input placeholder="Filter keyword" v-model="treeFilterText" style="padding-bottom:10px">
+                            <el-input :placeholder="$t('Filter Keyword')" v-model="treeFilterText"
+                                style="padding-bottom:10px">
                             </el-input>
                             <div :style="menuStyle">
                                 <el-tree class="filter-tree" :data="treeDataNew" :props="treeDefaultProps" node-key="id"
@@ -68,37 +69,38 @@ Author:
                 </el-main>
                 <el-main :style="debugDisplay">
                     <el-card class="box-card">
-                        <el-divider content-position="left">Method && URL</el-divider>
-                        <el-select v-model="methodValue" placeholder="Select" style="width:8%;min-width:130px;">
+                        <el-divider content-position="left">{{ $t("Method && URL") }}</el-divider>
+                        <el-select v-model="methodValue" :placeholder="$t('Select')" style="width:8%;min-width:130px;">
                             <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
                                 :value="item.value">
                             </el-option>
                         </el-select>
                         <el-select v-model="hostValue" filterable allow-create clearable default-first-option
-                            placeholder="Select" style="width:20%;min-width:160px;">
+                            :placeholder="$t('Select')" style="width:20%;min-width:160px;">
                             <el-option v-for="item in hostOptions" :key="item.value" :label="item.label"
                                 :value="item.value">
                             </el-option>
                         </el-select>
                         <el-select v-model="urlValue" filterable allow-create clearable default-first-option
-                            placeholder="Select" style="width:50%;;min-width:209px;">
+                            :placeholder="$t('Select')" style="width:50%;;min-width:209px;">
                             <el-option v-for="item in urlOptions" :key="item.value" :label="item.label"
                                 :value="item.value">
                             </el-option>
                         </el-select>
                         <el-button type="primary" style="width:6%;min-width:80px;" @click="sendRequest"
-                            :loading="loading">Send</el-button>
+                            :loading="loading">{{ $t("Send") }}</el-button>
                     </el-card>
                     <el-card class="box-card" style="margin-top:10px">
-                        <el-divider content-position="left">Headers</el-divider>
+                        <el-divider content-position="left">{{ $t("Headers") }}</el-divider>
                         <el-row>
                             <el-input v-model="headerNameInput" size="small" style="width:20%;min-width:160px;"
-                                placeholder="name" clearable>
+                                :placeholder="$t('Name')" clearable>
                             </el-input>
                             <el-input v-model="headerValueInput" size="small" style="width:20%;min-width:160px;"
-                                placeholder="value" clearable>
+                                :placeholder="$t('Value')" clearable>
                             </el-input>
-                            <el-button type="primary" size="small" style="width:60px;" @click="addHeader">Add
+                            <el-button type="primary" size="small" style="width:60px;" @click="addHeader">{{ $t("Add")
+                                }}
                             </el-button>
                         </el-row></br>
                         <el-row>
@@ -109,29 +111,29 @@ Author:
                         </el-row>
                     </el-card>
                     <el-card class="box-card" style="margin-top:10px">
-                        <el-divider content-position="left">Body</el-divider>
+                        <el-divider content-position="left">{{ $t("Body") }}</el-divider>
                         <el-row>
-                            <el-input type="textarea" :autosize="{ minRows: 6}" placeholder="Request Body"
+                            <el-input type="textarea" :autosize="{ minRows: 6}" :placeholder="$t('Request Body')"
                                 v-model="bodyTextarea">
                             </el-input>
                         </el-row>
                     </el-card>
                     <el-card class="box-card" style="margin-top:10px">
-                        <el-divider content-position="left">Response</el-divider>
+                        <el-divider content-position="left">{{ $t("Response") }}</el-divider>
                         <el-button class="copyResponse" type="text" icon="el-icon-document-copy" @click="copyResponse">
                         </el-button>
                         <el-tabs type="card" v-model="responseTabsActiveName">
-                            <el-tab-pane label="Headers" name="Headers">
+                            <el-tab-pane :label="$t('Headers')" name="Headers">
                                 <div id="responseHeaderText">
                                     <pre><code class="hljs language-bash">&nbsp;</code></pre>
                                 </div>
                             </el-tab-pane>
-                            <el-tab-pane label="Response" name="Response">
-                                <div id="responseResponseText">
+                            <el-tab-pane :label="$t('Response')" name="Response">
+                                <div id="responseContentText">
                                     <pre><code class="hljs language-bash">&nbsp;</code></pre>
                                 </div>
                             </el-tab-pane>
-                            <el-tab-pane label="Preview" name="Preview">
+                            <el-tab-pane :label="$t('Preview')" name="Preview">
                                 <div id="responsePreviewText">
                                     <pre><code class="hljs language-bash">&nbsp;</code></pre>
                                 </div>
@@ -140,22 +142,24 @@ Author:
                     </el-card>
                 </el-main>
             </el-container>
-            <a class="project-name-version" href="https://github.com/kwkwc/flask-docs/" target="_blank">{{PROJECT_NAME}}
+            <a class="project-name-version" :href="PROJECT_URL" target="_blank">{{PROJECT_NAME}}
                 v{{PROJECT_VERSION}}</a>
         </el-card>
         <div class="auth" :style="authDisplay">
             <el-card class="auth-box-card">
                 <div slot="header">
                     <span>
-                        <h2>Welcome to Flask-Docs</h2>
+                        <h2>{{ $t("Welcome to") }} <a class="project-name" :href="PROJECT_URL"
+                                target="_blank">Flask-Docs</a></h2>
                     </span>
-                    <span>Please enter the original password for $API_DOC_PASSWORD_SHA2</span>
+                    <span>{{ $t("Please enter the original password for $API_DOC_PASSWORD_SHA2") }}</span>
                 </div>
                 <el-row>
-                    <el-input v-model="authPassword" style="width:70%;min-width:160px;" placeholder="PASSWORD"
+                    <el-input v-model="authPassword" style="width:70%;min-width:160px;" :placeholder="$t('PASSWORD')"
                         show-password ref="passwordInput" @keyup.enter.native="verifyAuth">
                     </el-input>
-                    <el-button type="primary" style="width:100px;" @click="verifyAuth" :loading="loading">SUBMIT
+                    <el-button type="primary" style="width:100px;" @click="verifyAuth" :loading="loading">{{
+                        $t("LOGIN") }}
                     </el-button>
                 </el-row>
             </el-card>
@@ -168,6 +172,13 @@ Author:
 <script>
     new Vue({
         el: "#app",
+        i18n: new VueI18n({
+            locale: navigator.language.toLowerCase(),
+            messages: {
+                "zh-cn": zhLocale,
+                "zh": zhLocale
+            }
+        }),
         data: {
             loading: false,
             headerIndex: "1",
@@ -179,6 +190,7 @@ Author:
             },
             PROJECT_NAME: "",
             PROJECT_VERSION: "",
+            PROJECT_URL: "https://github.com/kwkwc/flask-docs/",
             title: "Documentation",
             version: "1.0.0",
             description: "",
@@ -205,7 +217,7 @@ Author:
             headerTags: [],
             bodyTextarea: "",
             responseTabsActiveName: "Headers",
-            responseTabsActiveDict: { "Headers": "responseHeaderText", "Response": "responseResponseText", "Preview": "responsePreviewText" },
+            responseTabsActiveDict: { "Headers": "responseHeaderText", "Response": "responseContentText", "Preview": "responsePreviewText" },
             authPassword: "",
             authPasswordSHA2: "",
             authDisplay: "display:none",
@@ -271,15 +283,15 @@ Author:
                         if (err.response && err.response.status === 401) {
                             this.authShow()
                             if (this.authPassword != "") {
-                                this.$message.error("Incorrect password")
+                                this.$message.error(this.$t("Incorrect password"))
                             }
                             else {
-                                this.$message.error("Unauthorized")
+                                this.$message.error(this.$t("Unauthorized"))
                             }
                         }
                         else {
                             this.mainShow()
-                            this.$message.error("Error")
+                            this.$message.error(this.$t("Error"))
                         }
                         this.loading = false
                     }
@@ -445,15 +457,15 @@ Author:
 
                 this.makeHljsPreCode("responseHeaderText", JSON.stringify(resHeadersdict, null, 4))
                 if (resHeaders["content-type"] && resHeaders["content-type"].indexOf("application/json") != -1) {
-                    this.makeHljsPreCode("responseResponseText", JSON.stringify(resData))
+                    this.makeHljsPreCode("responseContentText", JSON.stringify(resData))
                     this.makeHljsPreCode("responsePreviewText", JSON.stringify(resData, null, 4))
                 }
                 else if (resHeaders["content-type"] && resHeaders["content-type"].indexOf("text/html") != -1) {
-                    document.getElementById("responseResponseText").innerHTML = "<code>" + resData + "</code>"
+                    document.getElementById("responseContentText").innerHTML = "<code>" + resData + "</code>"
                     document.getElementById("responsePreviewText").innerHTML = "<code>" + resData + "</code>"
                 }
                 else {
-                    this.makeHljsPreCode("responseResponseText", resData)
+                    this.makeHljsPreCode("responseContentText", resData)
                     this.makeHljsPreCode("responsePreviewText", resData)
                 }
                 document.querySelectorAll("pre code").forEach((block) => {
@@ -490,8 +502,8 @@ Author:
                             catch (err) {
                                 data = this.bodyTextarea
                                 this.$notify.error({
-                                    title: "Error",
-                                    message: "The request body is not json"
+                                    title: this.$t("Error"),
+                                    message: this.$t("The request body is not json")
                                 })
                             }
                         }
@@ -504,7 +516,7 @@ Author:
 
                 document.getElementById("responseHeaderText").innerHTML = ""
                 document.getElementById("responsePreviewText").innerHTML = ""
-                document.getElementById("responseResponseText").innerHTML = ""
+                document.getElementById("responseContentText").innerHTML = ""
                 axios({
                     method: this.methodValue,
                     url: this.hostValue + this.urlValue,
@@ -515,7 +527,7 @@ Author:
                 }).then(res => {
                     this.makeResponse(res)
                     this.$notify({
-                        title: "Success",
+                        title: this.$t("Success"),
                         type: "success"
                     })
                     this.loading = false
@@ -525,24 +537,24 @@ Author:
                             errResponse = err.response
                             this.makeResponse(errResponse)
                             this.$notify({
-                                title: "Warning",
+                                title: this.$t("Warning"),
                                 type: "warning"
                             })
                             this.loading = false
                             return
                         } else if (err.request) {
                             console.log(err.request)
-                            document.getElementById("responseResponseText").innerHTML = err.request
+                            document.getElementById("responseContentText").innerHTML = err.request
                         } else {
                             console.log("Error", err.message)
-                            document.getElementById("responseResponseText").innerHTML = err.message
+                            document.getElementById("responseContentText").innerHTML = err.message
                         }
                         document.querySelectorAll("pre code").forEach((block) => {
                             hljs.highlightElement(block)
                         })
                         this.responseTabsActiveName = "Response"
                         this.$notify.error({
-                            title: "Error",
+                            title: this.$t("Error"),
                         })
                         this.loading = false
                     }
@@ -613,7 +625,7 @@ Author:
                 input.select()
                 if (document.execCommand("copy")) {
                     this.$message({
-                        message: "Copied",
+                        message: this.$t("Copied"),
                         type: "success"
                     })
                 }
@@ -777,6 +789,11 @@ Author:
         margin-bottom: 6px;
         font-size: 12px;
         color: #e5e5e5;
+        text-decoration: none;
+    }
+
+    .project-name {
+        color: #303133;
         text-decoration: none;
     }
 
