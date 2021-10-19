@@ -35,7 +35,7 @@ setup(
         "RESTful",
         "auto",
     ],
-    install_requires=["Flask", "Flask-RESTful"],
+    install_requires=["Flask"],
     classifiers=[
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
