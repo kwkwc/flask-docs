@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.6.8
+    0.6.9
 History:
     Created on 2020/10/29
-    Last modified on 2021/10/20
+    Last modified on 2022/01/09
 Author:
     kwkw
 -->
@@ -69,7 +69,7 @@ Author:
                 </el-main>
                 <el-main :style="debugDisplay">
                     <el-card class="box-card">
-                        <el-divider content-position="left">{{ $t("Method && URL") }}</el-divider>
+                        <el-divider content-position="left">{{ $t("Request") }}</el-divider>
                         <el-select v-model="methodValue" :placeholder="$t('Select')" style="width:8%;min-width:130px;">
                             <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
                                 :value="item.value">
