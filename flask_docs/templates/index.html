@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.7.1
+    0.7.2
 History:
     Created on 2020/10/29
     Last modified on 2022/01/09
@@ -41,7 +41,17 @@ Author:
                         <el-menu-item index="1">{{ titleVersion }}</el-menu-item>
                         <el-button class="lock" type="text" icon="el-icon-lock" @click="lock"
                             v-if="authPasswordSHA2 != ''"></el-button>
-                        <el-button class="download" type="text" icon="el-icon-download" @click="download"></el-button>
+                        <el-upload class="upload" :on-change="importTestData"
+                            :before-upload="importTestDataBf" accept="application/json" action=""
+                            v-if="debugDisplay === 'display:block'">
+                            <i class="el-icon-upload2" style="color:#409eff;"></i>
+                        </el-upload>
+                        <el-button class="download" type="text" icon="el-icon-download" @click="exportTestData"
+                            v-if="debugDisplay === 'display:block'">
+                        </el-button>
+                        <el-button class="download" type="text" icon="el-icon-download" @click="downloadDoc"
+                            v-if="docDisplay === 'display:block'">
+                        </el-button>
                         <el-button class="debug" type="text" :icon="debugShowIcon" @click="debugShow"></el-button>
                     </el-menu>
                 </el-header>
@@ -328,7 +338,7 @@ Author:
                 }
                 return md
             },
-            download() {
+            downloadDoc() {
                 let md = ""
                 this.treeDataNew.forEach((t, index) => {
                     md += "# " + t.full_name + "\n\n"
@@ -735,6 +745,34 @@ Author:
                 this.urlValueBak = val
                 this.refreshOptions("url", "", true)
                 this.optionsLocked = false
+            },
+            exportTestData() {
+                testData = {}
+                for (key in localStorage) {
+                    if (key.indexOf("cache:body") !== -1) {
+                        testData[key] = localStorage.getItem(key)
+                    }
+                }
+                saveAs(new Blob([JSON.stringify(testData, null, 4)], { type: "text/json;charset=utf-8" }), this.title + " (" + this.version + ")" + "_test_data.json")
+            },
+            importTestData(file) {
+                let reader = new FileReader()
+                reader.readAsText(file.raw)
+                reader.onload = (e) => {
+                    testData = JSON.parse(e.target.result)
+                    for (key in testData) {
+                        if (key.indexOf("cache:body") !== -1) {
+                            localStorage.setItem(key, testData[key])
+                        }
+                    }
+                }
+                this.$message({
+                    message: this.$t("Uploaded"),
+                    type: "success"
+                })
+            },
+            importTestDataBf(file) {
+                return false
             }
         },
         computed: {
@@ -805,13 +843,18 @@ Author:
         margin-left: 0px;
     }
 
-    .debug,
     .download,
+    .upload,
+    .debug,
     .lock {
         padding-top: 25px;
         padding-right: 20px;
         font-size: 20px;
         float: right;
+    }
+
+    .upload {
+        padding-top: 23px;
     }
 
     pre {
