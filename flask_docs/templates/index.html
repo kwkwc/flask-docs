@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.7.0
+    0.7.1
 History:
     Created on 2020/10/29
     Last modified on 2022/01/09
@@ -75,18 +75,26 @@ Author:
                                 :value="item.value">
                             </el-option>
                         </el-select>
-                        <el-select v-model="hostValue" filterable allow-create clearable default-first-option
-                            :placeholder="$t('Select')" style="width:20%;min-width:160px;">
-                            <el-option v-for="item in hostOptions" :key="item.value" :label="item.label"
-                                :value="item.value">
-                            </el-option>
-                        </el-select>
-                        <el-select v-model="urlValue" filterable allow-create clearable default-first-option
-                            :placeholder="$t('Select')" style="width:50%;;min-width:209px;">
-                            <el-option v-for="item in urlOptions" :key="item.value" :label="item.label"
-                                :value="item.value">
-                            </el-option>
-                        </el-select>
+                        <el-autocomplete class="inline-input" v-model="hostValue" :fetch-suggestions="hostQuerySearch"
+                            :placeholder="$t('Input')" style="width:20%;min-width:160px;" clearable
+                            @change="hostChanged">
+                            <template slot-scope="{ item }">
+                                <div class="name">{{ item.value }}<el-button style="float:right;" type="text"
+                                        icon="el-icon-close" @click="clearHostOptions(item.value)">
+                                    </el-button>
+                                </div>
+                            </template>
+                        </el-autocomplete>
+                        <el-autocomplete class="inline-input" v-model="urlValue" :fetch-suggestions="urlQuerySearch"
+                            :placeholder="$t('Input')" style="width:50%;;min-width:209px;" clearable
+                            @change="urlChanged">
+                            <template slot-scope="{ item }">
+                                <div class="name">{{ item.value }}<el-button style="float:right;" type="text"
+                                        icon="el-icon-close" @click="clearUrlOptions(item.value)">
+                                    </el-button>
+                                </div>
+                            </template>
+                        </el-autocomplete>
                         <el-button type="primary" style="width:6%;min-width:80px;" @click="sendRequest"
                             :loading="loading">{{ $t("Send") }}</el-button>
                     </el-card>
@@ -221,7 +229,8 @@ Author:
             authPassword: "",
             authPasswordSHA2: "",
             authDisplay: "display:none",
-            mainDisplay: "display:none"
+            mainDisplay: "display:none",
+            optionsLocked: false
         },
         created: function () {
             this.changeWindowSize()
@@ -401,30 +410,6 @@ Author:
                     })
                 }
                 this.urlOptions = urlOptionsNew
-            },
-            changeOptions(options, optionsBak, val) {
-                val = val.trim()
-                if (!val) {
-                    let optionsNew = new Array()
-                    this[options].forEach((item, index) => {
-                        if (item.label !== this[optionsBak]) {
-                            optionsNew.push({ value: item.value, label: item.label })
-                        }
-                    })
-                    this[options] = optionsNew
-                    return
-                }
-                if (val === "") {
-                    return
-                }
-                this[optionsBak] = val
-                if (!this[options].some(item => {
-                    if (item.label == val) {
-                        return true
-                    }
-                })) {
-                    this[options].push({ value: val, label: val })
-                }
             },
             addHeader() {
                 let headerNameInputNew = this.headerNameInput.trim()
@@ -681,6 +666,75 @@ Author:
                 this.authPasswordSHA2 = ""
                 this.authPassword = ""
                 this.getData()
+            },
+            createFilter(queryString) {
+                return (options) => {
+                    return (options.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1)
+                }
+            },
+            hostQuerySearch(queryString, cb) {
+                let options = this.hostOptions;
+                let results = queryString ? options.filter(this.createFilter(queryString)) : options
+                cb(results);
+            },
+            urlQuerySearch(queryString, cb) {
+                let options = this.urlOptions;
+                let results = queryString ? options.filter(this.createFilter(queryString)) : options
+                cb(results);
+            },
+            changeOptions(options, optionsBak, val, isClear) {
+                if (val === "" && isClear == null) {
+                    return
+                }
+                val = val.trim()
+                if (!val) {
+                    let optionsNew = new Array()
+                    this[options].forEach((item, index) => {
+                        if (item.label !== this[optionsBak]) {
+                            optionsNew.push({ value: item.value, label: item.label })
+                        }
+                    })
+                    this[options] = optionsNew
+                    return
+                }
+                this[optionsBak] = val
+                if (!this[options].some(item => {
+                    if (item.label == val) {
+                        return true
+                    }
+                })) {
+                    this[options].push({ value: val, label: val })
+                }
+            },
+            refreshOptions(type, val, isClear) {
+                let options = type + "Options"
+                let optionsBak = type + "ValueBak"
+                let cache = "cache:" + type
+                this.changeOptions(options, optionsBak, val, isClear)
+                this.setCache(cache, this[options])
+                this.getBodyCache()
+            },
+            hostChanged(val) {
+                if (!this.optionsLocked) {
+                    this.refreshOptions("host", val)
+                }
+            },
+            urlChanged(val) {
+                if (!this.optionsLocked) {
+                    this.refreshOptions("url", val)
+                }
+            },
+            clearHostOptions(val) {
+                this.optionsLocked = true
+                this.hostValueBak = val
+                this.refreshOptions("host", "", true)
+                this.optionsLocked = false
+            },
+            clearUrlOptions(val) {
+                this.optionsLocked = true
+                this.urlValueBak = val
+                this.refreshOptions("url", "", true)
+                this.optionsLocked = false
             }
         },
         computed: {
@@ -710,14 +764,9 @@ Author:
                 this.getBodyCache()
             },
             hostValue(val) {
-                this.changeOptions("hostOptions", "hostOptionsBak", val)
-                this.setCache("cache:host", this.hostOptions)
-                this.getBodyCache()
-            },
-            urlValue(val) {
-                this.changeOptions("urlOptions", "urlValueBak", val)
-                this.setCache("cache:url", this.urlOptions)
-                this.getBodyCache()
+                if (this.hostValueBak === "") {
+                    this.refreshOptions("host", val)
+                }
             }
         }
     })
