@@ -2,7 +2,7 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.7.2
+    0.7.3
 History:
     Created on 2020/10/29
     Last modified on 2022/01/09
@@ -805,6 +805,12 @@ Author:
                 if (this.hostValueBak === "") {
                     this.refreshOptions("host", val)
                 }
+                else {
+                    this.getBodyCache()
+                }
+            },
+            urlValue(val) {
+                this.getBodyCache()
             }
         }
     })
