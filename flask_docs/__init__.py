@@ -231,8 +231,10 @@ class ApiDoc(object):
                     if r in current_app.config["API_DOC_METHODS_LIST"]
                 ]
             )
-            if method:
-                url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
+            if not method:
+                continue
+
+            url = "{}\t[{}]".format(url, "\t".join(method.split(" ")))
 
             api_data = {
                 "url": url,
