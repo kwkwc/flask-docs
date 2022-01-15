@@ -5,10 +5,10 @@
 Program:
     Sample app restful
 Version:
-    0.3.5
+    0.3.6
 History:
     Created on 2018/05/20
-    Last modified on 2021/10/17
+    Last modified on 2022/01/15
 Author:
     kwkw
 """
@@ -59,10 +59,10 @@ class Todo(Resource):
         > Add todo
 
         ### args
-        |  args | nullable | request type | type |  remarks |
+        |  args | required | request type | type |  remarks |
         |-------|----------|--------------|------|----------|
-        |  name |  false   |    body      | str  | todo name |
-        |  type |  false   |    body      | str  | todo type |
+        |  name |  true    |    body      | str  | todo name |
+        |  type |  true    |    body      | str  | todo type |
 
         ### request
         ```json
@@ -86,10 +86,10 @@ class Todo(Resource):
         > Get todo
 
         ### args
-        |  args | nullable | request type | type |  remarks |
+        |  args | required | request type | type |  remarks |
         |-------|----------|--------------|------|----------|
-        |  name |  false   |    query     | str  | todo name |
-        |  type |  true    |    query     | str  | todo type |
+        |  name |  true    |    query     | str  | todo name |
+        |  type |  false   |    query     | str  | todo type |
 
         ### request
         ```

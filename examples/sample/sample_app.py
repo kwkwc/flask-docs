@@ -5,10 +5,10 @@
 Program:
     Sample app
 Version:
-    0.3.4
+    0.3.5
 History:
     Created on 2018/05/20
-    Last modified on 2021/10/08
+    Last modified on 2022/01/15
 Author:
     kwkw
 """
@@ -58,10 +58,10 @@ def add_data():
 
     @@@
     ### args
-    |  args | nullable | request type | type |  remarks |
+    |  args | required | request type | type |  remarks |
     |-------|----------|--------------|------|----------|
-    | title |  false   |    body      | str  | blog title    |
-    | name  |  false   |    body      | str  | person's name |
+    | title |  true    |    body      | str  | blog title    |
+    | name  |  true    |    body      | str  | person's name |
 
     ### request
     ```json
@@ -83,10 +83,10 @@ def delete_data():
 
     @@@
     ### args
-    |  args  | nullable | request type | type |  remarks     |
+    |  args  | required | request type | type |  remarks     |
     |--------|----------|--------------|------|--------------|
-    |  id    |  true    |    query     |  str | blog id    |
-    |  name  |  false   |    query     |  str | person's name |
+    |  id    |  false   |    query     |  str | blog id    |
+    |  name  |  true    |    query     |  str | person's name |
 
     ### request
     ```

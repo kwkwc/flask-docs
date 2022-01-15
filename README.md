@@ -91,10 +91,10 @@ def add_data():
 
     @@@
     ### args
-    |  args | nullable | request type | type |  remarks |
+    |  args | required | request type | type |  remarks |
     |-------|----------|--------------|------|----------|
-    | title |  false   |    body      | str  | blog title    |
-    | name  |  false   |    body      | str  | person's name |
+    | title |  true    |    body      | str  | blog title    |
+    | name  |  true    |    body      | str  | person's name |
 
     ### request
     ```json
@@ -122,10 +122,10 @@ def delete_data():
 
     @@@
     ### args
-    |  args  | nullable | request type | type |  remarks     |
+    |  args  | required | request type | type |  remarks     |
     |--------|----------|--------------|------|--------------|
-    |  id    |  true    |    query     |  str | blog id    |
-    |  name  |  false   |    query     |  str | person's name |
+    |  id    |  false   |    query     |  str | blog id    |
+    |  name  |  true    |    query     |  str | person's name |
 
     ### request
     ```
@@ -194,10 +194,10 @@ class Todo(Resource):
         > Add todo
 
         ### args
-        |  args | nullable | request type | type |  remarks |
+        |  args | required | request type | type |  remarks |
         |-------|----------|--------------|------|----------|
-        |  name |  false   |    body      | str  | todo name |
-        |  type |  false   |    body      | str  | todo type |
+        |  name |  true    |    body      | str  | todo name |
+        |  type |  true    |    body      | str  | todo type |
 
         ### request
         ```json
@@ -221,10 +221,10 @@ class Todo(Resource):
         > Get todo
 
         ### args
-        |  args | nullable | request type | type |  remarks |
+        |  args | required | request type | type |  remarks |
         |-------|----------|--------------|------|----------|
-        |  name |  false   |    query     | str  | todo name |
-        |  type |  true    |    query     | str  | todo type |
+        |  name |  true    |    query     | str  | todo name |
+        |  type |  false   |    query     | str  | todo type |
 
         ### request
         ```
