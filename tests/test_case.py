@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.1.0
+    0.1.1
 History:
     Created on 2020/10/18
-    Last modified on 2021/10/17
+    Last modified on 2022/01/16
 Author:
     kwkw
 """
@@ -27,7 +27,7 @@ from flask_docs import ApiDoc
 
 app = Flask(__name__)
 app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "DELETE"]
-app.config["API_DOC_MEMBER"] = ["api", "platform"]
+app.config["API_DOC_MEMBER"] = ["api", "platform", "callback"]
 app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["add_data"]
 app.config["API_DOC_RESTFUL_EXCLUDE"] = ["TodoListExclude"]
 ApiDoc(app, title="Test App")
@@ -88,6 +88,7 @@ class CoverageTestCase(unittest.TestCase):
     def test_api_route_coverage(self):
 
         api = Blueprint("api", __name__)
+        callback = Blueprint("callback", __name__)
 
         @api.route("/add_data", methods=["POST", "PATCH"])
         @api.route("/post_data", methods=["POST", "PUT"])
@@ -98,7 +99,12 @@ class CoverageTestCase(unittest.TestCase):
         def delete_data():
             pass
 
+        @callback.route("/change_data", methods=["PUT"])
+        def change_data():
+            pass
+
         app.register_blueprint(api, url_prefix="/api")
+        app.register_blueprint(callback, url_prefix="/callback")
 
         with app.test_client() as client:
             res = client.get("/docs/api/data")
