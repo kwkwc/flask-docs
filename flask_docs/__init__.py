@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.6.2
+    0.6.3
 History:
     Created on 2018/05/20
-    Last modified on 2021/10/16
+    Last modified on 2022/01/15
 Author:
     kwkw
 """
@@ -158,27 +158,27 @@ class ApiDoc(object):
         data_dict = {}
 
         for rule in current_app.url_map.iter_rules():
-            func = current_app.view_functions[rule.endpoint]
+            cls = current_app.view_functions[rule.endpoint]
 
-            if not hasattr(func, "view_class"):
+            if not hasattr(cls, "view_class"):
                 continue
 
-            if func.methods is None:
+            if cls.methods is None:
                 continue
 
-            c_name = func.view_class.__name__
+            c_name = cls.view_class.__name__
 
             if c_name in current_app.config["API_DOC_RESTFUL_EXCLUDE"]:
                 continue
 
-            c_doc = self._clean_doc(self._get_api_doc(func))
+            c_doc = self._clean_doc(self._get_api_doc(cls))
 
             if c_doc and c_doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
                 c_name = "{}({})".format(c_name, c_doc)
 
             data_dict.setdefault(c_name, {"children": []})
 
-            for method in func.methods:
+            for method in cls.methods:
                 if method not in current_app.config["API_DOC_METHODS_LIST"]:
                     continue
 
@@ -190,7 +190,7 @@ class ApiDoc(object):
                 }
 
                 self._add_api_data(
-                    data_dict, api_data, getattr(func.view_class, method.lower())
+                    data_dict, api_data, getattr(cls.view_class, method.lower())
                 )
 
             if data_dict[c_name]["children"] == []:
@@ -243,11 +243,11 @@ class ApiDoc(object):
 
             self._add_api_data(data_dict, api_data, func)
 
-        for k in copy.deepcopy(data_dict):
-            if data_dict[k]["children"] == []:
-                data_dict.pop(k)
+        for bp_name in copy.deepcopy(data_dict):
+            if data_dict[bp_name]["children"] == []:
+                data_dict.pop(bp_name)
             else:
-                data_dict[k]["children"].sort(key=lambda x: x["name"])
+                data_dict[bp_name]["children"].sort(key=lambda x: x["name"])
 
         return data_dict
 
