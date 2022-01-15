@@ -5,10 +5,10 @@
 Program:
     Sample app restx
 Version:
-    1.0.0
+    1.0.1
 History:
     Created on 2021/10/17
-    Last modified on 2021/10/17
+    Last modified on 2022/01/15
 Author:
     kwkw
 """
@@ -55,12 +55,12 @@ class TodoList(Resource):
     def put(self):
         """Change the data"""
 
-        return jsonify({"todos": "put todolist"})
+        return {"todos": "put todolist"}
 
     def delete(self):
         """Delete the data"""
 
-        return jsonify({"todos": "delete todolist"})
+        return {"todos": "delete todolist"}
 
 
 if __name__ == "__main__":
