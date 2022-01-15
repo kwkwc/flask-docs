@@ -26,7 +26,7 @@ jobs:
         pip install -r tests/requirements.txt
     - name: Lint with flake8
       run: |
-        flake8 flask_docs tests --ignore=E402,E501
+        flake8 flask_docs tests examples --ignore=E402,E501
     - name: Test with pytest
       run: |
         pytest --cov=flask_docs --cov-report=xml
