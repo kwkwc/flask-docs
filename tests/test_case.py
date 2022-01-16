@@ -5,7 +5,7 @@
 Program:
     Test case
 Version:
-    0.1.1
+    0.1.2
 History:
     Created on 2020/10/18
     Last modified on 2022/01/16
@@ -22,6 +22,8 @@ import unittest
 
 from flask import Blueprint, Flask
 from flask_restful import Api, Resource
+from flask_restful.reqparse import RequestParser
+from flask_restful.inputs import int_range
 
 from flask_docs import ApiDoc
 
@@ -30,6 +32,7 @@ app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "DELETE"]
 app.config["API_DOC_MEMBER"] = ["api", "platform", "callback"]
 app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["add_data"]
 app.config["API_DOC_RESTFUL_EXCLUDE"] = ["TodoListExclude"]
+app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
 ApiDoc(app, title="Test App")
 
 
@@ -56,8 +59,27 @@ class RestfulApiTestRoute(Resource):
 class TodoList(RestfulApiTestRoute):
     """Manage todolist"""
 
+    TODO_NUMBER_MIN = 1
+
     def post(self):
         """Submission of data"""
+
+        parser = RequestParser()
+        # fmt: off
+        parser.add_argument(
+            "name", location="json", type=str, required=True, help="todo name",
+        )
+        parser.add_argument(
+            "type", location="json", type=str, required=True, choices=["life", "job"],
+            default="life", help="todo type",
+        )
+        parser.add_argument(
+            "number", location="json", type=int_range(TodoList.TODO_NUMBER_MIN, 9),
+            required=True, help="todo number",
+        )
+        parser.add_argument()
+        # fmt: on
+
         pass
 
     @ApiDoc.change_doc({"markdown": "json"})
@@ -110,6 +132,7 @@ class CoverageTestCase(unittest.TestCase):
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, "application/json")
+            self.assertNotEqual(res.json["data"], {})
 
     def test_restful_api_route_coverage(self):
 

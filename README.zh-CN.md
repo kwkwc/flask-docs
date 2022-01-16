@@ -65,6 +65,9 @@ ApiDoc(
 
 # 需要排除的子成员 Api 函数名称
 # app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
+
+# 自动生成请求参数 markdown
+# app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
 ```
 
 ## 如何书写 markdown 格式文档

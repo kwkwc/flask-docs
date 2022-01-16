@@ -5,17 +5,19 @@
 Program:
     Flask-Docs
 Version:
-    0.6.3
+    0.6.4
 History:
     Created on 2018/05/20
-    Last modified on 2022/01/15
+    Last modified on 2022/01/16
 Author:
     kwkw
 """
 
 import copy
+import inspect
 import logging
 import os
+from collections import OrderedDict
 from functools import wraps
 
 from flask import Blueprint, current_app, jsonify, request
@@ -43,6 +45,22 @@ class ApiDoc(object):
     with open(os.path.join(APP_TEMPLATES, "js_template_local.html"), "r") as h:
         JS_TEMPLATE_LOCAL = h.read()
 
+    LOCATIONS = {
+        "args": "query",
+        "form": "formData",
+        "headers": "header",
+        "json": "body",
+        "values": "query",
+        "files": "formData",
+    }
+
+    PY_TYPES = {
+        int: "integer",
+        str: "string",
+        bool: "boolean",
+        float: "number",
+    }
+
     def __init__(self, app=None, title="Api Doc", version="1.0.0", description=""):
         if app is not None:
             self.init_app(app, title, version, description)
@@ -64,6 +82,7 @@ class ApiDoc(object):
             "API_DOC_METHODS_LIST", ["GET", "POST", "PUT", "DELETE", "PATCH"]
         )
         app.config.setdefault("API_DOC_PASSWORD_SHA2", "")
+        app.config.setdefault("API_DOC_AUTO_GENERATING_ARGS_MD", False)
 
         with app.app_context():
             self._check_value_type(
@@ -81,7 +100,10 @@ class ApiDoc(object):
                 ],
                 str,
             )
-            self._check_value_type(["API_DOC_ENABLE", "API_DOC_CDN"], bool)
+            self._check_value_type(
+                ["API_DOC_ENABLE", "API_DOC_CDN", "API_DOC_AUTO_GENERATING_ARGS_MD"],
+                bool,
+            )
             self._check_value_type(
                 [
                     "API_DOC_MEMBER",
@@ -284,6 +306,11 @@ class ApiDoc(object):
                 api_data["doc_md"],
             ) = self._get_doc_name_extra_doc_md(doc)
 
+            if current_app.config["API_DOC_AUTO_GENERATING_ARGS_MD"]:
+                args_md = self._get_args_md(func)
+                if args_md:
+                    api_data["doc_md"] = "\n".join([args_md, api_data["doc_md"]])
+
         except Exception as e:
             logger.error(
                 "{} error - {} - {} - {}".format(PROJECT_NAME, e, router, api_name)
@@ -300,20 +327,15 @@ class ApiDoc(object):
     def _get_api_doc(self, func):
         func_doc = func.__doc__
         if func_doc:
-            return func_doc.replace("\t", "    ")
+            return func_doc.replace("\t", " " * 4)
         else:
             return current_app.config["API_DOC_NO_DOC_TEXT"]
 
+    def _clean_str(self, str):
+        return str.strip(" ").strip("\n\n").strip(" ").strip("\n").strip(" ")
+
     def _clean_doc(self, doc_src):
-        return (
-            doc_src.split("\n\n")[0]
-            .split("\n")[0]
-            .strip(" ")
-            .strip("\n\n")
-            .strip(" ")
-            .strip("\n")
-            .strip(" ")
-        )
+        return self._clean_str(doc_src.split("\n\n")[0].split("\n")[0])
 
     def _get_doc_name_extra_doc_md(self, doc_src):
         doc = doc_src.split("@@@")[0]
@@ -356,6 +378,105 @@ class ApiDoc(object):
                         d, type
                     )
                 )
+
+    def _get_argument(self, func):
+        func_source = inspect.getsource(func)
+        func_doc = func.__doc__
+        if func_doc:
+            func_source = func_source.replace(func_doc, "")
+        func_source = func_source.replace("\t", " " * 4)
+
+        argument_list = func_source.split("add_argument")
+
+        return argument_list
+
+    def _clean_argument(self, argument_source):
+        argument_data = ""
+        stack = []
+        index = 0
+        for char in argument_source:
+            if char == "(":
+                stack.append(char)
+            elif char == ")":
+                stack.pop()
+            index += 1
+            if not stack:
+                index -= 1
+                argument_data = argument_source[1:index]
+                break
+
+        return self._clean_str(argument_data)
+
+    def _parse_argument(self, argument_data):
+        def _run_eval(eval_str):
+            argument_dict = {}
+            try:
+                argument_dict = eval(eval_str)
+            except Exception as e:
+                e_str = str(e)
+                logger.error(e_str)
+                if "is not defined" in e_str:
+                    err_str = e_str.split("'")[1]
+                    argument_dict = _run_eval(eval_str.replace(err_str, ""))
+                else:
+                    return argument_dict
+
+            return argument_dict
+
+        args_dict = {}
+        arg_list = argument_data.split(",")
+        if len(arg_list) < 1 or not arg_list[0].strip():
+            return args_dict
+
+        name = arg_list[0].strip("'").strip('"').strip()
+        args_dict = OrderedDict(
+            name=name,
+            location="",
+            type="",
+            required="",
+            nullable="",
+            default="",
+            help="",
+        )
+        eval_str = "dict({})".format(",".join(arg_list[1:]).strip())
+        argument_dict = _run_eval(eval_str)
+        if not argument_dict:
+            return args_dict
+
+        args_dict["required"] = "False"
+        args_dict["nullable"] = "True"
+
+        for key, value in argument_dict.items():
+            if key not in args_dict:
+                continue
+            if key == "location":
+                args_dict[key] = ApiDoc.LOCATIONS.get(value, "")
+            elif key == "type":
+                args_dict[key] = ApiDoc.PY_TYPES.get(value, "")
+            else:
+                args_dict[key] = str(value)
+
+        return args_dict
+
+    def _get_args_md(self, func):
+        args_md_list = []
+        argument_list = self._get_argument(func)
+        for argument_source in argument_list:
+            argument_data = self._clean_argument(argument_source)
+            args_dict = self._parse_argument(argument_data)
+            if not args_dict:
+                continue
+            if not args_md_list:
+                args_md_list.append("### args")
+                args_md_list.append(
+                    "|" + "|".join(arg_key for arg_key in args_dict.keys()) + "|"
+                )
+                args_md_list.append("|---" * len(args_dict) + "|")
+            args_md_list.append(
+                "|" + "|".join(arg_value for arg_value in args_dict.values()) + "|"
+            )
+
+        return "\n".join(args_md_list)
 
     def _unauthorized(self):
         response = jsonify({"error": "unauthorized"})

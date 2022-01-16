@@ -66,6 +66,9 @@ ApiDoc(
 
 # Name of the Submembers Api function to be excluded
 # app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
+
+# Auto generating request args markdown
+# app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
 ```
 
 ## How to add markdown documents to the code

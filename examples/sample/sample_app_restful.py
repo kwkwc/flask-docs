@@ -5,16 +5,17 @@
 Program:
     Sample app restful
 Version:
-    0.3.6
+    0.3.7
 History:
     Created on 2018/05/20
-    Last modified on 2022/01/15
+    Last modified on 2022/01/16
 Author:
     kwkw
 """
 
 from flask import Flask
 from flask_restful import Api, Resource
+from flask_restful.reqparse import RequestParser
 
 from flask_docs import ApiDoc
 
@@ -39,6 +40,9 @@ app = Flask(__name__)
 # RESTful Api class name to exclude
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
+# Auto generating request args markdown
+app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
+
 restful_api = Api(app)
 ApiDoc(
     app,
@@ -55,15 +59,6 @@ class Todo(Resource):
         """Add todo
 
         @@@
-        ### description
-        > Add todo
-
-        ### args
-        |  args | required | request type | type |  remarks |
-        |-------|----------|--------------|------|----------|
-        |  name |  true    |    body      | str  | todo name |
-        |  type |  true    |    body      | str  | todo type |
-
         ### request
         ```json
         {"name": "xx", "type": "code"}
@@ -75,6 +70,17 @@ class Todo(Resource):
         ```
         @@@
         """
+        parser = RequestParser()
+        # fmt: off
+        parser.add_argument(
+            "name", location="json", type=str, required=True, help="todo name",
+        )
+        parser.add_argument(
+            "type", location="json", type=str, required=True, default="life",
+            help="todo type",
+        )
+        parser.add_argument()
+        # fmt: on
 
         return {"todo": "post todo"}
 
