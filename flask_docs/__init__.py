@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.6.4
+    0.6.5
 History:
     Created on 2018/05/20
-    Last modified on 2022/01/16
+    Last modified on 2022/01/27
 Author:
     kwkw
 """
@@ -193,10 +193,10 @@ class ApiDoc(object):
             if c_name in current_app.config["API_DOC_RESTFUL_EXCLUDE"]:
                 continue
 
-            c_doc = self._clean_doc(self._get_api_doc(cls))
+            c_name_extra = self._get_first_line_of_doc(self._get_api_doc(cls))
 
-            if c_doc and c_doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
-                c_name = "{}({})".format(c_name, c_doc)
+            if c_name_extra:
+                c_name = "{}({})".format(c_name, c_name_extra)
 
             data_dict.setdefault(c_name, {"children": []})
 
@@ -301,10 +301,10 @@ class ApiDoc(object):
             doc = self._get_api_doc(func)
 
             (
-                api_data["doc"],
                 api_data["name_extra"],
+                api_data["doc"],
                 api_data["doc_md"],
-            ) = self._get_doc_name_extra_doc_md(doc)
+            ) = self._split_doc(doc)
 
             if current_app.config["API_DOC_AUTO_GENERATING_ARGS_MD"]:
                 args_md = self._get_args_md(func)
@@ -329,19 +329,20 @@ class ApiDoc(object):
         if func_doc:
             return func_doc.replace("\t", " " * 4)
         else:
-            return current_app.config["API_DOC_NO_DOC_TEXT"]
+            return ""
 
     def _clean_str(self, str):
         return str.strip(" ").strip("\n\n").strip(" ").strip("\n").strip(" ")
 
-    def _clean_doc(self, doc_src):
+    def _get_first_line_of_doc(self, doc_src):
         return self._clean_str(doc_src.split("\n\n")[0].split("\n")[0])
 
-    def _get_doc_name_extra_doc_md(self, doc_src):
-        doc = doc_src.split("@@@")[0]
+    def _split_doc(self, doc_src):
+        doc_src_split = doc_src.split("@@@")
+        doc = doc_src_split[0]
 
-        if doc != current_app.config["API_DOC_NO_DOC_TEXT"]:
-            name_extra = self._clean_doc(doc)
+        if doc:
+            name_extra = self._get_first_line_of_doc(doc)
         else:
             name_extra = ""
 
@@ -357,14 +358,14 @@ class ApiDoc(object):
         if doc == "":
             doc = current_app.config["API_DOC_NO_DOC_TEXT"]
 
-        if len(doc_src.split("@@@")) >= 2:
-            doc_md = doc_src.split("@@@")[1].strip(" ")
-            space_count = doc_src.split("@@@")[0].split("\n")[-1].count(" ")
+        if len(doc_src_split) >= 2:
+            doc_md = doc_src_split[1].strip(" ")
+            space_count = doc_src_split[0].split("\n")[-1].count(" ")
             doc_md = "\n".join(doc_md.split("\n" + " " * space_count))
         else:
             doc_md = ""
 
-        return doc, name_extra, doc_md
+        return name_extra, doc, doc_md
 
     def _check_value_type(self, data_packages, type, data_type="config"):
         for d in data_packages:
