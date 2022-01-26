@@ -5,10 +5,10 @@
 Program:
     Sample app restful
 Version:
-    0.3.7
+    0.3.8
 History:
     Created on 2018/05/20
-    Last modified on 2022/01/16
+    Last modified on 2022/01/27
 Author:
     kwkw
 """
@@ -43,6 +43,9 @@ app = Flask(__name__)
 # Auto generating request args markdown
 app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
 
+# Disable markdown processing for all documents
+# app.config["API_DOC_ALL_MD"] = False
+
 restful_api = Api(app)
 ApiDoc(
     app,
@@ -58,7 +61,6 @@ class Todo(Resource):
     def post(self):
         """Add todo
 
-        @@@
         ### request
         ```json
         {"name": "xx", "type": "code"}
@@ -68,7 +70,6 @@ class Todo(Resource):
         ```json
         {"code": xxxx, "msg": "xxx", "data": null}
         ```
-        @@@
         """
         parser = RequestParser()
         # fmt: off
@@ -86,6 +87,13 @@ class Todo(Resource):
 
     def get(self):
         """Get todo
+
+        Extra notes:
+        {
+            "data":{
+                "xx": "xxx"
+            }
+        }
 
         @@@
         ### description

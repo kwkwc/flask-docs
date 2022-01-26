@@ -5,10 +5,10 @@
 Program:
     Sample app restx
 Version:
-    1.0.1
+    1.0.2
 History:
     Created on 2021/10/17
-    Last modified on 2022/01/15
+    Last modified on 2022/01/27
 Author:
     kwkw
 """
@@ -38,6 +38,9 @@ app = Flask(__name__)
 
 # RESTful Api class name to exclude
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["TodoList"]
+
+# Disable markdown processing for all documents
+# app.config["API_DOC_ALL_MD"] = False
 
 restx_api = Api(app)
 ApiDoc(

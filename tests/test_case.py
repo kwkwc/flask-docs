@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.1.2
+    0.1.3
 History:
     Created on 2020/10/18
-    Last modified on 2022/01/16
+    Last modified on 2022/01/27
 Author:
     kwkw
 """
@@ -62,7 +62,15 @@ class TodoList(RestfulApiTestRoute):
     TODO_NUMBER_MIN = 1
 
     def post(self):
-        """Submission of data"""
+        """Submission of data
+
+        Extra notes:
+        {
+            "data":{
+                "xx": "xxx"
+            }
+        }
+        """
 
         parser = RequestParser()
         # fmt: off

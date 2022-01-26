@@ -68,13 +68,20 @@ ApiDoc(
 
 # 自动生成请求参数 markdown
 # app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
+
+# 禁止以 markdown 处理所有文档
+# app.config["API_DOC_ALL_MD"] = False
 ```
 
-## 如何书写 markdown 格式文档
+## 标记 @@@
 
 ```
+# 默认以 markdown 处理所有文档
+# 1. 如果希望指定处理，请使用 `@@@` 包裹
+# 2. 如果希望展示原始文档，请关闭 `API_DOC_ALL_MD`，并去除 `@@@` 标记
+
 @@@
-在注释结尾用 “@@@” 包含 markdown 格式文档
+# 在这里写下你的 markdown 文档
 @@@
 ```
 
@@ -91,7 +98,6 @@ http://127.0.0.1/docs/api/
 def add_data():
     """Add some data
 
-    @@@
     ### args
     |  args | required | request type | type |  remarks |
     |-------|----------|--------------|------|----------|
@@ -107,7 +113,6 @@ def add_data():
     ```json
     {"code": xxxx, "msg": "xxx", "data": null}
     ```
-    @@@
     """
     return jsonify({"api": "add data"})
 

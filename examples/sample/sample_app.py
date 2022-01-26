@@ -5,10 +5,10 @@
 Program:
     Sample app
 Version:
-    0.3.5
+    0.3.6
 History:
     Created on 2018/05/20
-    Last modified on 2022/01/15
+    Last modified on 2022/01/27
 Author:
     kwkw
 """
@@ -40,6 +40,9 @@ app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
 # Name of the Submembers Api function to be excluded
 # app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
+
+# Disable markdown processing for all documents
+# app.config["API_DOC_ALL_MD"] = False
 
 ApiDoc(
     app,

@@ -5,10 +5,10 @@
 Program:
     Sample app decorator
 Version:
-    1.0.4
+    1.0.5
 History:
     Created on 2021/05/15
-    Last modified on 2021/10/08
+    Last modified on 2022/01/27
 Author:
     kwkw
 """
@@ -37,6 +37,9 @@ app = Flask(__name__)
 
 # Api Document needs to be displayed
 app.config["API_DOC_MEMBER"] = ["api"]
+
+# Disable markdown processing for all documents
+# app.config["API_DOC_ALL_MD"] = False
 
 ApiDoc(
     app,

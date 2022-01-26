@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.6.5
+    0.6.6
 History:
     Created on 2018/05/20
     Last modified on 2022/01/27
@@ -83,6 +83,7 @@ class ApiDoc(object):
         )
         app.config.setdefault("API_DOC_PASSWORD_SHA2", "")
         app.config.setdefault("API_DOC_AUTO_GENERATING_ARGS_MD", False)
+        app.config.setdefault("API_DOC_ALL_MD", True)
 
         with app.app_context():
             self._check_value_type(
@@ -101,7 +102,12 @@ class ApiDoc(object):
                 str,
             )
             self._check_value_type(
-                ["API_DOC_ENABLE", "API_DOC_CDN", "API_DOC_AUTO_GENERATING_ARGS_MD"],
+                [
+                    "API_DOC_ENABLE",
+                    "API_DOC_CDN",
+                    "API_DOC_AUTO_GENERATING_ARGS_MD",
+                    "API_DOC_ALL_MD",
+                ],
                 bool,
             )
             self._check_value_type(
@@ -355,15 +361,20 @@ class ApiDoc(object):
             .rstrip(" ")
         )
 
-        if doc == "":
-            doc = current_app.config["API_DOC_NO_DOC_TEXT"]
-
         if len(doc_src_split) >= 2:
             doc_md = doc_src_split[1].strip(" ")
-            space_count = doc_src_split[0].split("\n")[-1].count(" ")
-            doc_md = "\n".join(doc_md.split("\n" + " " * space_count))
+        elif doc and current_app.config["API_DOC_ALL_MD"]:
+            doc_md = doc.strip(" ")
+            doc = ""
         else:
             doc_md = ""
+
+        if doc_md:
+            space_count = doc_src_split[0].split("\n")[-1].count(" ")
+            doc_md = "\n".join(doc_md.split("\n" + " " * space_count))
+
+        if doc == "":
+            doc = current_app.config["API_DOC_NO_DOC_TEXT"]
 
         return name_extra, doc, doc_md
 

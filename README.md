@@ -69,11 +69,18 @@ ApiDoc(
 
 # Auto generating request args markdown
 # app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
+
+# Disable markdown processing for all documents
+# app.config["API_DOC_ALL_MD"] = False
 ```
 
-## How to add markdown documents to the code
+## Tag @@@
 
 ```
+# Process all documents in markdown by default
+# 1. use the `@@@` wrapper if you want to specify processing
+# 2. Turn off `API_DOC_ALL_MD` and remove the `@@@` tag if you want to display the original document
+
 @@@
 # Write your markdown document here
 @@@
@@ -92,7 +99,6 @@ http://127.0.0.1/docs/api/
 def add_data():
     """Add some data
 
-    @@@
     ### args
     |  args | required | request type | type |  remarks |
     |-------|----------|--------------|------|----------|
@@ -108,7 +114,6 @@ def add_data():
     ```json
     {"code": xxxx, "msg": "xxx", "data": null}
     ```
-    @@@
     """
     return jsonify({"api": "add data"})
 
