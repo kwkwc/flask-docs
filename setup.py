@@ -15,7 +15,7 @@ setup(
     url="https://github.com/kwkwc/flask-docs",
     license="MIT",
     author="kwkw",
-    author_email="wei497896143@yeah.net",
+    author_email="",
     description="Adds Docs support to Flask.",
     # long_description=read("README.md"),
     # long_description_content_type="text/markdown",
