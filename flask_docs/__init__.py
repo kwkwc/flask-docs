@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.6.6
+    0.6.7
 History:
     Created on 2018/05/20
-    Last modified on 2022/01/27
+    Last modified on 2022/04/02
 Author:
     kwkw
 """
@@ -470,14 +470,64 @@ class ApiDoc(object):
 
         return args_dict
 
+    def _get_restx_argument(self, func):
+        return getattr(func, "__apidoc__", {}).get("expect", [])
+
+    def _clean_restx_argument(self, expect_source):
+        argument_data_list = []
+
+        try:
+            from flask_restx.reqparse import RequestParser
+        except ImportError:  # pragma: no cover
+            return argument_data_list  # pragma: no cover
+
+        if isinstance(expect_source, RequestParser):
+            argument_data_list = expect_source.__schema__
+
+        return argument_data_list
+
+    def _parse_restx_argument(self, argument_data_list):
+        args_list = []
+
+        if not argument_data_list:
+            return args_list
+
+        for argument_data in argument_data_list:
+            args_list.append(
+                OrderedDict(
+                    name=argument_data.get("name", ""),
+                    location=argument_data.get("in", ""),
+                    type=argument_data.get("type", ""),
+                    required=str(argument_data.get("required", "False")),
+                    nullable=str(argument_data.get("nullable", "")),
+                    default=str(argument_data.get("default", "")),
+                    help=argument_data.get("description", ""),
+                )
+            )
+
+        return args_list
+
     def _get_args_md(self, func):
-        args_md_list = []
+        args_dict_list = []
+
+        expect_list = self._get_restx_argument(func)
+        for expect in expect_list:
+            argument_data_list = self._clean_restx_argument(expect)
+            args_list = self._parse_restx_argument(argument_data_list)
+            if not args_list:
+                continue
+            args_dict_list.extend(args_list)
+
         argument_list = self._get_argument(func)
         for argument_source in argument_list:
             argument_data = self._clean_argument(argument_source)
             args_dict = self._parse_argument(argument_data)
             if not args_dict:
                 continue
+            args_dict_list.append(args_dict)
+
+        args_md_list = []
+        for args_dict in args_dict_list:
             if not args_md_list:
                 args_md_list.append("### args")
                 args_md_list.append(

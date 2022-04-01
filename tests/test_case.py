@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.1.3
+    0.1.4
 History:
     Created on 2020/10/18
-    Last modified on 2022/01/27
+    Last modified on 2022/04/02
 Author:
     kwkw
 """
@@ -24,6 +24,8 @@ from flask import Blueprint, Flask
 from flask_restful import Api, Resource
 from flask_restful.reqparse import RequestParser
 from flask_restful.inputs import int_range
+from flask_restx import Api as RestxApi, Resource as RestxResource
+from flask_restx.reqparse import RequestParser as RestxRequestParser
 
 from flask_docs import ApiDoc
 
@@ -152,6 +154,33 @@ class CoverageTestCase(unittest.TestCase):
 
         todo = TodoList()
         todo.get()
+
+        with app.test_client() as client:
+            res = client.get("/docs/api/data")
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.content_type, "application/json")
+
+    def test_restx_api_route_coverage(self):
+
+        restx_api = RestxApi(app)
+        ns = restx_api.namespace("sample", description="Sample RESTX API")
+
+        RestxParser = RestxRequestParser()
+        # fmt: off
+        RestxParser.add_argument(
+            "name", location="json", type=str, required=True, help="todo name",
+        )
+        # fmt: on
+
+        @restx_api.route("/todolistrestx")
+        class TodoListRestx(RestxResource):
+            @ns.expect(RestxParser)
+            def post(self):
+                return {"todos": "post todolistrestx"}
+
+            @ns.expect(())
+            def get(self):
+                return {"todos": "get todolistrestx"}
 
         with app.test_client() as client:
             res = client.get("/docs/api/data")

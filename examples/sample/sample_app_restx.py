@@ -5,16 +5,17 @@
 Program:
     Sample app restx
 Version:
-    1.0.2
+    1.0.3
 History:
     Created on 2021/10/17
-    Last modified on 2022/01/27
+    Last modified on 2022/04/02
 Author:
     kwkw
 """
 
 from flask import Flask
 from flask_restx import Api, Resource
+from flask_restx.reqparse import RequestParser
 
 from flask_docs import ApiDoc
 
@@ -39,6 +40,9 @@ app = Flask(__name__)
 # RESTful Api class name to exclude
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["TodoList"]
 
+# Auto generating request args markdown
+app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
+
 # Disable markdown processing for all documents
 # app.config["API_DOC_ALL_MD"] = False
 
@@ -50,11 +54,21 @@ ApiDoc(
     description="A simple app RESTX API",
 )
 
+ns = restx_api.namespace("sample", description="Sample RESTX API")
 
-@restx_api.route('/todolist')
+parser = RequestParser()
+# fmt: off
+parser.add_argument(
+    "name", location="json", type=str, required=True, help="todo name",
+)
+# fmt: on
+
+
+@restx_api.route("/todolist")
 class TodoList(Resource):
     """Manage todolist"""
 
+    @ns.expect(parser)
     def put(self):
         """Change the data"""
 
