@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.7.3
+    0.7.4
 History:
     Created on 2020/10/29
-    Last modified on 2022/01/09
+    Last modified on 2022/06/09
 Author:
     kwkw
 -->
@@ -41,9 +41,8 @@ Author:
                         <el-menu-item index="1">{{ titleVersion }}</el-menu-item>
                         <el-button class="lock" type="text" icon="el-icon-lock" @click="lock"
                             v-if="authPasswordSHA2 != ''"></el-button>
-                        <el-upload class="upload" :on-change="importTestData"
-                            :before-upload="importTestDataBf" accept="application/json" action=""
-                            v-if="debugDisplay === 'display:block'">
+                        <el-upload class="upload" :on-change="importTestData" :before-upload="importTestDataBf"
+                            accept="application/json" action="" v-if="debugDisplay === 'display:block'">
                             <i class="el-icon-upload2" style="color:#409eff;"></i>
                         </el-upload>
                         <el-button class="download" type="text" icon="el-icon-download" @click="exportTestData"
@@ -324,7 +323,7 @@ Author:
                     urls = [urls[0].split("\t")[0]]
                 }
                 for (i = 0; i < urls.length; i++) {
-                    md += "- " + urls[i].replace(/\t/g, " ") + "\n\n"
+                    md += "- " + urls[i].replace(/\t/g, " ").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\n\n"
                 }
                 if (con.api_type === "api") {
                     md += "### method" + "\n"
