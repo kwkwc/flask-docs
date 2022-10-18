@@ -1,3 +1,4 @@
 Flask
 Flask-RESTful
 Flask-RESTX
+werkzeug<=2.1.2
