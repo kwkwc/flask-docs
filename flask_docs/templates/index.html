@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.7.4
+    0.7.5
 History:
     Created on 2020/10/29
-    Last modified on 2022/06/09
+    Last modified on 2022/12/27
 Author:
     kwkw
 -->
@@ -572,7 +572,7 @@ Author:
                 return cacheValue
             },
             setBodyCache() {
-                bodyKey = "cache:body:" + CryptoJS.SHA1([this.hostValue, this.urlValue, this.methodValue].join("-")).toString()
+                bodyKey = "cache:body:" + CryptoJS.SHA1([this.urlValue, this.methodValue].join("-")).toString()
                 this.setCache(bodyKey, this.bodyTextarea)
             },
             getHostCache() {
@@ -596,10 +596,10 @@ Author:
                 }
             },
             getBodyCache() {
-                if ((this.hostValue === "") || (this.urlValue === "")) {
+                if (this.urlValue === "") {
                     return
                 }
-                bodyKey = "cache:body:" + CryptoJS.SHA1([this.hostValue, this.urlValue, this.methodValue].join("-")).toString()
+                bodyKey = "cache:body:" + CryptoJS.SHA1([this.urlValue, this.methodValue].join("-")).toString()
                 let bodyCacheTextarea = this.getCache(bodyKey)
                 if (bodyCacheTextarea) {
                     this.bodyTextarea = bodyCacheTextarea
