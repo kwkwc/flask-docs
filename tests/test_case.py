@@ -15,6 +15,7 @@ Author:
 
 
 import sys
+import os
 
 sys.path.append(".")
 
@@ -40,14 +41,12 @@ ApiDoc(app, title="Test App")
 
 class AcceptTestCase(unittest.TestCase):
     def test_accept_docs_api(self):
-
         with app.test_client() as client:
             res = client.get("/docs/api/")
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, "text/html; charset=utf-8")
 
     def test_accept_docs_api_data(self):
-
         with app.test_client() as client:
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
@@ -118,7 +117,6 @@ class TodoListExclude(RestfulApiTestRoute):
 
 class CoverageTestCase(unittest.TestCase):
     def test_api_route_coverage(self):
-
         api = Blueprint("api", __name__)
         callback = Blueprint("callback", __name__)
 
@@ -145,7 +143,6 @@ class CoverageTestCase(unittest.TestCase):
             self.assertNotEqual(res.json["data"], {})
 
     def test_restful_api_route_coverage(self):
-
         restful_api = Api(app)
         restful_api.add_resource(TodoList, "/todolist", "/todo")
         restful_api.add_resource(TodoListNone, "/todolist_none")
@@ -161,7 +158,6 @@ class CoverageTestCase(unittest.TestCase):
             self.assertEqual(res.content_type, "application/json")
 
     def test_restx_api_route_coverage(self):
-
         restx_api = RestxApi(app)
         ns = restx_api.namespace("sample", description="Sample RESTX API")
 
@@ -186,6 +182,12 @@ class CoverageTestCase(unittest.TestCase):
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, "application/json")
+
+    def test_offline_html_doc(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["api_doc", "html"])
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("./htmldoc")
 
 
 if __name__ == "__main__":
