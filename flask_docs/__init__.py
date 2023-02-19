@@ -15,15 +15,19 @@ Author:
 
 import copy
 import inspect
+import json
 import logging
 import os
 from collections import OrderedDict
 from functools import wraps
-
+import shutil
+import pathlib
+import click
 from flask import Blueprint, current_app, jsonify, request
+from flask.cli import AppGroup
 
 from flask_docs.version import __version__
-
+from flask_docs.exceptions import TargetExistsException
 PROJECT_NAME = "Flask-Docs"
 PROJECT_VERSION = __version__
 
@@ -66,7 +70,6 @@ class ApiDoc(object):
             self.init_app(app, title, version, description)
 
     def init_app(self, app, title="Api Doc", version="1.0.0", description=""):
-
         app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
         app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
         app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
@@ -132,38 +135,16 @@ class ApiDoc(object):
 
             @api_doc.route("/", methods=["GET"])
             def index():
-                if current_app.config["API_DOC_CDN"]:
-                    CSS_TEMPLATE = ApiDoc.CSS_TEMPLATE_CDN
-                    JS_TEMPLATE = ApiDoc.JS_TEMPLATE_CDN
-
-                    if current_app.config["API_DOC_CDN_CSS_TEMPLATE"]:
-                        CSS_TEMPLATE = current_app.config["API_DOC_CDN_CSS_TEMPLATE"]
-                    if current_app.config["API_DOC_CDN_JS_TEMPLATE"]:
-                        JS_TEMPLATE = current_app.config["API_DOC_CDN_JS_TEMPLATE"]
-
-                    return ApiDoc.INDEX_HTML.replace(
-                        "<!-- ___CSS_TEMPLATE___ -->", CSS_TEMPLATE
-                    ).replace("<!-- ___JS_TEMPLATE___ -->", JS_TEMPLATE)
-                else:
-                    return ApiDoc.INDEX_HTML.replace(
-                        "<!-- ___CSS_TEMPLATE___ -->", ApiDoc.CSS_TEMPLATE_LOCAL
-                    ).replace("<!-- ___JS_TEMPLATE___ -->", ApiDoc.JS_TEMPLATE_LOCAL)
+                return self._render_html()
 
             @api_doc.route("/data", methods=["GET"])
             @self._verify_password
             def data():
-
                 url_prefix = current_app.config["API_DOC_URL_PREFIX"]
                 referer = request.headers.get("referer", "http://127.0.0.1")
                 host = referer.split(url_prefix)[0]
 
-                data_dict = {}
-
-                # Restful Api
-                data_dict.update(self._get_restful_api_data())
-
-                # Api
-                data_dict.update(self._get_api_data())
+                data_dict = self._get_data_dict()
 
                 return jsonify(
                     {
@@ -178,7 +159,71 @@ class ApiDoc(object):
                     }
                 )
 
+            docs_cli = AppGroup("docs", short_help="Manage document.")
+            app.cli.add_command(docs_cli)
+
+            @docs_cli.command("html", short_help="Generate offline html document.")
+            @click.option("--out", "-o", help="Out put dir", default="htmldoc", show_default=True)
+            @click.option("--force", "-f", help="Force override", default=False, show_default=True, is_flag=True)
+            def offline_html(out: str, force: bool):
+                html_str = self._render_html()
+
+                data_dict = self._get_data_dict()
+                data = {
+                    "PROJECT_NAME": PROJECT_NAME,
+                    "PROJECT_VERSION": PROJECT_VERSION,
+                    "host": "http://127.0.0.1",
+                    "title": title,
+                    "version": version,
+                    "description": description,
+                    "noDocText": current_app.config["API_DOC_NO_DOC_TEXT"],
+                    "data": data_dict,
+                }
+
+                dest = pathlib.Path(out)
+                if os.path.exists(dest):
+                    if not force:
+                        raise TargetExistsException(out)
+                    shutil.rmtree(dest)
+                os.mkdir(dest)
+
+                with open(dest / 'index.html', "w") as html_file, open(
+                    dest / 'data', "w"
+                ) as datafile:
+                    html_file.write(html_str)
+                    json.dump(data, datafile)
+                shutil.copytree(api_doc.static_folder, dest / 'static')
+
             app.register_blueprint(api_doc)
+
+    def _render_html(self):
+        html_str = ApiDoc.INDEX_HTML
+        if current_app.config["API_DOC_CDN"]:
+            CSS_TEMPLATE = ApiDoc.CSS_TEMPLATE_CDN
+            JS_TEMPLATE = ApiDoc.JS_TEMPLATE_CDN
+
+            if current_app.config["API_DOC_CDN_CSS_TEMPLATE"]:
+                CSS_TEMPLATE = current_app.config["API_DOC_CDN_CSS_TEMPLATE"]
+            if current_app.config["API_DOC_CDN_JS_TEMPLATE"]:
+                JS_TEMPLATE = current_app.config["API_DOC_CDN_JS_TEMPLATE"]
+
+            return html_str.replace(
+                "<!-- ___CSS_TEMPLATE___ -->", CSS_TEMPLATE
+            ).replace("<!-- ___JS_TEMPLATE___ -->", JS_TEMPLATE)
+        else:
+            return html_str.replace(
+                "<!-- ___CSS_TEMPLATE___ -->", ApiDoc.CSS_TEMPLATE_LOCAL
+            ).replace("<!-- ___JS_TEMPLATE___ -->", ApiDoc.JS_TEMPLATE_LOCAL)
+
+    def _get_data_dict(self):
+        data_dict = {}
+
+        # Restful Api
+        data_dict.update(self._get_restful_api_data())
+
+        # Api
+        data_dict.update(self._get_api_data())
+        return data_dict
 
     def _get_restful_api_data(self):
         """Restful Api"""

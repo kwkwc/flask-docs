@@ -20,6 +20,9 @@
 - Support Flask-RESTX
 - Support flask.views.MethodView
 - Support online debugging
+- Support offline document
+    - [x] HTML
+    - [ ] Markdown
 
 ## Installation
 
@@ -323,6 +326,8 @@ def delete_data():
 
 ![debugger](flask_docs/assets/debugger.png)
 
+## Offline HTML Document
+- html : Run `flask docs html` will generate offline html document at `htmldoc/`
 ## Examples
 
 [Complete example][examples]

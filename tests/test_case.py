@@ -15,11 +15,12 @@ Author:
 
 
 import sys
+import os
 
 sys.path.append(".")
 
 import unittest
-
+import shutil
 from flask import Blueprint, Flask
 from flask_restful import Api, Resource
 from flask_restful.reqparse import RequestParser
@@ -28,6 +29,7 @@ from flask_restx import Api as RestxApi, Resource as RestxResource
 from flask_restx.reqparse import RequestParser as RestxRequestParser
 
 from flask_docs import ApiDoc
+from flask_docs.exceptions import TargetExistsException
 
 app = Flask(__name__)
 app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "DELETE"]
@@ -40,14 +42,12 @@ ApiDoc(app, title="Test App")
 
 class AcceptTestCase(unittest.TestCase):
     def test_accept_docs_api(self):
-
         with app.test_client() as client:
             res = client.get("/docs/api/")
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, "text/html; charset=utf-8")
 
     def test_accept_docs_api_data(self):
-
         with app.test_client() as client:
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
@@ -118,7 +118,6 @@ class TodoListExclude(RestfulApiTestRoute):
 
 class CoverageTestCase(unittest.TestCase):
     def test_api_route_coverage(self):
-
         api = Blueprint("api", __name__)
         callback = Blueprint("callback", __name__)
 
@@ -145,7 +144,6 @@ class CoverageTestCase(unittest.TestCase):
             self.assertNotEqual(res.json["data"], {})
 
     def test_restful_api_route_coverage(self):
-
         restful_api = Api(app)
         restful_api.add_resource(TodoList, "/todolist", "/todo")
         restful_api.add_resource(TodoListNone, "/todolist_none")
@@ -161,7 +159,6 @@ class CoverageTestCase(unittest.TestCase):
             self.assertEqual(res.content_type, "application/json")
 
     def test_restx_api_route_coverage(self):
-
         restx_api = RestxApi(app)
         ns = restx_api.namespace("sample", description="Sample RESTX API")
 
@@ -186,6 +183,50 @@ class CoverageTestCase(unittest.TestCase):
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, "application/json")
+
+    def test_offline_html_doc(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "html"])
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("htmldoc")
+
+        shutil.rmtree("htmldoc")
+
+    def test_offline_html_doc_out(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "html", "--out", "htmldoc2"])
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("htmldoc2")
+
+        shutil.rmtree("htmldoc2")
+
+    def test_offline_html_doc_out_short_mode(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "html", "-o", "htmldoc2"])
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("htmldoc2")
+
+        shutil.rmtree("htmldoc2")
+
+    def test_offline_html_doc_should_error_when_exists(self):
+        runner = app.test_cli_runner()
+        os.mkdir('htmldoc_exists')
+
+        result = runner.invoke(args=["docs", "html", "-o", "htmldoc_exists"])
+
+        assert isinstance(result.exception, TargetExistsException)
+        shutil.rmtree("htmldoc_exists")
+
+    def test_offline_html_doc_should_override_when_use_force(self):
+        runner = app.test_cli_runner()
+        os.mkdir('htmldoc_exists2')
+
+        result = runner.invoke(args=["docs", "html", "-o", "htmldoc_exists2", "--force"])
+
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("htmldoc_exists2")
+
+        shutil.rmtree("htmldoc_exists2")
 
 
 if __name__ == "__main__":
