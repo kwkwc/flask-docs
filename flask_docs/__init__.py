@@ -185,7 +185,7 @@ class ApiDoc(object):
                 ) as datafile:
                     html_file.write(html_str)
                     json.dump(data, datafile)
-                shutil.copytree(api_doc.static_folder + "/", "htmldoc/static")
+                shutil.copytree(api_doc.static_folder, "htmldoc/static")
 
             app.register_blueprint(api_doc)
 
