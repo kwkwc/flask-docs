@@ -21,6 +21,8 @@
 - 支持 flask.views.MethodView
 - 支持在线调试
 - 支持离线文档生成
+    - [x] HTML
+    - [ ] Markdown
 
 ## 安装
 

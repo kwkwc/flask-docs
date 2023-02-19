@@ -185,7 +185,7 @@ class CoverageTestCase(unittest.TestCase):
 
     def test_offline_html_doc(self):
         runner = app.test_cli_runner()
-        result = runner.invoke(args=["api_doc", "html"])
+        result = runner.invoke(args=["docs", "html"])
         assert result.exit_code == 0
         assert "index.html" in os.listdir("./htmldoc")
 

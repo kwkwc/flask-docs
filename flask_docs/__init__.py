@@ -23,6 +23,7 @@ from functools import wraps
 import shutil
 
 from flask import Blueprint, current_app, jsonify, request
+from flask.cli import AppGroup
 
 from flask_docs.version import __version__
 
@@ -157,18 +158,18 @@ class ApiDoc(object):
                     }
                 )
 
-            @api_doc.cli.command("html")
+            docs_cli = AppGroup("docs", short_help="Manage document.")
+            app.cli.add_command(docs_cli)
+            
+            @docs_cli.command("html", short_help="Generate offline html document.")
             def offline_html():
                 html_str = self._render_html()
-                # url_prefix = current_app.config["API_DOC_URL_PREFIX"]
-                # referer = request.headers.get("referer", "http://127.0.0.1")
-                # host = referer.split(url_prefix)[0]
 
                 data_dict = self._get_data_dict()
                 data = {
                     "PROJECT_NAME": PROJECT_NAME,
                     "PROJECT_VERSION": PROJECT_VERSION,
-                    "host": "host",
+                    "host": "http://127.0.0.1",
                     "title": title,
                     "version": version,
                     "description": description,
@@ -189,7 +190,7 @@ class ApiDoc(object):
             app.register_blueprint(api_doc)
 
     def _render_html(self):
-        html_str = ApiDoc.INDEX_HTML.replace("<!-- HTML_MODE -->", "offline")
+        html_str = ApiDoc.INDEX_HTML
         if current_app.config["API_DOC_CDN"]:
             CSS_TEMPLATE = ApiDoc.CSS_TEMPLATE_CDN
             JS_TEMPLATE = ApiDoc.JS_TEMPLATE_CDN

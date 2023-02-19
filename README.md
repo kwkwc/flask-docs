@@ -20,7 +20,9 @@
 - Support Flask-RESTX
 - Support flask.views.MethodView
 - Support online debugging
-- Support offline html format document
+- Support offline document
+    - [x] HTML
+    - [ ] Markdown
 
 ## Installation
 
