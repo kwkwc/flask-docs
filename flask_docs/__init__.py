@@ -160,7 +160,7 @@ class ApiDoc(object):
 
             docs_cli = AppGroup("docs", short_help="Manage document.")
             app.cli.add_command(docs_cli)
-            
+
             @docs_cli.command("html", short_help="Generate offline html document.")
             def offline_html():
                 html_str = self._render_html()
