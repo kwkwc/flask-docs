@@ -326,7 +326,7 @@ def delete_data():
 ![debugger](flask_docs/assets/debugger.png)
 
 # 生成离线文档
-运行 `flask api_doc html` 将在 `htmldoc/` 生成离线文档
+- html ：运行 `flask docs html` 将在 `htmldoc/` 生成离线文档
 ## 示例
 
 [完整示例][examples]

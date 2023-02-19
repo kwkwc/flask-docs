@@ -327,7 +327,7 @@ def delete_data():
 ![debugger](flask_docs/assets/debugger.png)
 
 ## Offline HTML Document
-Run `flask api_doc html` will generate offline html document at `htmldoc/`
+- html : Run `flask docs html` will generate offline html document at `htmldoc/`
 ## Examples
 
 [Complete example][examples]
