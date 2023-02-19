@@ -20,7 +20,7 @@ import os
 sys.path.append(".")
 
 import unittest
-
+import shutil
 from flask import Blueprint, Flask
 from flask_restful import Api, Resource
 from flask_restful.reqparse import RequestParser
@@ -187,7 +187,9 @@ class CoverageTestCase(unittest.TestCase):
         runner = app.test_cli_runner()
         result = runner.invoke(args=["docs", "html"])
         assert result.exit_code == 0
-        assert "index.html" in os.listdir("./htmldoc")
+        assert "index.html" in os.listdir("htmldoc")
+
+        shutil.rmtree("htmldoc")
 
 
 if __name__ == "__main__":

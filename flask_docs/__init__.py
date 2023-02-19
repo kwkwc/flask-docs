@@ -21,7 +21,7 @@ import os
 from collections import OrderedDict
 from functools import wraps
 import shutil
-
+import pathlib
 from flask import Blueprint, current_app, jsonify, request
 from flask.cli import AppGroup
 
@@ -177,15 +177,17 @@ class ApiDoc(object):
                     "data": data_dict,
                 }
 
-                if os.path.exists("./htmldoc"):
-                    shutil.rmtree("./htmldoc")
-                os.mkdir("./htmldoc")
-                with open("./htmldoc/index.html", "w") as html_file, open(
-                    "./htmldoc/data", "w"
+                dest = pathlib.Path("htmldoc")
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                os.mkdir(dest)
+
+                with open(dest / 'index.html', "w") as html_file, open(
+                    dest / 'data', "w"
                 ) as datafile:
                     html_file.write(html_str)
                     json.dump(data, datafile)
-                shutil.copytree(api_doc.static_folder, "htmldoc/static")
+                shutil.copytree(api_doc.static_folder, dest / 'static')
 
             app.register_blueprint(api_doc)
 
