@@ -22,6 +22,7 @@ from collections import OrderedDict
 from functools import wraps
 import shutil
 import pathlib
+import click
 from flask import Blueprint, current_app, jsonify, request
 from flask.cli import AppGroup
 
@@ -162,7 +163,8 @@ class ApiDoc(object):
             app.cli.add_command(docs_cli)
 
             @docs_cli.command("html", short_help="Generate offline html document.")
-            def offline_html():
+            @click.option("--out", "-o", help="Out put dir", default="htmldoc", show_default=True)
+            def offline_html(out: str):
                 html_str = self._render_html()
 
                 data_dict = self._get_data_dict()
@@ -177,7 +179,7 @@ class ApiDoc(object):
                     "data": data_dict,
                 }
 
-                dest = pathlib.Path("htmldoc")
+                dest = pathlib.Path(out)
                 if os.path.exists(dest):
                     shutil.rmtree(dest)
                 os.mkdir(dest)

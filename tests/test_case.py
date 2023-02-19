@@ -191,6 +191,22 @@ class CoverageTestCase(unittest.TestCase):
 
         shutil.rmtree("htmldoc")
 
+    def test_offline_html_doc_out(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "html", "--out", "htmldoc2"])
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("htmldoc2")
+
+        shutil.rmtree("htmldoc2")
+
+    def test_offline_html_doc_out_short_mode(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "html", "-o", "htmldoc2"])
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("htmldoc2")
+
+        shutil.rmtree("htmldoc2")
+
 
 if __name__ == "__main__":
     unittest.main()
