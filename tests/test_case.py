@@ -29,6 +29,7 @@ from flask_restx import Api as RestxApi, Resource as RestxResource
 from flask_restx.reqparse import RequestParser as RestxRequestParser
 
 from flask_docs import ApiDoc
+from flask_docs.exceptions import TargetExistsException
 
 app = Flask(__name__)
 app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "DELETE"]
@@ -206,6 +207,26 @@ class CoverageTestCase(unittest.TestCase):
         assert "index.html" in os.listdir("htmldoc2")
 
         shutil.rmtree("htmldoc2")
+
+    def test_offline_html_doc_should_error_when_exists(self):
+        runner = app.test_cli_runner()
+        os.mkdir('htmldoc_exists')
+
+        result = runner.invoke(args=["docs", "html", "-o", "htmldoc_exists"])
+
+        assert isinstance(result.exception, TargetExistsException)
+        shutil.rmtree("htmldoc_exists")
+
+    def test_offline_html_doc_should_override_when_use_force(self):
+        runner = app.test_cli_runner()
+        os.mkdir('htmldoc_exists2')
+
+        result = runner.invoke(args=["docs", "html", "-o", "htmldoc_exists2", "--force"])
+
+        assert result.exit_code == 0
+        assert "index.html" in os.listdir("htmldoc_exists2")
+
+        shutil.rmtree("htmldoc_exists2")
 
 
 if __name__ == "__main__":

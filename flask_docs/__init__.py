@@ -27,7 +27,7 @@ from flask import Blueprint, current_app, jsonify, request
 from flask.cli import AppGroup
 
 from flask_docs.version import __version__
-
+from flask_docs.exceptions import TargetExistsException
 PROJECT_NAME = "Flask-Docs"
 PROJECT_VERSION = __version__
 
@@ -164,7 +164,8 @@ class ApiDoc(object):
 
             @docs_cli.command("html", short_help="Generate offline html document.")
             @click.option("--out", "-o", help="Out put dir", default="htmldoc", show_default=True)
-            def offline_html(out: str):
+            @click.option("--force", "-f", help="Force override", default=False, show_default=True, is_flag=True)
+            def offline_html(out: str, force: bool):
                 html_str = self._render_html()
 
                 data_dict = self._get_data_dict()
@@ -181,6 +182,8 @@ class ApiDoc(object):
 
                 dest = pathlib.Path(out)
                 if os.path.exists(dest):
+                    if not force:
+                        raise TargetExistsException(out)
                     shutil.rmtree(dest)
                 os.mkdir(dest)
 
