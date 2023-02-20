@@ -5,10 +5,10 @@
 Program:
     Test case config fail
 Version:
-    0.0.1
+    0.0.2
 History:
     Created on 2022/01/16
-    Last modified on 2022/01/16
+    Last modified on 2023/02/21
 Author:
     kwkw
 """
@@ -32,7 +32,6 @@ apidoc = ApiDoc(title="Test App")
 
 class ConfigTestCase(unittest.TestCase):
     def test_api_config_fail(self):
-
         try:
             apidoc.init_app(app)
         except ValueError as e:
