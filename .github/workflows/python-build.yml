@@ -24,11 +24,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 black isort pytest-cov
+        pip install flake8 mypy black isort pytest-cov
         pip install -r tests/requirements.txt
     - name: Lint with flake8
       run: |
         flake8 flask_docs tests examples
+    - name: Static check with mypy
+      run: |
+        mypy flask_docs tests examples
     - name: Format with black
       run: |
         black flask_docs tests examples --check
