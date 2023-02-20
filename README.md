@@ -15,12 +15,12 @@
 ## Features
 
 - Automatic generation of markdown documentation
-- Support for generating offline documentation
+- Support offline markdown document download
 - Support Flask-RESTful
 - Support Flask-RESTX
-- Support flask.views.MethodView
+- Support Flask MethodView
 - Support online debugging
-- Support offline document
+- Support command to generate offline document
     - [x] HTML
     - [ ] Markdown
 
@@ -327,7 +327,8 @@ def delete_data():
 ![debugger](flask_docs/assets/debugger.png)
 
 ## Offline HTML Document
-- html : Run `flask docs html` will generate offline html document at `htmldoc/`
+- HTML : Run `flask docs html` will generate offline html document at `htmldoc/`
+
 ## Examples
 
 [Complete example][examples]

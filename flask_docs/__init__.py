@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.6.9
+    0.7.0
 History:
     Created on 2018/05/20
     Last modified on 2023/02/20
@@ -67,16 +67,16 @@ class ApiDoc(object):
         float: "number",
     }
 
-    def __init__(self, app=None, title="Api Doc", version="1.0.0", description=""):
+    def __init__(self, app=None, title="API Doc", version="1.0.0", description=""):
         if app is not None:
             self.init_app(app, title, version, description)
 
-    def init_app(self, app, title="Api Doc", version="1.0.0", description=""):
+    def init_app(self, app, title="API Doc", version="1.0.0", description=""):
         app.config.setdefault("API_DOC_CDN_CSS_TEMPLATE", "")
         app.config.setdefault("API_DOC_CDN_JS_TEMPLATE", "")
         app.config.setdefault("API_DOC_URL_PREFIX", "/docs/api")
         app.config.setdefault(
-            "API_DOC_NO_DOC_TEXT", "No documentation found for this Api"
+            "API_DOC_NO_DOC_TEXT", "No documentation found for this API"
         )
         app.config.setdefault("API_DOC_ENABLE", True)
         app.config.setdefault("API_DOC_CDN", False)
@@ -166,7 +166,7 @@ class ApiDoc(object):
 
             @docs_cli.command("html", short_help="Generate offline html document.")
             @click.option(
-                "--out", "-o", help="Out put dir", default="htmldoc", show_default=True
+                "--out", "-o", help="Output dir", default="htmldoc", show_default=True
             )
             @click.option(
                 "--force",
