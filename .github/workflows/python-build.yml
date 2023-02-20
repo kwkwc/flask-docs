@@ -31,7 +31,7 @@ jobs:
         black --check flask_docs examples tests
     - name: Lint with flake8
       run: |
-        flake8 flask_docs tests examples --ignore=E402,E501
+        flake8 flask_docs tests examples
     - name: Test with pytest
       run: |
         pytest --cov=flask_docs --cov-report=xml
