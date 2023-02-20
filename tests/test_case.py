@@ -5,7 +5,7 @@
 Program:
     Test case
 Version:
-    0.1.7
+    0.1.8
 History:
     Created on 2020/10/18
     Last modified on 2023/02/21
@@ -39,20 +39,6 @@ app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["add_data"]
 app.config["API_DOC_RESTFUL_EXCLUDE"] = ["TodoListExclude"]
 app.config["API_DOC_AUTO_GENERATING_ARGS_MD"] = True
 ApiDoc(app, title="Test App")
-
-
-class AcceptTestCase(unittest.TestCase):
-    def test_accept_docs_api(self):
-        with app.test_client() as client:
-            res = client.get("/docs/api/")
-            self.assertEqual(res.status_code, 200)
-            self.assertEqual(res.content_type, "text/html; charset=utf-8")
-
-    def test_accept_docs_api_data(self):
-        with app.test_client() as client:
-            res = client.get("/docs/api/data")
-            self.assertEqual(res.status_code, 200)
-            self.assertEqual(res.content_type, "application/json")
 
 
 class RestfulApiTestRoute(Resource):
@@ -117,27 +103,82 @@ class TodoListExclude(RestfulApiTestRoute):
         pass
 
 
+# Flask-Restful
+api = Blueprint("api", __name__)
+callback = Blueprint("callback", __name__)
+
+
+@api.route("/add_data", methods=["POST", "PATCH"])
+@api.route("/post_data", methods=["POST", "PUT"])
+def add_data():
+    pass
+
+
+@api.route("/delete_data", methods=["DELETE"])
+def delete_data():
+    pass
+
+
+@callback.route("/change_data", methods=["PUT"])
+def change_data():
+    pass
+
+
+app.register_blueprint(api, url_prefix="/api")
+app.register_blueprint(callback, url_prefix="/callback")
+
+restful_api = Api(app)
+restful_api.add_resource(TodoList, "/todolist", "/todo")
+restful_api.add_resource(TodoListNone, "/todolist_none")
+restful_api.add_resource(TodoListNoneMethod, "/todolist_none_method")
+restful_api.add_resource(TodoListExclude, "/todolist_exclude")
+
+todo = TodoList()
+todo.get()
+# Flask-Restful end
+
+# Flask-Restx
+restx_api = RestxApi(app)
+ns = restx_api.namespace("sample", description="Sample RESTX API")
+
+RestxParser = RestxRequestParser()
+# fmt: off
+RestxParser.add_argument(
+    "name", location="json", type=str, required=True, help="todo name",
+)
+# fmt: on
+
+
+@restx_api.route("/todolistrestx")
+class TodoListRestx(RestxResource):
+    @ns.expect(RestxParser)
+    def post(self):
+        return {"todos": "post todolistrestx"}
+
+    @ns.expect(())
+    def get(self):
+        return {"todos": "get todolistrestx"}
+
+
+# Flask-Restx end
+
+
+class AcceptTestCase(unittest.TestCase):
+    def test_accept_docs_api(self):
+        with app.test_client() as client:
+            res = client.get("/docs/api/")
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.content_type, "text/html; charset=utf-8")
+
+    def test_accept_docs_api_data(self):
+        with app.test_client() as client:
+            res = client.get("/docs/api/data")
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.content_type, "application/json")
+
+
 class CoverageTestCase(unittest.TestCase):
     def test_api_route_coverage(self):
-        api = Blueprint("api", __name__)
-        callback = Blueprint("callback", __name__)
-
-        @api.route("/add_data", methods=["POST", "PATCH"])
-        @api.route("/post_data", methods=["POST", "PUT"])
-        def add_data():
-            pass
-
-        @api.route("/delete_data", methods=["DELETE"])
-        def delete_data():
-            pass
-
-        @callback.route("/change_data", methods=["PUT"])
-        def change_data():
-            pass
-
-        app.register_blueprint(api, url_prefix="/api")
-        app.register_blueprint(callback, url_prefix="/callback")
-
         with app.test_client() as client:
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
@@ -145,41 +186,12 @@ class CoverageTestCase(unittest.TestCase):
             self.assertNotEqual(res.json["data"], {})
 
     def test_restful_api_route_coverage(self):
-        restful_api = Api(app)
-        restful_api.add_resource(TodoList, "/todolist", "/todo")
-        restful_api.add_resource(TodoListNone, "/todolist_none")
-        restful_api.add_resource(TodoListNoneMethod, "/todolist_none_method")
-        restful_api.add_resource(TodoListExclude, "/todolist_exclude")
-
-        todo = TodoList()
-        todo.get()
-
         with app.test_client() as client:
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, "application/json")
 
     def test_restx_api_route_coverage(self):
-        restx_api = RestxApi(app)
-        ns = restx_api.namespace("sample", description="Sample RESTX API")
-
-        RestxParser = RestxRequestParser()
-        # fmt: off
-        RestxParser.add_argument(
-            "name", location="json", type=str, required=True, help="todo name",
-        )
-        # fmt: on
-
-        @restx_api.route("/todolistrestx")
-        class TodoListRestx(RestxResource):
-            @ns.expect(RestxParser)
-            def post(self):
-                return {"todos": "post todolistrestx"}
-
-            @ns.expect(())
-            def get(self):
-                return {"todos": "get todolistrestx"}
-
         with app.test_client() as client:
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 200)
