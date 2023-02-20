@@ -39,7 +39,8 @@ jobs:
         isort flask_docs tests examples --profile black --check
     - name: Test with pytest
       run: |
-        pytest --cov=flask_docs --cov-report=xml
+        pytest -vv --cov=flask_docs --cov-config .coveragerc --cov-report=xml --junit-xml results.xml tests
+        coverage report -m --skip-covered
     - name: "Upload coverage to Codecov"
       uses: codecov/codecov-action@v3
       with:

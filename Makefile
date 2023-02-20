@@ -20,7 +20,8 @@ test: mypy
 test: format
 test: isort
 test: lint
-	pytest --cov=flask_docs --cov-report=xml
+	pytest -vv --cov=flask_docs --cov-config .coveragerc --cov-report=xml --junit-xml results.xml tests
+	coverage report -m --skip-covered
 
 clean:
 	rm -rf dist build
