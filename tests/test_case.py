@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.1.4
+    0.1.5
 History:
     Created on 2020/10/18
-    Last modified on 2022/04/02
+    Last modified on 2023/02/20
 Author:
     kwkw
 """
@@ -210,7 +210,7 @@ class CoverageTestCase(unittest.TestCase):
 
     def test_offline_html_doc_should_error_when_exists(self):
         runner = app.test_cli_runner()
-        os.mkdir('htmldoc_exists')
+        os.mkdir("htmldoc_exists")
 
         result = runner.invoke(args=["docs", "html", "-o", "htmldoc_exists"])
 
@@ -219,9 +219,11 @@ class CoverageTestCase(unittest.TestCase):
 
     def test_offline_html_doc_should_override_when_use_force(self):
         runner = app.test_cli_runner()
-        os.mkdir('htmldoc_exists2')
+        os.mkdir("htmldoc_exists2")
 
-        result = runner.invoke(args=["docs", "html", "-o", "htmldoc_exists2", "--force"])
+        result = runner.invoke(
+            args=["docs", "html", "-o", "htmldoc_exists2", "--force"]
+        )
 
         assert result.exit_code == 0
         assert "index.html" in os.listdir("htmldoc_exists2")
