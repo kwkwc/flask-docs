@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.7.0
+    0.7.1
 History:
     Created on 2018/05/20
     Last modified on 2023/02/20
@@ -27,7 +27,6 @@ import click
 from flask import Blueprint, current_app, jsonify, request
 from flask.cli import AppGroup
 
-from flask_docs.exceptions import TargetExistsException
 from flask_docs.version import __version__
 
 PROJECT_NAME = "Flask-Docs"
@@ -194,7 +193,7 @@ class ApiDoc(object):
                 dest = pathlib.Path(out)
                 if os.path.exists(dest):
                     if not force:
-                        raise TargetExistsException(out)
+                        print(f"Target `{dest}` exists, use -f or --force to override.")
                     shutil.rmtree(dest)
                 os.mkdir(dest)
 

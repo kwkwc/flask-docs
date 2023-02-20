@@ -5,10 +5,10 @@
 Program:
     Test case
 Version:
-    0.1.6
+    0.1.7
 History:
     Created on 2020/10/18
-    Last modified on 2023/02/20
+    Last modified on 2023/02/21
 Author:
     kwkw
 """
@@ -31,7 +31,6 @@ from flask_restx import Resource as RestxResource
 from flask_restx.reqparse import RequestParser as RestxRequestParser
 
 from flask_docs import ApiDoc
-from flask_docs.exceptions import TargetExistsException
 
 app = Flask(__name__)
 app.config["API_DOC_METHODS_LIST"] = ["GET", "POST", "DELETE"]
@@ -216,7 +215,10 @@ class CoverageTestCase(unittest.TestCase):
 
         result = runner.invoke(args=["docs", "html", "-o", "htmldoc_exists"])
 
-        assert isinstance(result.exception, TargetExistsException)
+        assert (
+            "Target `htmldoc_exists` exists, use -f or --force to override."
+            == result.output.strip()
+        )
         shutil.rmtree("htmldoc_exists")
 
     def test_offline_html_doc_should_override_when_use_force(self):
