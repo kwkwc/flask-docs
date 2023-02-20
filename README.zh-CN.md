@@ -14,13 +14,13 @@
 
 ## 特性
 
-- 根据代码注释自动生成文档
-- 支持离线 markdown 文档下载
+- 根据代码注释自动生成 Markdown 文档
+- 支持离线 Markdown 文档下载
 - 支持 Flask-RESTful
 - 支持 Flask-RESTX
-- 支持 flask.views.MethodView
+- 支持 Flask MethodView
 - 支持在线调试
-- 支持离线文档生成
+- 支持命令行生成离线文档
     - [x] HTML
     - [ ] Markdown
 
@@ -326,7 +326,8 @@ def delete_data():
 ![debugger](flask_docs/assets/debugger.png)
 
 # 生成离线文档
-- html ：运行 `flask docs html` 将在 `htmldoc/` 生成离线文档
+- HTML ：运行 `flask docs html` 将在 `htmldoc/` 生成离线文档
+
 ## 示例
 
 [完整示例][examples]

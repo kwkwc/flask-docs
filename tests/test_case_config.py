@@ -5,10 +5,10 @@
 Program:
     Test case config
 Version:
-    0.0.1
+    0.0.2
 History:
     Created on 2021/10/17
-    Last modified on 2021/10/17
+    Last modified on 2023/02/21
 Author:
     kwkw
 """
@@ -36,14 +36,12 @@ ApiDoc(app, title="Test App")
 
 class AcceptTestCase(unittest.TestCase):
     def test_accept_docs_api(self):
-
         with app.test_client() as client:
             res = client.get("/docs/api/")
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content_type, "text/html; charset=utf-8")
 
     def test_accept_docs_api_data(self):
-
         with app.test_client() as client:
             res = client.get("/docs/api/data")
             self.assertEqual(res.status_code, 401)
@@ -52,7 +50,6 @@ class AcceptTestCase(unittest.TestCase):
 
 class CoverageTestCase(unittest.TestCase):
     def test_api_route_coverage(self):
-
         with app.test_client() as client:
             res = client.get(
                 "/docs/api/data",
