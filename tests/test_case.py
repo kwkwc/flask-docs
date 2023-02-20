@@ -5,7 +5,7 @@
 Program:
     Test case
 Version:
-    0.1.5
+    0.1.6
 History:
     Created on 2020/10/18
     Last modified on 2023/02/20
@@ -14,18 +14,20 @@ Author:
 """
 
 
-import sys
 import os
+import sys
 
 sys.path.append(".")
 
-import unittest
 import shutil
+import unittest
+
 from flask import Blueprint, Flask
 from flask_restful import Api, Resource
-from flask_restful.reqparse import RequestParser
 from flask_restful.inputs import int_range
-from flask_restx import Api as RestxApi, Resource as RestxResource
+from flask_restful.reqparse import RequestParser
+from flask_restx import Api as RestxApi
+from flask_restx import Resource as RestxResource
 from flask_restx.reqparse import RequestParser as RestxRequestParser
 
 from flask_docs import ApiDoc

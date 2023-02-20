@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.6.8
+    0.6.9
 History:
     Created on 2018/05/20
     Last modified on 2023/02/20
@@ -18,16 +18,17 @@ import inspect
 import json
 import logging
 import os
+import pathlib
+import shutil
 from collections import OrderedDict
 from functools import wraps
-import shutil
-import pathlib
+
 import click
 from flask import Blueprint, current_app, jsonify, request
 from flask.cli import AppGroup
 
-from flask_docs.version import __version__
 from flask_docs.exceptions import TargetExistsException
+from flask_docs.version import __version__
 
 PROJECT_NAME = "Flask-Docs"
 PROJECT_VERSION = __version__
