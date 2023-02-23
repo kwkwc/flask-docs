@@ -64,13 +64,13 @@ ApiDoc(
 # Custom url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
-# RESTful Api class name to exclude
+# RESTful API class name to exclude
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
-# Name of the Api blueprint to be displayed
+# Name of the API blueprint to be displayed
 # app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
-# Name of the Submembers Api function to be excluded
+# Name of the Submembers API function to be excluded
 # app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
 
 # Auto generating request args markdown
@@ -98,7 +98,7 @@ ApiDoc(
 http://127.0.0.1/docs/api/
 ```
 
-## Api and document pages
+## API and document pages
 
 ````python
 @api.route("/add_data", methods=["POST"])
@@ -192,7 +192,7 @@ app.register_blueprint(platform, url_prefix="/platform")
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
 
-## Flask-RESTful Api and document pages
+## Flask-RESTful API and document pages
 
 ````python
 from flask_restful import Resource, Api
@@ -263,7 +263,7 @@ restful_api.add_resource(Todo, "/todo")
 
 ![sample_app](flask_docs/assets/sample_app_restful_get.png)
 
-## flask.views.MethodView Api
+## Flask MethodView API
 
 > **_For the time being, only url_rule with the same class name are supported_**
 

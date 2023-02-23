@@ -8,7 +8,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/flask-docs)](https://pypi.org/project/Flask-Docs/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-> Flask Api 文档自动生成插件
+> Flask API 文档自动生成插件
 
 [English](README.md)
 
@@ -63,13 +63,13 @@ ApiDoc(
 # 自定义 url_prefix
 # app.config["API_DOC_URL_PREFIX"] = "/docs/api"
 
-# 需要排除的 RESTful Api 类名
+# 需要排除的 RESTful API 类名
 # app.config["API_DOC_RESTFUL_EXCLUDE"] = ["Todo"]
 
-# 需要显示的 Api 蓝图名称
+# 需要显示的 API 蓝图名称
 # app.config["API_DOC_MEMBER"] = ["api", "platform"]
 
-# 需要排除的子成员 Api 函数名称
+# 需要排除的子成员 API 函数名称
 # app.config["API_DOC_MEMBER_SUB_EXCLUDE"] = ["delete_data"]
 
 # 自动生成请求参数 markdown
@@ -97,7 +97,7 @@ ApiDoc(
 http://127.0.0.1/docs/api/
 ```
 
-## Api demo
+## API demo
 
 ````python
 @api.route("/add_data", methods=["POST"])
@@ -191,7 +191,7 @@ app.register_blueprint(platform, url_prefix="/platform")
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
 
-## Flask-RESTful Api demo
+## Flask-RESTful API demo
 
 ````python
 from flask_restful import Resource, Api
@@ -262,7 +262,7 @@ restful_api.add_resource(Todo, "/todo")
 
 ![sample_app](flask_docs/assets/sample_app_restful_get.png)
 
-## flask.views.MethodView Api demo
+## Flask MethodView API demo
 
 > **_目前只支持与类名相同的 url_rule_**
 
