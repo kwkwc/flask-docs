@@ -2,10 +2,10 @@
 Program:
     Flask-Docs HTML Template
 Version:
-    0.7.5
+    0.7.6
 History:
     Created on 2020/10/29
-    Last modified on 2022/12/27
+    Last modified on 2023/02/23
 Author:
     kwkw
 -->
@@ -133,6 +133,8 @@ Author:
                             <el-input type="textarea" :autosize="{ minRows: 6}" :placeholder="$t('Request Body')"
                                 v-model="bodyTextarea">
                             </el-input>
+                            <el-button class="formatBody" type="text" icon="el-icon-brush" @click="formatBody">
+                            </el-button>
                         </el-row>
                     </el-card>
                     <el-card class="box-card" style="margin-top:10px">
@@ -772,6 +774,17 @@ Author:
             },
             importTestDataBf(file) {
                 return false
+            },
+            formatBody() {
+                try {
+                    this.bodyTextarea = JSON.stringify(JSON.parse(this.bodyTextarea), null, 4)
+                }
+                catch (err) {
+                    this.$notify.error({
+                        title: this.$t("Error"),
+                        message: this.$t("The request body is not json")
+                    })
+                }
             }
         },
         computed: {
@@ -912,6 +925,13 @@ Author:
 
     .auth-box-card {
         max-width: 580px;
+    }
+
+    .formatBody {
+        font-size: 20px;
+        position: absolute;
+        z-index: 100;
+        right: 20px;
     }
 </style>
 
