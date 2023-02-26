@@ -45,6 +45,16 @@ ApiDoc(
 )
 ```
 
+## 查看文档页面
+
+```
+http://127.0.0.1/docs/api/
+```
+
+## 演示
+
+[在线演示][online_demo]
+
 ## 配置
 ```python
 # 使用 CDN
@@ -91,13 +101,7 @@ ApiDoc(
 @@@
 ```
 
-## 查看文档页面
-
-```
-http://127.0.0.1/docs/api/
-```
-
-## API demo
+## API
 
 ````python
 @api.route("/add_data", methods=["POST"])
@@ -191,7 +195,7 @@ app.register_blueprint(platform, url_prefix="/platform")
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
 
-## Flask-RESTful API demo
+## Flask-RESTful API
 
 ````python
 from flask_restful import Resource, Api
@@ -262,7 +266,7 @@ restful_api.add_resource(Todo, "/todo")
 
 ![sample_app](flask_docs/assets/sample_app_restful_get.png)
 
-## Flask MethodView API demo
+## Flask MethodView API
 
 > **_目前只支持与类名相同的 url_rule_**
 
@@ -345,3 +349,5 @@ def delete_data():
 [RESTClient](https://github.com/chao/RESTClient/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples
+
+[online_demo]: https://kwkwc.github.io/flask-docs-demo/
