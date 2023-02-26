@@ -45,6 +45,16 @@ ApiDoc(
 )
 ```
 
+## View the documentation page
+
+```
+http://127.0.0.1/docs/api/
+```
+
+## Page demo
+
+[Online Demo][online_demo]
+
 ## Configuration
 
 ```python
@@ -90,12 +100,6 @@ ApiDoc(
 @@@
 # Write your markdown document here
 @@@
-```
-
-## View the documentation page
-
-```
-http://127.0.0.1/docs/api/
 ```
 
 ## API and document pages
@@ -346,3 +350,5 @@ def delete_data():
 [RESTClient](https://github.com/chao/RESTClient/)
 
 [examples]: https://github.com/kwkwc/flask-docs/tree/master/examples
+
+[online_demo]: https://kwkwc.github.io/flask-docs-demo/
