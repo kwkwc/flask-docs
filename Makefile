@@ -28,7 +28,7 @@ test:
 	pytest \
 		--cov flask_docs \
 		--cov-config .coveragerc \
-		--cov-report=xml \
+		--cov-report xml \
 		--junit-xml results.xml \
 		-vv tests
 	coverage report -m --skip-covered
