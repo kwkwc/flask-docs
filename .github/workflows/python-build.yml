@@ -23,29 +23,26 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
-        pip install -r requirements.ci.txt
+        make install
     - name: Lint with flake8
       run: |
-        flake8 flask_docs tests examples
-    - name: Static check with mypy
-      run: |
-        mypy flask_docs tests examples
+        make lint
     - name: Format with black
       run: |
-        black flask_docs tests examples --check
+        make format-check
     - name: Import sorting with isort
       run: |
-        isort flask_docs tests examples --profile black --check
+        make isort-check
+    - name: Static check with mypy
+      run: |
+        make mypy
     - name: Test with pytest
       run: |
-        pytest -vv --cov=flask_docs --cov-config .coveragerc --cov-report=xml --junit-xml results.xml tests
-        coverage report -m --skip-covered
+        make test
     - name: Build package
       run: |
-        pip install wheel
-        python setup.py sdist bdist_wheel
+        pip3 install wheel
+        make dist wheel
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
