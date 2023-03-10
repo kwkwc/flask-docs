@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.7.1
+    0.7.2
 History:
     Created on 2018/05/20
-    Last modified on 2023/02/20
+    Last modified on 2023/03/10
 Author:
     kwkw
 """
@@ -534,7 +534,7 @@ class ApiDoc(object):
         try:
             from flask_restx.reqparse import RequestParser
         except ImportError:  # pragma: no cover
-            return argument_data_list  # pragma: no cover
+            return argument_data_list
 
         if isinstance(expect_source, RequestParser):
             argument_data_list = expect_source.__schema__
