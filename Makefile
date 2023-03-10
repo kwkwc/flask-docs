@@ -1,4 +1,5 @@
-.PHONY: install lint format format-check isort isort-check mypy test test-all clean dist build wheel upload
+.PHONY: install lint format format-check isort isort-check \
+	mypy test test-all clean build dist wheel upload
 
 install:
 	pip3 install --upgrade pip
@@ -24,19 +25,24 @@ mypy:
 	mypy flask_docs tests examples
 
 test:
-	pytest -vv --cov=flask_docs --cov-config .coveragerc --cov-report=xml --junit-xml results.xml tests
+	pytest \
+		--cov flask_docs \
+		--cov-config .coveragerc \
+		--cov-report=xml \
+		--junit-xml results.xml \
+		-vv tests
 	coverage report -m --skip-covered
 
 test-all: lint format-check isort-check mypy test
 
 clean:
-	rm -rf dist build
-
-dist: clean
-	python3 setup.py sdist
+	rm -rf build dist
 
 build: clean
 	python3 setup.py build
+
+dist: clean
+	python3 setup.py sdist
 
 wheel: clean
 	python3 setup.py bdist_wheel
