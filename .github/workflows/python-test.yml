@@ -23,15 +23,15 @@ jobs:
     - name: Install dependencies
       run: |
         make install
-    - name: Lint with flake8
-      run: |
-        make lint
     - name: Format with black
       run: |
         make format-check
     - name: Import sorting with isort
       run: |
         make isort-check
+    - name: Lint with flake8
+      run: |
+        make lint
     - name: Static check with mypy
       run: |
         make mypy
