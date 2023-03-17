@@ -1,11 +1,11 @@
-# lint
-flake8
-
 # format
 black
 
 # import sorting
 isort
+
+# lint
+flake8
 
 # static check
 mypy
