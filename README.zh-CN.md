@@ -10,7 +10,7 @@
 
 > Flask API 文档自动生成插件
 
-[English](README.md)
+[English](README.md) | 简体中文
 
 ## 特性
 
