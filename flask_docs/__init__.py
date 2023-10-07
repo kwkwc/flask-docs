@@ -5,10 +5,10 @@
 Program:
     Flask-Docs
 Version:
-    0.7.2
+    0.7.3
 History:
     Created on 2018/05/20
-    Last modified on 2023/03/10
+    Last modified on 2023/10/07
 Author:
     kwkw
 """
@@ -194,6 +194,7 @@ class ApiDoc(object):
                 if os.path.exists(dest):
                     if not force:
                         print(f"Target `{dest}` exists, use -f or --force to override.")
+                        exit(1)
                     shutil.rmtree(dest)
                 os.mkdir(dest)
 
