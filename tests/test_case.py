@@ -231,6 +231,7 @@ class CoverageTestCase(unittest.TestCase):
             "Target `htmldoc_exists` exists, use -f or --force to override."
             == result.output.strip()
         )
+        assert result.exit_code == 1
         shutil.rmtree("htmldoc_exists")
 
     def test_offline_html_doc_should_override_when_use_force(self):
@@ -245,6 +246,51 @@ class CoverageTestCase(unittest.TestCase):
         assert "index.html" in os.listdir("htmldoc_exists2")
 
         shutil.rmtree("htmldoc_exists2")
+
+    def test_offline_markdown_doc(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "markdown"])
+
+        assert result.exit_code == 0
+        assert "doc.md" in os.listdir(".")
+
+        shutil.os.remove("doc.md")
+
+    def test_offline_markdown_doc_out(self):
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "markdown", "--out", "doc2.md"])
+
+        assert result.exit_code == 0
+        assert "doc2.md" in os.listdir(".")
+
+        shutil.os.remove("doc2.md")
+
+    def test_offline_markdown_doc_should_error_when_exists(self):
+        open("doc_exists.md", "w")
+
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=["docs", "markdown", "-o", "doc_exists.md"])
+
+        assert (
+            "Target `doc_exists.md` exists, use -f or --force to override."
+            == result.output.strip()
+        )
+        assert result.exit_code == 1
+
+        shutil.os.remove("doc_exists.md")
+
+    def test_offline_markdown_doc_should_override_when_use_force(self):
+        open("doc_exists2.md", "w")
+
+        runner = app.test_cli_runner()
+        result = runner.invoke(
+            args=["docs", "markdown", "-o", "doc_exists2.md", "--force"]
+        )
+
+        assert result.exit_code == 0
+        assert "doc_exists2.md" in os.listdir(".")
+
+        shutil.os.remove("doc_exists2.md")
 
 
 if __name__ == "__main__":

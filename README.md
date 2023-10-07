@@ -22,7 +22,7 @@ English | [简体中文](README.zh-CN.md)
 - Support online debugging
 - Support command to generate offline document
     - [x] HTML
-    - [ ] Markdown
+    - [x] Markdown
 
 ## Installation
 

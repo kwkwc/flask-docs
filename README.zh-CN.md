@@ -22,7 +22,7 @@
 - 支持在线调试
 - 支持命令行生成离线文档
     - [x] HTML
-    - [ ] Markdown
+    - [x] Markdown
 
 ## 安装
 
