@@ -5,7 +5,7 @@
 Program:
     Flask-Docs
 Version:
-    0.7.3
+    0.7.4
 History:
     Created on 2018/05/20
     Last modified on 2023/10/07
@@ -204,6 +204,71 @@ class ApiDoc(object):
                     html_file.write(html_str)
                     json.dump(data, datafile)
                 shutil.copytree(api_doc.static_folder, dest / "static")
+
+            @docs_cli.command(
+                "markdown", short_help="Generate offline markdown document."
+            )
+            @click.option(
+                "--out", "-o", help="Output file", default="doc.md", show_default=True
+            )
+            @click.option(
+                "--force",
+                "-f",
+                help="Force override",
+                default=False,
+                show_default=True,
+                is_flag=True,
+            )
+            def offline_markdown(out: str, force: bool):
+                def handle_md(md, item):
+                    md += "### url" + "\n"
+                    urls = item["url"].split(" ")
+                    if len(urls) == 1:
+                        urls = [urls[0].split("\t")[0]]
+                    for i in range(len(urls)):
+                        md += (
+                            "- "
+                            + urls[i]
+                            .replace("\t", " ")
+                            .replace("<", "&lt;")
+                            .replace(">", "&gt;")
+                            + "\n\n"
+                        )
+                    if item["api_type"] == "api":
+                        md += "### method" + "\n"
+                        md += "- " + item["method"] + "\n\n"
+                    if (
+                        item["doc"] == current_app.config["API_DOC_NO_DOC_TEXT"]
+                        and item["doc_md"] != ""
+                    ):
+                        pass
+                    else:
+                        md += "### doc" + "\n"
+                        md += "```doc\n" + item["doc"] + "\n```\n\n"
+                    return md
+
+                data_dict = self._get_data_dict()
+
+                dest = pathlib.Path(out)
+                if dest.exists():
+                    if not force:
+                        print(f"Target `{dest}` exists, use -f or --force to override.")
+                        exit(1)
+
+                md = ""
+                for full_name in data_dict:
+                    md += "# " + full_name + "\n\n"
+                    for item in data_dict[full_name]["children"]:
+                        md += "## " + item["name"]
+                        if item["name_extra"] != "":
+                            md += "(" + item["name_extra"] + ")"
+                        md += "\n\n"
+                        md = handle_md(md, item)
+                        md += item["doc_md"] + "\n\n\n"
+                    md += "\n\n"
+
+                with open(dest, "w") as f:
+                    f.write(md)
 
             app.register_blueprint(api_doc)
 
