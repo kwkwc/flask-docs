@@ -231,6 +231,7 @@ class CoverageTestCase(unittest.TestCase):
             "Target `htmldoc_exists` exists, use -f or --force to override."
             == result.output.strip()
         )
+        assert result.exit_code == 1
         shutil.rmtree("htmldoc_exists")
 
     def test_offline_html_doc_should_override_when_use_force(self):
