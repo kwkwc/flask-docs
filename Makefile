@@ -1,5 +1,5 @@
 .PHONY: install format format-check isort isort-check lint \
-	mypy test test-all clean build dist wheel upload
+	mypy test check-all clean build dist wheel upload
 
 install:
 	pip3 install --upgrade pip
@@ -33,7 +33,7 @@ test:
 		-vv tests
 	coverage report -m --skip-covered
 
-test-all: format-check isort-check lint mypy test
+check-all: format-check isort-check lint mypy test
 
 clean:
 	rm -rf build dist
