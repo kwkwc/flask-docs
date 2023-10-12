@@ -87,11 +87,8 @@ Author:
                         </el-col>
                     </el-row>
                 </el-main>
-
                 <el-main :style="debugDisplay">
-
                     <el-card class="box-card">
-
                         <el-divider content-position="left">{{ $t("Request") }}</el-divider>
                         <el-select v-model="methodValue" :placeholder="$t('Select')" style="width:8%;min-width:130px;">
                             <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
