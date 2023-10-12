@@ -68,7 +68,18 @@ Author:
                             </div>
                         </el-col>
                         <el-col :span="16" style="padding-left:20px">
-                            <div :style="contentStyle">
+                            <div :style="contentStyle" style="position: relative;">
+                                    <el-dropdown style="position: absolute; right: 5px; top:0px;" class="download" @command="handleCommand">
+                                        <span class="el-dropdown-link">
+                                            <el-button type="text" >COPY</el-button>
+                                        </span>
+                                        <template #dropdown>
+                                            <el-dropdown-menu>
+                                                <el-dropdown-item v-for="(item,index) in copyContent"
+                                                    :key="item" :command="index">{{item["prop"]}}</el-dropdown-item>
+                                            </el-dropdown-menu>
+                                        </template>
+                                    </el-dropdown>
                                 <article class="markdown-body">
                                     <div id="md"></div>
                                 </article>
@@ -76,8 +87,11 @@ Author:
                         </el-col>
                     </el-row>
                 </el-main>
+
                 <el-main :style="debugDisplay">
+
                     <el-card class="box-card">
+
                         <el-divider content-position="left">{{ $t("Request") }}</el-divider>
                         <el-select v-model="methodValue" :placeholder="$t('Select')" style="width:8%;min-width:130px;">
                             <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
@@ -241,7 +255,8 @@ Author:
             authPasswordSHA2: "",
             authDisplay: "display:none",
             mainDisplay: "display:none",
-            optionsLocked: false
+            optionsLocked: false,
+            copyContent: []
         },
         created: function () {
             this.changeWindowSize()
@@ -263,6 +278,9 @@ Author:
             }
         },
         methods: {
+            handleCommand(index) {
+                this.copy_to_clipboard(this.copyContent[index]["value"])
+            },
             changeWindowSize() {
                 let screenHeightMenu = window.innerHeight - 220
                 let screenHeightContent = screenHeightMenu + 50
@@ -317,6 +335,21 @@ Author:
                     }
                 )
             },
+            copy_to_clipboard(value) {
+                let transfer = document.createElement('input');
+                document.body.appendChild(transfer);
+                transfer.value = value;
+                transfer.select()
+                if (document.execCommand('copy')) {
+                    document.execCommand('copy');
+                }
+                document.body.removeChild(transfer);
+                this.$message({
+                    message: `successfully copied: ${value}`,
+                    type: "success"
+                })
+            }
+            ,
             make_md(md, con) {
                 md += "### url" + "\n"
                 var urls = new Array()
@@ -324,9 +357,13 @@ Author:
                 if (urls.length == 1) {
                     urls = [urls[0].split("\t")[0]]
                 }
+                let URL = ""
                 for (i = 0; i < urls.length; i++) {
-                    md += "- " + urls[i].replace(/\t/g, " ").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\n\n"
+                    URL = urls[i].replace(/\t/g, " ").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\n\n"
                 }
+                md += "- " + URL
+                this.copyContent.splice(0)
+                this.copyContent.push({ prop: "URL", value: URL })
                 if (con.api_type === "api") {
                     md += "### method" + "\n"
                     md += "- " + con.method + "\n\n"
@@ -337,6 +374,7 @@ Author:
                     md += "### doc" + "\n"
                     md += "```doc\n" + con.doc + "\n```\n\n"
                 }
+
                 return md
             },
             downloadDoc() {
@@ -370,6 +408,28 @@ Author:
                             md += "# " + data.full_name + "\n\n"
                             md = this.make_md(md, con)
                             md += con.doc_md
+                            const extra_content = con.doc_md.split("\n")
+                            try {
+                                let recent_name = undefined
+                                const new_copy_content = []
+                                for (const line in extra_content) {
+                                    if (extra_content[line].startsWith("#")) {
+                                        const _name = extra_content[line].split(" ")
+                                        if (_name.length > 0) {
+                                            let name = _name[1]
+                                            recent_name = name
+                                            new_copy_content.push({ "prop": name, "value": "" })
+                                        }
+                                    } else if (recent_name !== undefined) {
+                                        new_copy_content.find(v => v.prop === recent_name)["value"] += extra_content[line]
+                                    }
+                                }
+                                this.copyContent.push(...new_copy_content)
+                                // console.log(this.copyContent)
+                            } catch (e) {
+                                console.warn("cannot add more copy content because:", e)
+                            }
+
                         }
                     })
                     document.getElementById("md").innerHTML = marked(md)
