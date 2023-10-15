@@ -21,8 +21,8 @@
 - 支持 Flask MethodView
 - 支持在线调试
 - 支持命令行生成离线文档
-    - [x] HTML
-    - [x] Markdown
+  - [x] HTML
+  - [x] Markdown
 
 ## 安装
 
@@ -47,7 +47,7 @@ ApiDoc(
 
 ## 查看文档页面
 
-```
+```shell
 http://127.0.0.1/docs/api/
 ```
 
@@ -56,6 +56,7 @@ http://127.0.0.1/docs/api/
 [在线演示][online_demo]
 
 ## 配置
+
 ```python
 # 使用 CDN
 # app.config["API_DOC_CDN"] = True
@@ -91,7 +92,7 @@ http://127.0.0.1/docs/api/
 
 ## 标记 @@@
 
-```
+```shell
 # 默认以 markdown 处理所有文档
 # 1. 如果希望指定处理，请使用 `@@@` 包裹
 # 2. 如果希望展示原始文档，请关闭 `API_DOC_ALL_MD`，并去除 `@@@` 标记
@@ -329,7 +330,8 @@ def delete_data():
 
 ![debugger](flask_docs/assets/debugger.png)
 
-# 命令行生成离线文档
+## 命令行生成离线文档
+
 - HTML：运行 `flask docs html` 将在 `htmldoc/` 生成离线 HTML 文档
 - Markdown：运行 `flask docs markdown` 将生成 `doc.md` 离线 Markdown 文档
 

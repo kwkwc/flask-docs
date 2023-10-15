@@ -21,8 +21,8 @@ English | [简体中文](README.zh-CN.md)
 - Support Flask MethodView
 - Support online debugging
 - Support command to generate offline document
-    - [x] HTML
-    - [x] Markdown
+  - [x] HTML
+  - [x] Markdown
 
 ## Installation
 
@@ -47,7 +47,7 @@ ApiDoc(
 
 ## View the documentation page
 
-```
+```shell
 http://127.0.0.1/docs/api/
 ```
 
@@ -92,7 +92,7 @@ http://127.0.0.1/docs/api/
 
 ## Tag @@@
 
-```
+```shell
 # Process all documents in markdown by default
 # 1. use the `@@@` wrapper if you want to specify processing
 # 2. Turn off `API_DOC_ALL_MD` and remove the `@@@` tag if you want to display the original document
@@ -102,7 +102,7 @@ http://127.0.0.1/docs/api/
 @@@
 ```
 
-## API and document pages
+## API
 
 ````python
 @api.route("/add_data", methods=["POST"])
@@ -196,7 +196,7 @@ app.register_blueprint(platform, url_prefix="/platform")
 
 ![sample_app](flask_docs/assets/sample_app_get.png)
 
-## Flask-RESTful API and document pages
+## Flask-RESTful API
 
 ````python
 from flask_restful import Resource, Api
@@ -331,6 +331,7 @@ def delete_data():
 ![debugger](flask_docs/assets/debugger.png)
 
 ## Command to generate offline document
+
 - HTML: Run `flask docs html` will generate offline html document at `htmldoc/`
 - Markdown: Run `flask docs markdown` will generate the `doc.md` offline markdown document
 

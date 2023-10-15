@@ -2,9 +2,9 @@ name: test
 
 on:
   push:
-    branch:
-    - master
-    - test
+    branches: ["master", "test", "dev"]
+  pull_request:
+    branches: ["master", "test"]
 
 jobs:
   test:
@@ -16,28 +16,36 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         make install
+
     - name: Format with black
       run: |
         make format-check
+
     - name: Import sorting with isort
       run: |
         make isort-check
+
     - name: Lint with flake8
       run: |
         make lint
+
     - name: Static check with mypy
       run: |
         make mypy
+
     - name: Test with pytest
       run: |
         make test
+
     - name: "Upload coverage to Codecov"
       uses: codecov/codecov-action@v3
       with:
