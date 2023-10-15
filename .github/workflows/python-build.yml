@@ -3,9 +3,9 @@ name: build
 on:
   push:
     tags:
-    - '*' 
-    branch:
-    - master
+      - '*' 
+    branches:
+      - master
 
 jobs:
   deploy:
