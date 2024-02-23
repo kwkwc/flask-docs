@@ -48,6 +48,7 @@ jobs:
     - name: Build package
       run: |
         pip3 install wheel
+        pip3 install setuptools
         make dist wheel
 
     - name: Publish package
