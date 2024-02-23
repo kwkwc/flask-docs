@@ -5,10 +5,10 @@
 Program:
     Test case config
 Version:
-    0.0.2
+    0.0.3
 History:
     Created on 2021/10/17
-    Last modified on 2023/02/21
+    Last modified on 2024/02/23
 Author:
     kwkw
 """
@@ -28,9 +28,9 @@ app = Flask(__name__)
 app.config["API_DOC_CDN"] = True
 app.config["API_DOC_CDN_CSS_TEMPLATE"] = "test_css"
 app.config["API_DOC_CDN_JS_TEMPLATE"] = "test_js"
-app.config[
-    "API_DOC_PASSWORD_SHA2"
-] = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+app.config["API_DOC_PASSWORD_SHA2"] = (
+    "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+)
 ApiDoc(app, title="Test App")
 
 
