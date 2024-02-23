@@ -56,7 +56,7 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
-        skip_existing: true
+        skip-existing: true
 
     - name: "Upload coverage to Codecov"
       uses: codecov/codecov-action@v4
