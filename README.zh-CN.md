@@ -3,10 +3,11 @@
 [![build](https://github.com/kwkwc/flask-docs/actions/workflows/python-build.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/python-build.yml)
 [![test](https://github.com/kwkwc/flask-docs/actions/workflows/python-test.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/python-test.yml)
 [![codecov](https://codecov.io/gh/kwkwc/flask-docs/branch/master/graph/badge.svg?token=EV69K9WPJ0)](https://codecov.io/gh/kwkwc/flask-docs)
-[![license](https://img.shields.io/github/license/kwkwc/flask-docs)](https://github.com/kwkwc/flask-docs/blob/master/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/Flask-Docs)](https://pypi.org/project/Flask-Docs/)
 [![Python](https://img.shields.io/pypi/pyversions/flask-docs)](https://pypi.org/project/Flask-Docs/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/kwkwc/flask-docs)
+[![license](https://img.shields.io/github/license/kwkwc/flask-docs)](https://github.com/kwkwc/flask-docs/blob/master/LICENSE)
 
 > Flask API 文档自动生成插件
 
