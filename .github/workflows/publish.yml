@@ -12,6 +12,10 @@ jobs:
       matrix:
         python-version: [3.x]
 
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+
     steps:
     - uses: actions/checkout@v4
 
@@ -50,11 +54,9 @@ jobs:
         pip3 install setuptools
         make dist wheel
 
-    - name: Publish package
+    - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
         skip-existing: true
 
     - name: "Upload coverage to Codecov"
