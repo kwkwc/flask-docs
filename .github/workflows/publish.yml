@@ -1,11 +1,11 @@
-name: build
+name: publish
 
 on:
   release:
     types: [created]
 
 jobs:
-  deploy:
+  build-and-publish:
 
     runs-on: ubuntu-latest
     strategy:

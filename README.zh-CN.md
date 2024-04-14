@@ -1,7 +1,7 @@
 # Flask-Docs
 
-[![build](https://github.com/kwkwc/flask-docs/actions/workflows/python-build.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/python-build.yml)
-[![test](https://github.com/kwkwc/flask-docs/actions/workflows/python-test.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/python-test.yml)
+[![test](https://github.com/kwkwc/flask-docs/actions/workflows/test.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/test.yml)
+[![publish](https://github.com/kwkwc/flask-docs/actions/workflows/publish.yml/badge.svg)](https://github.com/kwkwc/flask-docs/actions/workflows/publish.yml)
 [![codecov](https://codecov.io/gh/kwkwc/flask-docs/branch/master/graph/badge.svg?token=EV69K9WPJ0)](https://codecov.io/gh/kwkwc/flask-docs)
 [![PyPI](https://img.shields.io/pypi/v/Flask-Docs)](https://pypi.org/project/Flask-Docs/)
 [![Python](https://img.shields.io/pypi/pyversions/flask-docs)](https://pypi.org/project/Flask-Docs/)
