@@ -27,7 +27,9 @@
 
 ## 安装
 
-`pip3 install Flask-Docs`
+```bash
+pip3 install Flask-Docs
+```
 
 ## 使用
 

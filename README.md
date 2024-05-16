@@ -27,7 +27,9 @@ English | [简体中文](README.zh-CN.md)
 
 ## Installation
 
-`pip3 install Flask-Docs`
+```bash
+pip3 install Flask-Docs
+```
 
 ## Usage
 
